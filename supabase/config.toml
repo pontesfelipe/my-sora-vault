@@ -1,8 +1,1 @@
-project_id = "thrwpxiahqgubjkjnkgt"
-
-# Only check-user-access needs to be public (pre-login access check)
-[functions.check-user-access]
-verify_jwt = false
-
-# All other functions use default JWT verification (verify_jwt = true)
-# No need to explicitly set verify_jwt = true as it's the default
+project_id = "vrjvckoltjujsegzjmaz"
