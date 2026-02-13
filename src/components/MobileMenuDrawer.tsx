@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Settings, HelpCircle, Info, Shield, Lightbulb, LogOut } from "lucide-react";
+import { Settings, HelpCircle, Info, Shield, Lightbulb, LogOut, Bot, ClipboardList, BookHeart } from "lucide-react";
 import {
   Drawer,
   DrawerContent,
@@ -23,6 +23,7 @@ export function MobileMenuDrawer({ children }: MobileMenuDrawerProps) {
   const { user, isAdmin, signOut } = useAuth();
 
   const menuItems = [
+    { title: "Vault Assistant", url: "/vault-pal", icon: Bot },
     { title: "Settings", url: "/settings", icon: Settings },
     { title: "FAQ", url: "/faq", icon: HelpCircle },
     { title: "About", url: "/about", icon: Info },
@@ -48,11 +49,10 @@ export function MobileMenuDrawer({ children }: MobileMenuDrawerProps) {
       </DrawerTrigger>
       <DrawerContent className="pb-safe">
         <DrawerHeader className="text-left">
-          <DrawerTitle className="text-lg font-semibold text-textMain">More Options</DrawerTitle>
+          <DrawerTitle className="text-lg font-semibold text-textMain">More</DrawerTitle>
         </DrawerHeader>
         
         <div className="px-4 pb-6 space-y-1">
-          {/* Menu Items */}
           {menuItems.map((item) => {
             const isActive = location.pathname === item.url;
             return (
@@ -71,7 +71,6 @@ export function MobileMenuDrawer({ children }: MobileMenuDrawerProps) {
             );
           })}
 
-          {/* Feedback Button */}
           {user && (
             <SubmitFeedbackDialog>
               <button
@@ -83,7 +82,6 @@ export function MobileMenuDrawer({ children }: MobileMenuDrawerProps) {
             </SubmitFeedbackDialog>
           )}
 
-          {/* User Section */}
           {user && (
             <div className="pt-4 mt-4 border-t border-borderSubtle">
               <p className="px-4 text-sm text-textMuted truncate mb-2">{user.email}</p>

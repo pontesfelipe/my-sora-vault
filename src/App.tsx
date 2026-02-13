@@ -10,12 +10,10 @@ import { CollectionProvider } from "@/contexts/CollectionContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { AppLayout } from "@/components/AppLayout";
 import { SplashScreen } from "@/components/SplashScreen";
-import Dashboard from "./pages/Dashboard";
-import Collection from "./pages/Collection";
-
-import UsageDetails from "./pages/UsageDetails";
-import PersonalNotes from "./pages/PersonalNotes";
-import Social from "./pages/Social";
+import Home from "./pages/Home";
+import Log from "./pages/Log";
+import Feed from "./pages/Feed";
+import Profile from "./pages/Profile";
 import WatchDetail from "./pages/WatchDetail";
 import Admin from "./pages/Admin";
 import WearLogsAdmin from "./pages/WearLogsAdmin";
@@ -57,22 +55,33 @@ function AppContent() {
       <BrowserRouter>
         <Routes>
           <Route path="/auth" element={<Auth />} />
-          <Route path="/" element={<ProtectedRoute><AppLayout><Dashboard /></AppLayout></ProtectedRoute>} />
+          
+          {/* Core 4 tabs */}
+          <Route path="/" element={<ProtectedRoute><AppLayout><Home /></AppLayout></ProtectedRoute>} />
+          <Route path="/log" element={<ProtectedRoute><AppLayout><Log /></AppLayout></ProtectedRoute>} />
+          <Route path="/feed" element={<ProtectedRoute><AppLayout><Feed /></AppLayout></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><AppLayout><Profile /></AppLayout></ProtectedRoute>} />
+          
+          {/* Utility pages */}
           <Route path="/vault-pal" element={<ProtectedRoute><AppLayout><VaultPal /></AppLayout></ProtectedRoute>} />
-          <Route path="/collection" element={<ProtectedRoute><AppLayout><Collection /></AppLayout></ProtectedRoute>} />
-          <Route path="/wishlist" element={<Navigate to="/collection" replace />} />
-          <Route path="/trips" element={<Navigate to="/usage-details?tab=trips" replace />} />
-          <Route path="/usage-details" element={<ProtectedRoute><AppLayout><UsageDetails /></AppLayout></ProtectedRoute>} />
-          <Route path="/personal-notes" element={<ProtectedRoute><AppLayout><PersonalNotes /></AppLayout></ProtectedRoute>} />
-          <Route path="/social" element={<ProtectedRoute><AppLayout><Social /></AppLayout></ProtectedRoute>} />
-          <Route path="/messages" element={<Navigate to="/social?tab=messages" replace />} />
-          <Route path="/forum" element={<Navigate to="/social?tab=forum" replace />} />
+          <Route path="/watch/:id" element={<ProtectedRoute><WatchDetail /></ProtectedRoute>} />
           <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
           <Route path="/admin/wear-logs" element={<ProtectedRoute><WearLogsAdmin /></ProtectedRoute>} />
           <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-          <Route path="/watch/:id" element={<ProtectedRoute><WatchDetail /></ProtectedRoute>} />
           <Route path="/faq" element={<ProtectedRoute><FAQ /></ProtectedRoute>} />
           <Route path="/about" element={<ProtectedRoute><About /></ProtectedRoute>} />
+          
+          {/* Legacy redirects */}
+          <Route path="/collection" element={<Navigate to="/profile" replace />} />
+          <Route path="/dashboard" element={<Navigate to="/" replace />} />
+          <Route path="/social" element={<Navigate to="/feed" replace />} />
+          <Route path="/messages" element={<Navigate to="/feed?tab=messages" replace />} />
+          <Route path="/forum" element={<Navigate to="/feed?tab=forum" replace />} />
+          <Route path="/usage-details" element={<Navigate to="/log" replace />} />
+          <Route path="/personal-notes" element={<Navigate to="/profile" replace />} />
+          <Route path="/wishlist" element={<Navigate to="/profile?tab=wishlist" replace />} />
+          <Route path="/trips" element={<Navigate to="/log" replace />} />
+          
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

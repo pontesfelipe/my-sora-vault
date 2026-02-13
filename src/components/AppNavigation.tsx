@@ -1,21 +1,16 @@
-import { Watch, BarChart3, BookHeart, Shield, Settings, HelpCircle, Info, Lightbulb, Bot, ClipboardList, Users } from "lucide-react";
+import { Home, Clock, Users, User, Watch, BookHeart, Shield, Settings, HelpCircle, Info, Lightbulb, Bot, ClipboardList } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import { SubmitFeedbackDialog } from "@/components/SubmitFeedbackDialog";
 import { useAuth } from "@/contexts/AuthContext";
-import { useCollection } from "@/contexts/CollectionContext";
 import { useSocialNotifications } from "@/hooks/useSocialNotifications";
-import { isWatchCollection } from "@/types/collection";
 import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-  SidebarTrigger,
   useSidebar,
   SidebarFooter,
 } from "@/components/ui/sidebar";
@@ -26,21 +21,17 @@ export function AppNavigation() {
   const { open } = useSidebar();
   const location = useLocation();
   const { user, isAdmin, signOut } = useAuth();
-  const { currentCollection } = useCollection();
   const { totalCount } = useSocialNotifications();
-  
-  const isWatches = currentCollection ? isWatchCollection(currentCollection.collection_type) : true;
 
   const mainNavItems = [
-    { title: "Dashboard", url: "/", icon: BarChart3 },
-    { title: "My Vault Assistant", url: "/vault-pal", icon: Bot },
-    { title: "Collection", url: "/collection", icon: Watch },
-    { title: "Usage Details", url: "/usage-details", icon: ClipboardList },
-    { title: "Collection Insights", url: "/personal-notes", icon: BookHeart },
-    { title: "Social", url: "/social", icon: Users },
+    { title: "Home", url: "/", icon: Home },
+    { title: "Log", url: "/log", icon: Clock },
+    { title: "Feed", url: "/feed", icon: Users },
+    { title: "Profile", url: "/profile", icon: User },
   ];
 
   const utilityNavItems = [
+    { title: "Vault Assistant", url: "/vault-pal", icon: Bot },
     { title: "Settings", url: "/settings", icon: Settings },
     { title: "FAQ", url: "/faq", icon: HelpCircle },
     { title: "About", url: "/about", icon: Info },
@@ -72,8 +63,10 @@ export function AppNavigation() {
           </div>
           <SidebarMenu className="space-y-1 px-2">
             {mainNavItems.map((item) => {
-              const isActive = location.pathname === item.url;
-              const showBadge = item.url === "/social" && totalCount > 0;
+              const isActive = item.url === "/"
+                ? location.pathname === "/"
+                : location.pathname.startsWith(item.url);
+              const showBadge = item.url === "/feed" && totalCount > 0;
               return (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild isActive={isActive}>
