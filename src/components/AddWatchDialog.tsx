@@ -562,7 +562,7 @@ export const AddWatchDialog = ({ onSuccess }: { onSuccess: () => void }) => {
                 htmlFor="availableForTrade"
                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
-                Available for trade/sell
+                Open to Trade
               </Label>
             </div>
 

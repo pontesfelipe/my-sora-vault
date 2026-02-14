@@ -276,7 +276,7 @@ export const WatchCard = ({ watch, totalDays, onDelete }: WatchCardProps) => {
           </div>
 
           <div className="flex items-center justify-between text-sm">
-            <span className="text-textMuted">Trade/Sell</span>
+            <span className="text-textMuted">Open to Trade</span>
             <Badge variant={watch.available_for_trade ? 'default' : 'outline'} className="text-xs">
               {watch.available_for_trade ? 'Available' : 'Not Available'}
             </Badge>

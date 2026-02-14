@@ -6,8 +6,8 @@ import { toast } from "sonner";
 export const FORUM_CATEGORIES = [
   { value: "general", label: "General Discussion" },
   { value: "watches", label: "Watch Talk" },
-  { value: "buying", label: "Buying Advice" },
-  { value: "selling", label: "Selling & Trading" },
+  { value: "collecting", label: "Collecting Advice" },
+  { value: "trading", label: "Trading & Exchange" },
   { value: "reviews", label: "Reviews" },
   { value: "news", label: "News & Updates" },
   { value: "showcase", label: "Collection Showcase" },
