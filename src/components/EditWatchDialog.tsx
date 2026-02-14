@@ -437,7 +437,7 @@ export const EditWatchDialog = ({ watch, onSuccess }: { watch: Watch; onSuccess:
               htmlFor="availableForTrade"
               className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
-              Available for trade/sell
+              Open to Trade
             </Label>
           </div>
 
@@ -450,7 +450,7 @@ export const EditWatchDialog = ({ watch, onSuccess }: { watch: Watch; onSuccess:
               type="number"
               step="0.01"
               min="0"
-              placeholder="From online resale marketplaces"
+              placeholder="From online reference sources"
               className="bg-background border-border"
             />
             <p className="text-xs text-muted-foreground">

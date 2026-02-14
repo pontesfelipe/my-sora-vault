@@ -369,7 +369,7 @@ const WatchDetail = () => {
                     )}
                     {watch.available_for_trade !== undefined && (
                       <div>
-                        <p className="text-sm text-muted-foreground mb-1">Trade/Sell</p>
+                        <p className="text-sm text-muted-foreground mb-1">Open to Trade</p>
                         <Badge 
                           variant={watch.available_for_trade ? "default" : "secondary"} 
                           className="text-base"

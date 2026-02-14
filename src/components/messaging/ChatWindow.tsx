@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { ShareWatchDetailsDialog } from "./ShareWatchDetailsDialog";
+import { TradeChatDisclaimer } from "@/components/TradeChatDisclaimer";
 
 interface ChatWindowProps {
   conversation: Conversation | null;
@@ -140,6 +141,9 @@ export function ChatWindow({ conversation, onSendMessage, onMarkAsRead }: ChatWi
           </Button>
         </div>
       </div>
+
+      {/* Trade disclaimer */}
+      <TradeChatDisclaimer />
     </div>
   );
 }
