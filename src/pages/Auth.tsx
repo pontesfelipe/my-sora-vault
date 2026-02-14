@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Watch, Footprints, ShoppingBag } from "lucide-react";
+import { Watch } from "lucide-react";
 
 import { useAuth } from "@/contexts/AuthContext";
 import { RegistrationRequestForm } from "@/components/RegistrationRequestForm";
@@ -190,11 +190,11 @@ export default function Auth() {
         <div className="w-full max-w-md">
           <div className="flex flex-col items-center mb-8">
             <div className="flex items-center gap-3 mb-4">
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-accent/15 text-xl font-bold text-accent shadow-lg shadow-accent/20">
-                SV
+               <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-accent/15 text-xl font-bold text-accent shadow-lg shadow-accent/20">
+                LV
               </div>
               <div className="flex items-center gap-2">
-                <h1 className="text-3xl font-bold tracking-tight text-textMain">Sora Vault</h1>
+                <h1 className="text-3xl font-bold tracking-tight text-textMain">Luxury Vault</h1>
                 <BetaBadge />
               </div>
             </div>
@@ -231,27 +231,19 @@ export default function Auth() {
           <div className="space-y-6">
             <div className="flex items-center gap-3">
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/20 backdrop-blur-sm text-lg font-bold text-accent shadow-lg">
-                SV
+                LV
               </div>
-              <h1 className="text-3xl font-bold tracking-tight text-foreground">Sora Vault</h1>
+              <h1 className="text-3xl font-bold tracking-tight text-foreground">Luxury Vault</h1>
             </div>
             
             <p className="text-xl text-foreground/80 max-w-md leading-relaxed">
-              The premier platform for managing your luxury collections with precision and elegance.
+              The premier platform for managing your luxury watch collection with precision and elegance.
             </p>
             
             <div className="flex gap-4 pt-4">
               <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-foreground/10 backdrop-blur-sm">
                 <Watch className="h-4 w-4 text-accent" />
                 <span className="text-sm text-foreground/90">Watches</span>
-              </div>
-              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-foreground/10 backdrop-blur-sm">
-                <Footprints className="h-4 w-4 text-accent" />
-                <span className="text-sm text-foreground/90">Sneakers</span>
-              </div>
-              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-foreground/10 backdrop-blur-sm">
-                <ShoppingBag className="h-4 w-4 text-accent" />
-                <span className="text-sm text-foreground/90">Purses</span>
               </div>
             </div>
           </div>
@@ -265,30 +257,22 @@ export default function Auth() {
           <div className="flex flex-col items-center mb-8 lg:hidden">
             <div className="flex items-center gap-3 mb-4">
               <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-accent/15 text-xl font-bold text-accent shadow-lg shadow-accent/20">
-                SV
+                LV
               </div>
               <div className="flex items-center gap-2">
-                <h1 className="text-3xl font-bold tracking-tight text-textMain">Sora Vault</h1>
+                <h1 className="text-3xl font-bold tracking-tight text-textMain">Luxury Vault</h1>
                 <BetaBadge />
               </div>
             </div>
             <p className="text-center text-textMuted max-w-md text-sm">
-              Your premium collection management studio
+              Your premium watch collection studio
             </p>
             
-            {/* Mobile collection type badges */}
+            {/* Mobile collection type badge */}
             <div className="flex gap-2 mt-4">
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/10">
                 <Watch className="h-3.5 w-3.5 text-accent" />
                 <span className="text-xs text-foreground/80">Watches</span>
-              </div>
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/10">
-                <Footprints className="h-3.5 w-3.5 text-accent" />
-                <span className="text-xs text-foreground/80">Sneakers</span>
-              </div>
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/10">
-                <ShoppingBag className="h-3.5 w-3.5 text-accent" />
-                <span className="text-xs text-foreground/80">Purses</span>
               </div>
             </div>
           </div>
@@ -300,7 +284,7 @@ export default function Auth() {
               <BetaBadge />
             </div>
             <p className="text-muted-foreground">
-              Sign in to access your collections
+              Sign in to access your collection
             </p>
           </div>
         
@@ -320,8 +304,8 @@ export default function Auth() {
                   {showPasswordReset 
                     ? "We'll email you a magic link that logs you in instantly"
                     : isSignUp 
-                    ? "Create an account to start tracking your collections" 
-                    : "Sign in to access your collections"}
+                    ? "Create an account to start tracking your watch collection" 
+                    : "Sign in to access your collection"}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
