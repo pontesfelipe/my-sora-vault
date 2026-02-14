@@ -5,48 +5,48 @@ import { HelpCircle } from "lucide-react";
 
 const faqItems = [
   {
-    question: "What is Sora Vault?",
-    answer: "Sora Vault is a comprehensive collection management platform designed to help enthusiasts track, organize, and analyze their luxury collections. Whether you collect watches, sneakers, or purses, it provides tools for logging usage history, managing trips and events, tracking activities, and gaining insights into your collection."
+    question: "What is Luxury Vault?",
+    answer: "Luxury Vault is a comprehensive watch collection management platform designed to help enthusiasts track, organize, and analyze their luxury timepieces. It provides tools for logging usage history, managing trips and events, tracking activities, and gaining insights into your collection."
   },
   {
-    question: "What types of collections can I manage?",
-    answer: "Sora Vault supports three collection types: Watches (with detailed specifications like movement, case size, and water resistance), Sneakers (with colorway, size, condition, and collaboration details), and Purses (with material, hardware, size category, and authenticity information)."
+    question: "What can I track about my watches?",
+    answer: "Luxury Vault supports detailed watch specifications including movement type, case material, case size, water resistance, power reserve, lug-to-lug measurements, warranty tracking, rarity, and historical significance."
   },
   {
-    question: "How do I add an item to my collection?",
-    answer: "Navigate to the Collection page and click the 'Add Item' button. Fill in the details about your item including brand, model, and type-specific specifications. You can also upload photos and additional documentation like warranty cards or authenticity certificates."
+    question: "How do I add a watch to my collection?",
+    answer: "Navigate to the Collection page and click the 'Add Item' button. Fill in the details about your watch including brand, model, and specifications. You can also upload photos and additional documentation like warranty cards or authenticity certificates."
   },
   {
     question: "What is the Wishlist feature?",
-    answer: "The Wishlist allows you to keep track of items you're interested in acquiring. You can add items with their brand, model, and preferred specifications. The system can also match your wishlist with other users who have those items available for trade."
+    answer: "The Wishlist allows you to keep track of watches you're interested in acquiring. You can add items with their brand, model, and preferred specifications. The system can also match your wishlist with other users who have those watches available for trade."
   },
   {
     question: "How does the Trade Matching work?",
-    answer: "When you mark an item as 'Available for Trade', the system automatically matches it with other users' wishlists. If there's a match, both parties receive a notification and can connect to discuss a potential trade."
+    answer: "When you mark a watch as 'Open to Trade', the system automatically matches it with other users' wishlists. If there's a match, both parties receive a notification and can connect to discuss a potential exchange."
   },
   {
     question: "What is Water Usage tracking?",
-    answer: "Water Usage tracking allows you to log activities where you've used your items in water (swimming, diving, etc.). This is particularly useful for watches to monitor water exposure and track water resistance over time."
+    answer: "Water Usage tracking allows you to log activities where you've used your watch in water (swimming, diving, etc.). This is useful to monitor water exposure and track water resistance over time."
   },
   {
-    question: "How do I log a wear/usage entry?",
-    answer: "You can log entries from multiple places: the Dashboard, the Item Detail page, or the Collection page. Simply select the item and date, and optionally associate it with a trip, event, or water activity."
+    question: "How do I log a wear entry?",
+    answer: "You can log entries from multiple places: the Home page, the Watch Detail page, or the Collection page. Simply select the watch and date, and optionally associate it with a trip, event, or water activity."
   },
   {
     question: "What are Collection Insights?",
-    answer: "Collection Insights provides AI-powered analysis of your collection, including taste preferences, usage patterns, and suggestions for items that might complement your collection."
+    answer: "Collection Insights provides AI-powered analysis of your collection, including taste preferences, usage patterns, and suggestions for watches that might complement your collection."
   },
   {
     question: "Can I share my collection with others?",
-    answer: "Yes! You can add friends through the Messages feature and share item details with them. You can also grant other users viewer or editor access to your collection."
+    answer: "Yes! You can add friends through the Messages feature and share watch details with them. You can also grant other users viewer or editor access to your collection."
   },
   {
     question: "How do I track warranties and authenticity?",
-    answer: "When adding or editing an item, you can set warranty dates and upload photos of warranty cards or authenticity certificates. The system will track warranty status and notify you before warranties expire."
+    answer: "When adding or editing a watch, you can set warranty dates and upload photos of warranty cards or authenticity certificates. The system will track warranty status and notify you before warranties expire."
   },
   {
-    question: "What data is stored about my items?",
-    answer: "Sora Vault stores comprehensive information including brand, model, type-specific specifications, purchase details, photos, documentation, usage history, and personal notes. All data is securely stored and only accessible to you and users you grant access to."
+    question: "What data is stored about my watches?",
+    answer: "Luxury Vault stores comprehensive information including brand, model, specifications, purchase details, photos, documentation, usage history, and personal notes. All data is securely stored and only accessible to you and users you grant access to."
   },
   {
     question: "Is my data secure?",
@@ -67,7 +67,7 @@ export default function FAQ() {
           <div>
             <h1 className="text-3xl font-bold">Frequently Asked Questions</h1>
             <p className="text-muted-foreground">
-              Find answers to common questions about Sora Vault
+              Find answers to common questions about Luxury Vault
             </p>
           </div>
         </div>

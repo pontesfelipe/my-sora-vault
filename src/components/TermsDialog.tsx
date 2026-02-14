@@ -21,7 +21,7 @@ export const TermsDialog = ({ open, onOpenChange }: TermsDialogProps) => {
             <section>
               <h3 className="font-semibold mb-2">1. Beta Disclaimer</h3>
               <p className="text-muted-foreground">
-                Sora Vault is currently in Beta, meaning features may be incomplete, unstable, or changed at any time. 
+                Luxury Vault is currently in Beta, meaning features may be incomplete, unstable, or changed at any time. 
                 Data may be inaccurate due to testing of AI systems, market data fetchers, analytics, or other components. 
                 By using the Application, you acknowledge that this is an experimental version and agree not to hold the 
                 developer liable for any issues arising during the Beta period.
@@ -31,7 +31,7 @@ export const TermsDialog = ({ open, onOpenChange }: TermsDialogProps) => {
             <section>
               <h3 className="font-semibold mb-2">2. No Fees & No Data Selling</h3>
               <p className="text-muted-foreground">
-                During Beta, Sora Vault is free of charge. User data is not sold, shared, or monetized. 
+                During Beta, Luxury Vault is free of charge. User data is not sold, shared, or monetized. 
                 Data is used only to operate the Application and provide AI‑driven insights.
               </p>
             </section>
@@ -54,7 +54,7 @@ export const TermsDialog = ({ open, onOpenChange }: TermsDialogProps) => {
             <section>
               <h3 className="font-semibold mb-2">5. Data & Content</h3>
               <p className="text-muted-foreground">
-                Users retain ownership of content uploaded. Sora Vault may process data solely to operate 
+                Users retain ownership of content uploaded. Luxury Vault may process data solely to operate 
                 the Application. Market values and analytics are estimates and may be inaccurate.
               </p>
             </section>
@@ -85,14 +85,14 @@ export const TermsDialog = ({ open, onOpenChange }: TermsDialogProps) => {
             <section>
               <h3 className="font-semibold mb-2">9. Intellectual Property</h3>
               <p className="text-muted-foreground">
-                Sora Vault's code, design, features, and branding belong to the developer.
+                Luxury Vault's code, design, features, and branding belong to the developer.
               </p>
             </section>
 
             <section>
               <h3 className="font-semibold mb-2">10. Third‑Party Sources</h3>
               <p className="text-muted-foreground">
-                Market data may use external sources. Sora Vault is not responsible for inaccurate 
+                Market data may use external sources. Luxury Vault is not responsible for inaccurate 
                 third‑party information.
               </p>
             </section>
@@ -100,7 +100,7 @@ export const TermsDialog = ({ open, onOpenChange }: TermsDialogProps) => {
             <section>
               <h3 className="font-semibold mb-2">11. Limitation of Liability</h3>
               <p className="text-muted-foreground">
-                Sora Vault is provided "as‑is," without warranties. The developer is not liable for 
+                Luxury Vault is provided "as‑is," without warranties. The developer is not liable for 
                 damages including data loss, financial decisions, or unauthorized access.
               </p>
             </section>

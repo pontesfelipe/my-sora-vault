@@ -21,7 +21,7 @@ export const PrivacyDialog = ({ open, onOpenChange }: PrivacyDialogProps) => {
             <section>
               <h3 className="font-semibold mb-2">1. Introduction</h3>
               <p className="text-muted-foreground">
-                This Privacy Policy explains how Sora Vault ("the Application") collects, uses, and 
+                This Privacy Policy explains how Luxury Vault ("the Application") collects, uses, and 
                 protects user information during the Beta phase.
               </p>
             </section>
@@ -30,7 +30,7 @@ export const PrivacyDialog = ({ open, onOpenChange }: PrivacyDialogProps) => {
               <h3 className="font-semibold mb-2">2. Information We Collect</h3>
               <ul className="list-disc list-inside text-muted-foreground space-y-1">
                 <li>Account information (email, password)</li>
-                <li>Collection data (watches, sneakers, purses), images, notes, and preferences</li>
+                <li>Collection data (watches), images, notes, and preferences</li>
                 <li>Activity logs (wear entries, trips, events, water usage)</li>
                 <li>Usage analytics</li>
                 <li>AI preference data</li>
@@ -52,7 +52,7 @@ export const PrivacyDialog = ({ open, onOpenChange }: PrivacyDialogProps) => {
             <section>
               <h3 className="font-semibold mb-2">4. No Data Selling</h3>
               <p className="text-muted-foreground">
-                Sora Vault does not sell, rent, trade, or monetize user data.
+                Luxury Vault does not sell, rent, trade, or monetize user data.
               </p>
             </section>
 

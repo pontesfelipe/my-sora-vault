@@ -1,8 +1,8 @@
-# Sora Vault
-Luxury collection management app for watches, sneakers, and purses.
+# Luxury Vault
+Luxury watch collection management app.
 
 ## Features
-- Multi-collection support (watches, sneakers, purses)
+- Watch collection management
 - Collection tracking with type-specific specifications
 - Wear/usage analytics
 - Financial valuation
