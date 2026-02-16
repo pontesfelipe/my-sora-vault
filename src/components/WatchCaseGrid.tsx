@@ -8,6 +8,7 @@ interface Watch {
   dial_color: string;
   type: string;
   cost: number;
+  image_url?: string;
   ai_image_url?: string;
   rarity?: string;
   available_for_trade?: boolean;
