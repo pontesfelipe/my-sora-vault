@@ -219,7 +219,21 @@ const Log = () => {
                         setSelectedWatchId(match.id);
                         toast.success("Matched to your collection!");
                       } else {
-                        toast.info("Watch not in collection — you can add it from your profile");
+                        // Navigate to collection page with pre-filled data to add the watch
+                        navigate("/collection", {
+                          state: {
+                            addWatch: true,
+                            prefill: {
+                              brand: identifiedWatch.brand || "",
+                              model: identifiedWatch.model || "",
+                              dial_color: identifiedWatch.dial_color || "",
+                              type: identifiedWatch.type || "automatic",
+                              case_size: identifiedWatch.case_size || "",
+                              movement: identifiedWatch.movement || "",
+                            },
+                          },
+                        });
+                        toast.info("Watch not in collection — let's add it!");
                       }
                     }}>
                       <Check className="h-4 w-4 mr-1" />
@@ -280,8 +294,26 @@ const Log = () => {
                   className="max-h-48 overflow-y-auto rounded-xl border border-borderSubtle"
                 >
                   {filteredWatches.length === 0 ? (
-                    <div className="p-4 text-center text-sm text-textMuted">
-                      No watches found
+                    <div className="p-4 text-center space-y-2">
+                      <p className="text-sm text-textMuted">No watches found</p>
+                      {watchSearch.trim() && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="gap-1.5"
+                          onClick={() => {
+                            navigate("/collection", {
+                              state: {
+                                addWatch: true,
+                                prefill: { brand: watchSearch.trim(), model: "" },
+                              },
+                            });
+                          }}
+                        >
+                          <Plus className="h-4 w-4" />
+                          Add "{watchSearch.trim()}" to collection
+                        </Button>
+                      )}
                     </div>
                   ) : (
                     filteredWatches.map((w) => (
