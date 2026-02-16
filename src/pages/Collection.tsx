@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SortableWatchCard } from "@/components/SortableWatchCard";
+import { WatchCaseGrid } from "@/components/WatchCaseGrid";
 import { PastWatchCard } from "@/components/PastWatchCard";
 import { PastWatchesStats } from "@/components/PastWatchesStats";
 import { AddWatchDialog } from "@/components/AddWatchDialog";
@@ -436,7 +437,7 @@ const Collection = () => {
             </Select>
           </div>
 
-          {/* Collection Grid */}
+          {/* Watch Case Showcase */}
           {filteredWatches.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-muted-foreground">
@@ -446,27 +447,7 @@ const Collection = () => {
               </p>
             </div>
           ) : (
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragEnd={handleDragEnd}
-            >
-              <SortableContext
-                items={filteredWatches.map((w) => w.id)}
-                strategy={rectSortingStrategy}
-              >
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredWatches.map((watch) => (
-                    <SortableWatchCard
-                      key={watch.id}
-                      watch={watch}
-                      totalDays={wearEntries.filter((w) => w.watch_id === watch.id).length}
-                      onDelete={handleRefetchAll}
-                    />
-                  ))}
-                </div>
-              </SortableContext>
-            </DndContext>
+            <WatchCaseGrid watches={filteredWatches} wearEntries={wearEntries} />
           )}
 
           {/* Past Items Section */}
