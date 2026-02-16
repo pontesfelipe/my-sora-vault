@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { Watch } from "lucide-react";
 
 import { useAuth } from "@/contexts/AuthContext";
+import { lovable } from "@/integrations/lovable/index";
 import { RegistrationRequestForm } from "@/components/RegistrationRequestForm";
 import { BetaBadge } from "@/components/BetaBadge";
 import { PrivacyDialog } from "@/components/PrivacyDialog";
@@ -151,17 +152,8 @@ export default function Auth() {
   const handleGoogleSignIn = async () => {
     setSigningIn(true);
     try {
-      const redirectUrl = `${window.location.origin}/`;
-      
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: redirectUrl,
-          queryParams: {
-            access_type: "offline",
-            prompt: "consent",
-          },
-        },
+      const { error } = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
       });
 
       if (error) {
