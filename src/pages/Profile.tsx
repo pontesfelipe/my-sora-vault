@@ -4,6 +4,7 @@ import {
   Watch, Settings, Heart, List, Plus, Search, Users, ChevronRight,
   Grid3X3, BookHeart, Bot, ShoppingBag, ArrowUpDown
 } from "lucide-react";
+import { WatchCaseGrid } from "@/components/WatchCaseGrid";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -263,36 +264,7 @@ const Profile = () => {
               </p>
             </Card>
           ) : (
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2">
-              {filteredWatches.map((watch, i) => (
-                <motion.div
-                  key={watch.id}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: i * 0.03 }}
-                  className="cursor-pointer group"
-                  onClick={() => navigate(`/watch/${watch.id}`)}
-                >
-                  <div className="aspect-square rounded-xl bg-surfaceMuted overflow-hidden group-hover:ring-2 ring-accent/30 transition-all">
-                    {watch.ai_image_url ? (
-                      <img
-                        src={watch.ai_image_url}
-                        alt={`${watch.brand} ${watch.model}`}
-                        className="h-full w-full object-cover"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div className="h-full w-full flex items-center justify-center">
-                        <Watch className="h-6 w-6 text-textMuted" />
-                      </div>
-                    )}
-                  </div>
-                  <p className="text-[11px] font-medium text-textMain truncate mt-1 px-0.5">
-                    {watch.brand} {watch.model}
-                  </p>
-                </motion.div>
-              ))}
-            </div>
+            <WatchCaseGrid watches={filteredWatches} wearEntries={wearEntries} />
           )}
           <p className="text-xs text-textMuted text-center">
             {watches.length} {watches.length === 1 ? currentCollectionConfig.singularLabel.toLowerCase() : currentCollectionConfig.pluralLabel.toLowerCase()}
