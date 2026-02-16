@@ -22,6 +22,7 @@ import Settings from "./pages/Settings";
 import FAQ from "./pages/FAQ";
 import About from "./pages/About";
 import VaultPal from "./pages/VaultPal";
+import TradeRules from "./pages/TradeRules";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -70,6 +71,7 @@ function AppContent() {
           <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
           <Route path="/faq" element={<ProtectedRoute><FAQ /></ProtectedRoute>} />
           <Route path="/about" element={<ProtectedRoute><About /></ProtectedRoute>} />
+          <Route path="/trade-rules" element={<ProtectedRoute><AppLayout><TradeRules /></AppLayout></ProtectedRoute>} />
           
           {/* Legacy redirects */}
           <Route path="/collection" element={<Navigate to="/profile" replace />} />
