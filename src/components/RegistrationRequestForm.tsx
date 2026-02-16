@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable/index";
 import { toast } from "sonner";
 import { Loader2, UserPlus } from "lucide-react";
 import { TermsDialog } from "./TermsDialog";
@@ -81,12 +82,8 @@ export const RegistrationRequestForm = () => {
 
     setLoading(true);
     try {
-      const redirectUrl = `${window.location.origin}/`;
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: redirectUrl,
-        },
+      const { error } = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
       });
 
       if (error) {
