@@ -12,6 +12,7 @@ interface WatchShowcaseCardProps {
     dial_color: string;
     type: string;
     cost: number;
+    image_url?: string;
     ai_image_url?: string;
     rarity?: string;
     available_for_trade?: boolean;
@@ -22,7 +23,7 @@ interface WatchShowcaseCardProps {
 
 export const WatchShowcaseCard = ({ watch, totalDays, index }: WatchShowcaseCardProps) => {
   const navigate = useNavigate();
-  const imageUrl = watch.ai_image_url || watchHero;
+  const imageUrl = watch.ai_image_url || watch.image_url || watchHero;
 
   return (
     <motion.div
