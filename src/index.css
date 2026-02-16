@@ -69,6 +69,16 @@
     --sidebar-ring: 219 98% 61%;
 
     --danger: 0 72% 51%;
+
+    /* Watch case showcase tokens - light */
+    --watch-case-top: 30 15% 78%;
+    --watch-case-bottom: 30 12% 68%;
+    --watch-case-shadow: 30 10% 30% / 0.3;
+    --watch-case-frame-start: 30 12% 82%;
+    --watch-case-frame-end: 30 10% 72%;
+    --watch-velvet-start: 240 8% 20%;
+    --watch-velvet-end: 240 10% 14%;
+    --watch-cushion-glow: 240 8% 28% / 0.4;
   }
 
   .dark {
@@ -130,6 +140,16 @@
     --sidebar-ring: 219 98% 61%;
 
     --danger: 0 72% 51%;
+
+    /* Watch case showcase tokens - dark */
+    --watch-case-top: 30 8% 32%;
+    --watch-case-bottom: 30 6% 22%;
+    --watch-case-shadow: 0 0% 0% / 0.5;
+    --watch-case-frame-start: 30 6% 28%;
+    --watch-case-frame-end: 30 5% 18%;
+    --watch-velvet-start: 240 12% 12%;
+    --watch-velvet-end: 240 14% 8%;
+    --watch-cushion-glow: 240 10% 22% / 0.5;
   }
 }
 

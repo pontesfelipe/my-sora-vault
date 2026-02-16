@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Settings, HelpCircle, Info, Shield, Lightbulb, LogOut, Bot } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   Drawer,
   DrawerContent,
@@ -12,6 +12,9 @@ import {
 import { SubmitFeedbackDialog } from "@/components/SubmitFeedbackDialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { triggerHaptic } from "@/utils/haptics";
+import { useWatchData } from "@/hooks/useWatchData";
+import { useCollection } from "@/contexts/CollectionContext";
+import watchHero from "@/assets/watch-hero.jpg";
 
 interface MobileMenuDrawerProps {
   children: React.ReactNode;
@@ -22,6 +25,8 @@ export function MobileMenuDrawer({ children }: MobileMenuDrawerProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, isAdmin, signOut } = useAuth();
+  const { selectedCollectionId } = useCollection();
+  const { watches } = useWatchData(selectedCollectionId);
 
   const menuItems = [
     { title: "Vault Assistant", url: "/vault-pal", icon: Bot },
@@ -49,9 +54,38 @@ export function MobileMenuDrawer({ children }: MobileMenuDrawerProps) {
         {children}
       </DrawerTrigger>
       <DrawerContent className="pb-safe">
-        <DrawerHeader className="text-left">
+        <DrawerHeader className="text-left pb-2">
           <DrawerTitle className="text-lg font-semibold text-textMain">More</DrawerTitle>
         </DrawerHeader>
+
+        {/* Mini watch showcase */}
+        {watches.length > 0 && (
+          <div className="px-4 pb-4">
+            <div className="relative rounded-2xl p-3 bg-gradient-to-b from-[hsl(var(--watch-case-frame-start))] to-[hsl(var(--watch-case-frame-end))] shadow-[0_4px_20px_-4px_hsl(var(--watch-case-shadow))]">
+              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent rounded-t-2xl" />
+              <div className="rounded-xl bg-gradient-to-br from-[hsl(var(--watch-velvet-start))] to-[hsl(var(--watch-velvet-end))] p-3">
+                <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+                  {watches.slice(0, 6).map((watch, index) => (
+                    <motion.button
+                      key={watch.id}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: index * 0.05, duration: 0.3 }}
+                      onClick={() => { navigate(`/watch/${watch.id}`); setOpen(false); }}
+                      className="flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden bg-[hsl(var(--watch-cushion-glow))] p-1 hover:ring-2 hover:ring-primary/50 transition-all"
+                    >
+                      <img
+                        src={watch.ai_image_url || watchHero}
+                        alt={`${watch.brand} ${watch.model}`}
+                        className="w-full h-full object-cover rounded-md"
+                      />
+                    </motion.button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         
         <div className="px-4 pb-6 space-y-1">
           {menuItems.map((item, index) => {
