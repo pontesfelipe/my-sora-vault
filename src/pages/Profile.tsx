@@ -2,8 +2,10 @@ import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Watch, Settings, Heart, List, Plus, Search, Users, ChevronRight,
-  Grid3X3, BookHeart, Bot, ShoppingBag, ArrowUpDown
+  Grid3X3, BookHeart, Bot, ShoppingBag, ArrowUpDown, ScrollText
 } from "lucide-react";
+import { useTrustLevel } from "@/hooks/useTrustLevel";
+import { TrustLevelBadge } from "@/components/TrustLevelBadge";
 import { WatchCaseGrid } from "@/components/WatchCaseGrid";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -30,6 +32,7 @@ const Profile = () => {
   const { selectedCollectionId, currentCollection, currentCollectionType, currentCollectionConfig } = useCollection();
   const { watches, wearEntries, loading, refetch } = useWatchData(selectedCollectionId);
   const { wishlist, loading: wishlistLoading, refetch: refetchWishlist } = useWishlistData();
+  const { data: trustData, config: trustConfig } = useTrustLevel();
   const [activeTab, setActiveTab] = useState("collection");
   const [searchQuery, setSearchQuery] = useState("");
   const [profileData, setProfileData] = useState<any>(null);
@@ -113,9 +116,12 @@ const Profile = () => {
       <div className="flex items-start gap-4">
         <UserAvatar size="lg" />
         <div className="flex-1 min-w-0">
-          <h1 className="text-xl font-bold text-textMain truncate">
-            {profileData?.username || profileData?.full_name || user?.email?.split("@")[0]}
-          </h1>
+          <div className="flex items-center gap-1.5">
+            <h1 className="text-xl font-bold text-textMain truncate">
+              {profileData?.username || profileData?.full_name || user?.email?.split("@")[0]}
+            </h1>
+            {trustData && <TrustLevelBadge level={trustData.trust_level} />}
+          </div>
           <div className="flex items-center gap-4 mt-1">
             <span className="text-sm text-textMuted">
               <strong className="text-textMain">{followerCount}</strong> followers

@@ -1102,6 +1102,27 @@ export type Database = {
           },
         ]
       }
+      trade_guidelines_acknowledgments: {
+        Row: {
+          acknowledged_at: string
+          id: string
+          user_id: string
+          version: string
+        }
+        Insert: {
+          acknowledged_at?: string
+          id?: string
+          user_id: string
+          version?: string
+        }
+        Update: {
+          acknowledged_at?: string
+          id?: string
+          user_id?: string
+          version?: string
+        }
+        Relationships: []
+      }
       trade_match_notifications: {
         Row: {
           created_at: string
@@ -1378,6 +1399,42 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      user_trust_levels: {
+        Row: {
+          assigned_by: string | null
+          completed_trades: number
+          created_at: string
+          id: string
+          reason: string | null
+          trust_level: Database["public"]["Enums"]["trust_level"]
+          updated_at: string
+          user_id: string
+          verified_at: string | null
+        }
+        Insert: {
+          assigned_by?: string | null
+          completed_trades?: number
+          created_at?: string
+          id?: string
+          reason?: string | null
+          trust_level?: Database["public"]["Enums"]["trust_level"]
+          updated_at?: string
+          user_id: string
+          verified_at?: string | null
+        }
+        Update: {
+          assigned_by?: string | null
+          completed_trades?: number
+          created_at?: string
+          id?: string
+          reason?: string | null
+          trust_level?: Database["public"]["Enums"]["trust_level"]
+          updated_at?: string
+          user_id?: string
+          verified_at?: string | null
         }
         Relationships: []
       }
@@ -1953,6 +2010,11 @@ export type Database = {
       collection_role: "owner" | "editor" | "viewer"
       collection_type: "watches" | "sneakers" | "purses"
       friend_request_status: "pending" | "accepted" | "declined"
+      trust_level:
+        | "observer"
+        | "collector"
+        | "verified_collector"
+        | "trusted_trader"
       watch_historical_significance:
         | "regular"
         | "notable"
@@ -2089,6 +2151,12 @@ export const Constants = {
       collection_role: ["owner", "editor", "viewer"],
       collection_type: ["watches", "sneakers", "purses"],
       friend_request_status: ["pending", "accepted", "declined"],
+      trust_level: [
+        "observer",
+        "collector",
+        "verified_collector",
+        "trusted_trader",
+      ],
       watch_historical_significance: [
         "regular",
         "notable",
