@@ -52,14 +52,15 @@ serve(async (req) => {
 
     // Build a detailed prompt for the watch image
     const watchDescription = [
-      `A photorealistic, high-quality product photograph of a ${brand} ${model} luxury wristwatch`,
-      dialColor ? `with a ${dialColor} dial` : '',
-      type ? `${type} style watch` : '',
-      caseSize ? `${caseSize} case size` : '',
-      movement ? `featuring ${movement} movement` : '',
+      `Create a photorealistic product photograph of the exact ${brand} ${model} wristwatch`,
+      `It must accurately depict the real ${brand} ${model} - match the actual design, dial layout, bezel, hands, and case shape of this specific model`,
+      dialColor ? `The dial color is ${dialColor}` : '',
+      type ? `It is a ${type} style watch` : '',
+      caseSize ? `Case size: ${caseSize}` : '',
+      movement ? `Movement: ${movement}` : '',
       'Professional studio lighting, white background, sharp focus, high detail',
-      'The watch should be displayed at a slight angle to show the dial and case details',
-      'Ultra high resolution, 4K quality product photography',
+      'Show the watch at a slight angle to display the dial face clearly with all markers, indices, and subdials visible',
+      'Ultra high resolution, luxury catalog product photography quality',
     ].filter(Boolean).join('. ');
 
     let messages: any[];

@@ -276,8 +276,9 @@ export const AddWatchDialog = ({ onSuccess }: { onSuccess: () => void }) => {
 
       if (error) throw error;
 
-      // Auto-analyze metadata after creating the watch
+      // Auto-analyze metadata and generate AI image after creating the watch
       if (insertData?.id) {
+        // Run metadata analysis
         try {
           const { data: aiData } = await supabase.functions.invoke('analyze-watch-metadata', {
             body: { brand: data.brand, model: data.model }
@@ -296,9 +297,29 @@ export const AddWatchDialog = ({ onSuccess }: { onSuccess: () => void }) => {
           }
         } catch (aiError) {
           console.error('Auto-analysis failed:', aiError);
-          // Don't block the main flow if AI analysis fails
         }
 
+        // Generate AI image for the watch (non-blocking)
+        try {
+          supabase.functions.invoke('generate-watch-image', {
+            body: {
+              watchId: insertData.id,
+              brand: data.brand,
+              model: data.model,
+              dialColor: data.dialColor,
+              type: data.type,
+              caseSize: formValues.caseSize || undefined,
+              movement: formValues.movement || undefined,
+              ...(uploadedPhotoBase64 ? { referenceImageBase64: uploadedPhotoBase64 } : {}),
+            }
+          }).then(() => {
+            console.log('AI image generated for', data.brand, data.model);
+          }).catch((imgErr) => {
+            console.error('AI image generation failed:', imgErr);
+          });
+        } catch (imgError) {
+          console.error('AI image generation invoke failed:', imgError);
+        }
       }
 
       toast({
