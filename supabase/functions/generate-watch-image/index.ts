@@ -17,6 +17,7 @@ const inputSchema = z.object({
   caseSize: z.string().max(20).optional(),
   movement: z.string().max(100).optional(),
   referenceImageBase64: z.string().max(15000000, 'Image too large (max 10MB)').optional(),
+  customPrompt: z.string().max(2000).optional(),
 });
 
 serve(async (req) => {
@@ -37,7 +38,7 @@ serve(async (req) => {
       );
     }
     
-    const { watchId, brand, model, dialColor, type, caseSize, movement, referenceImageBase64 } = parseResult.data;
+    const { watchId, brand, model, dialColor, type, caseSize, movement, referenceImageBase64, customPrompt } = parseResult.data;
     
     console.log(`Generating AI image for: ${brand} ${model}`);
     
@@ -50,8 +51,8 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabaseClient = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Build a detailed prompt for the watch image
-    const watchDescription = [
+    // Use custom prompt if provided, otherwise build a generic one
+    const watchDescription = customPrompt || [
       `Create a photorealistic product photograph of the exact ${brand} ${model} wristwatch`,
       `It must accurately depict the real ${brand} ${model} - match the actual design, dial layout, bezel, hands, and case shape of this specific model`,
       dialColor ? `The dial color is ${dialColor}` : '',
@@ -59,7 +60,8 @@ serve(async (req) => {
       caseSize ? `Case size: ${caseSize}` : '',
       movement ? `Movement: ${movement}` : '',
       'Professional studio lighting, white background, sharp focus, high detail',
-      'Show the watch at a slight angle to display the dial face clearly with all markers, indices, and subdials visible',
+      'The watch must be standing UPRIGHT facing the camera at a slight angle, NOT laying on its side',
+      'Show the dial face clearly with all markers, indices, and subdials visible',
       'Ultra high resolution, luxury catalog product photography quality',
     ].filter(Boolean).join('. ');
 
