@@ -6,6 +6,48 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Try to find a reference image URL for a watch using AI
+async function findReferenceImageUrl(brand: string, model: string, LOVABLE_API_KEY: string): Promise<string | null> {
+  try {
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash",
+        messages: [
+          { role: "system", content: "You are a watch image search assistant. Return ONLY a direct image URL (ending in .jpg, .jpeg, .png, or .webp) from a reputable source. No markdown, no explanation, just the URL. If you cannot find one, return NONE." },
+          { role: "user", content: `Find a high-quality product photo URL of the ${brand} ${model} watch from official brand websites, Hodinkee, or Chrono24. Return ONLY the URL.` }
+        ],
+        temperature: 0.2,
+      }),
+    });
+    if (!response.ok) return null;
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content?.trim();
+    if (!content || content === 'NONE') return null;
+    const urlMatch = content.match(/https?:\/\/[^\s"'<>]+\.(jpg|jpeg|png|webp)[^\s"'<>]*/i);
+    return urlMatch ? urlMatch[0] : content.startsWith('http') ? content : null;
+  } catch { return null; }
+}
+
+// Fetch image and convert to base64
+async function fetchImageAsBase64(imageUrl: string): Promise<string | null> {
+  try {
+    const resp = await fetch(imageUrl, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; WatchVault/1.0)' } });
+    if (!resp.ok) return null;
+    const buf = await resp.arrayBuffer();
+    const bytes = new Uint8Array(buf);
+    if (bytes.length < 5000) return null;
+    let binary = '';
+    for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+    const ct = resp.headers.get('content-type') || 'image/jpeg';
+    return `data:${ct};base64,${btoa(binary)}`;
+  } catch { return null; }
+}
+
 async function generateImageForWatch(
   supabaseClient: any,
   watch: any,
@@ -14,18 +56,34 @@ async function generateImageForWatch(
   try {
     console.log(`Generating image for: ${watch.brand} ${watch.model}`);
 
-    const watchDescription = [
-      `A photorealistic, high-quality product photograph of a ${watch.brand} ${watch.model} luxury wristwatch`,
-      watch.dial_color ? `with a ${watch.dial_color} dial` : '',
-      watch.type ? `${watch.type} style watch` : '',
-      watch.case_size ? `${watch.case_size} case size` : '',
-      watch.movement ? `featuring ${watch.movement} movement` : '',
-      'Professional studio lighting with a DARK background - deep navy or charcoal black, NOT white',
-      'The background should be a smooth, dark gradient reminiscent of luxury velvet',
-      'The watch should be displayed UPRIGHT at a slight angle to show the dial and case details',
-      'Frame the watch LARGE filling 80-85% of the image',
-      'Ultra high resolution, 4K quality product photography',
-    ].filter(Boolean).join('. ');
+    // Try to find a reference image online first
+    let referenceBase64: string | null = null;
+    const foundUrl = await findReferenceImageUrl(watch.brand, watch.model, LOVABLE_API_KEY);
+    if (foundUrl) {
+      referenceBase64 = await fetchImageAsBase64(foundUrl);
+    }
+
+    let messages: any[];
+    if (referenceBase64) {
+      console.log(`Using reference image for ${watch.brand} ${watch.model}`);
+      const editPrompt = `Based on this watch photo, create a professional studio product photograph. Keep the watch design EXACTLY accurate to the reference - same dial layout, subdials, hands, bezel, and case shape. DARK background (deep navy or charcoal black, NOT white). Professional studio lighting. The watch must be standing UPRIGHT. Frame the watch LARGE filling 80-85% of the image. The watch is a ${watch.brand} ${watch.model}${watch.dial_color ? ` with ${watch.dial_color} dial` : ''}. Ultra high resolution.`;
+      messages = [{ role: "user", content: [{ type: "text", text: editPrompt }, { type: "image_url", image_url: { url: referenceBase64 } }] }];
+    } else {
+      console.log(`No reference found for ${watch.brand} ${watch.model}, using pure generation`);
+      const watchDescription = [
+        `A photorealistic, high-quality product photograph of a ${watch.brand} ${watch.model} luxury wristwatch`,
+        watch.dial_color ? `with a ${watch.dial_color} dial` : '',
+        watch.type ? `${watch.type} style watch` : '',
+        watch.case_size ? `${watch.case_size} case size` : '',
+        watch.movement ? `featuring ${watch.movement} movement` : '',
+        'Professional studio lighting with a DARK background - deep navy or charcoal black, NOT white',
+        'The background should be a smooth, dark gradient reminiscent of luxury velvet',
+        'The watch should be displayed UPRIGHT at a slight angle to show the dial and case details',
+        'Frame the watch LARGE filling 80-85% of the image',
+        'Ultra high resolution, 4K quality product photography',
+      ].filter(Boolean).join('. ');
+      messages = [{ role: "user", content: watchDescription }];
+    }
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -35,7 +93,7 @@ async function generateImageForWatch(
       },
       body: JSON.stringify({
         model: "google/gemini-3-pro-image-preview",
-        messages: [{ role: "user", content: watchDescription }],
+        messages,
         modalities: ["image", "text"]
       }),
     });
