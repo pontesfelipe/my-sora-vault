@@ -31,7 +31,7 @@ const inputSchema = z.object({
 const COMPOSITION_RULES = [
   'SQUARE 1:1 aspect ratio composition',
   'The watch must be PERFECTLY CENTERED in the frame, both horizontally and vertically',
-  'The watch (including lugs and bracelet/strap visible portion) must fill exactly 75% of the image height',
+  'CRITICAL SIZE RULE: Regardless of the actual case diameter of the watch, ALL watches must appear the SAME visual size in the image - the watch case (excluding strap) must fill exactly 60% of the image width and 50% of the image height. This is a normalized catalog view where a 44mm Panerai and a 40mm IWC must look the same size in the frame',
   'STRAIGHT-ON front-facing view looking directly at the dial face - absolutely NO side angles',
   'Maximum 3-5 degree tilt for minimal depth perception - the full dial must be completely visible and readable',
   'The watch must be UPRIGHT with 12 o\'clock at the top',
