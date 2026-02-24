@@ -60,8 +60,10 @@ serve(async (req) => {
       type ? `It is a ${type} style watch` : '',
       caseSize ? `Case size: ${caseSize}` : '',
       movement ? `Movement: ${movement}` : '',
-      'Professional studio lighting, white background, sharp focus, high detail',
+      'Professional studio lighting with a DARK background - deep navy or charcoal black, NOT white',
+      'The background should be a smooth, dark gradient reminiscent of luxury velvet or suede',
       'The watch must be standing UPRIGHT facing the camera at a slight angle, NOT laying on its side',
+      'Frame the watch LARGE in the image - it should fill about 80-85% of the frame with minimal empty space around it',
       'Show the dial face clearly with all markers, indices, and subdials visible',
       'Ultra high resolution, luxury catalog product photography quality',
     ].filter(Boolean).join('. ');
@@ -95,7 +97,7 @@ serve(async (req) => {
     // If we have a reference image, use it to enhance the generation
     if (resolvedReferenceBase64) {
       console.log('Using reference image for enhanced generation');
-      const editPrompt = customPrompt || `Based on this watch photo, create a professional studio product photograph. Keep the watch design EXACTLY accurate to the reference - same dial layout, number of subdials, hands, bezel, and case shape. Render it as a clean, professional product shot with: white background, professional studio lighting, sharp focus showing all dial details and text, slight angle to show depth. The watch is a ${brand} ${model}${dialColor ? ` with ${dialColor} dial` : ''}. Make it look like a high-end catalog photo. The watch must be standing UPRIGHT. Ultra high resolution.`;
+      const editPrompt = customPrompt || `Based on this watch photo, create a professional studio product photograph. Keep the watch design EXACTLY accurate to the reference - same dial layout, number of subdials, hands, bezel, and case shape. Render it as a clean, professional product shot with: DARK background (deep navy or charcoal black, NOT white), professional studio lighting, sharp focus showing all dial details and text, slight angle to show depth. Frame the watch LARGE filling 80-85% of the image. The watch is a ${brand} ${model}${dialColor ? ` with ${dialColor} dial` : ''}. Make it look like a high-end catalog photo. The watch must be standing UPRIGHT. Ultra high resolution.`;
       messages = [
         {
           role: "user",

@@ -20,8 +20,10 @@ async function generateImageForWatch(
       watch.type ? `${watch.type} style watch` : '',
       watch.case_size ? `${watch.case_size} case size` : '',
       watch.movement ? `featuring ${watch.movement} movement` : '',
-      'Professional studio lighting, white background, sharp focus, high detail',
-      'The watch should be displayed at a slight angle to show the dial and case details',
+      'Professional studio lighting with a DARK background - deep navy or charcoal black, NOT white',
+      'The background should be a smooth, dark gradient reminiscent of luxury velvet',
+      'The watch should be displayed UPRIGHT at a slight angle to show the dial and case details',
+      'Frame the watch LARGE filling 80-85% of the image',
       'Ultra high resolution, 4K quality product photography',
     ].filter(Boolean).join('. ');
 
