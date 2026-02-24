@@ -51,7 +51,7 @@ export const WatchShowcaseCard = ({ watch, totalDays, index }: WatchShowcaseCard
             <motion.img
               src={imageUrl}
               alt={`${watch.brand} ${watch.model}`}
-              className="relative z-10 w-[85%] h-[85%] object-contain drop-shadow-[0_8px_24px_rgba(0,0,0,0.4)] group-hover:scale-105 transition-transform duration-500"
+              className="relative z-10 w-full h-full object-cover rounded-lg drop-shadow-[0_8px_24px_rgba(0,0,0,0.4)] group-hover:scale-105 transition-transform duration-500"
               whileHover={{ rotateY: 5, rotateX: -3 }}
               style={{ transformStyle: "preserve-3d" }}
             />
