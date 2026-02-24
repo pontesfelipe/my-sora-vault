@@ -17,6 +17,7 @@ const inputSchema = z.object({
   caseSize: z.string().max(20).optional(),
   movement: z.string().max(100).optional(),
   referenceImageBase64: z.string().max(15000000, 'Image too large (max 10MB)').optional(),
+  referenceImageUrl: z.string().url().max(2000).optional(),
   customPrompt: z.string().max(2000).optional(),
 });
 
@@ -38,7 +39,7 @@ serve(async (req) => {
       );
     }
     
-    const { watchId, brand, model, dialColor, type, caseSize, movement, referenceImageBase64, customPrompt } = parseResult.data;
+    const { watchId, brand, model, dialColor, type, caseSize, movement, referenceImageBase64, referenceImageUrl, customPrompt } = parseResult.data;
     
     console.log(`Generating AI image for: ${brand} ${model}`);
     
@@ -67,23 +68,40 @@ serve(async (req) => {
 
     let messages: any[];
 
+    // Resolve reference image: direct base64 or fetch from URL
+    let resolvedReferenceBase64 = referenceImageBase64;
+    if (!resolvedReferenceBase64 && referenceImageUrl) {
+      console.log('Fetching reference image from URL:', referenceImageUrl);
+      try {
+        const imgResponse = await fetch(referenceImageUrl);
+        if (imgResponse.ok) {
+          const arrayBuffer = await imgResponse.arrayBuffer();
+          const bytes = new Uint8Array(arrayBuffer);
+          let binary = '';
+          for (let i = 0; i < bytes.length; i++) {
+            binary += String.fromCharCode(bytes[i]);
+          }
+          const contentType = imgResponse.headers.get('content-type') || 'image/jpeg';
+          resolvedReferenceBase64 = `data:${contentType};base64,${btoa(binary)}`;
+          console.log('Reference image fetched and converted to base64');
+        } else {
+          console.error('Failed to fetch reference image:', imgResponse.status);
+        }
+      } catch (e) {
+        console.error('Error fetching reference image:', e);
+      }
+    }
+
     // If we have a reference image, use it to enhance the generation
-    if (referenceImageBase64) {
+    if (resolvedReferenceBase64) {
       console.log('Using reference image for enhanced generation');
+      const editPrompt = customPrompt || `Based on this watch photo, create a professional studio product photograph. Keep the watch design EXACTLY accurate to the reference - same dial layout, number of subdials, hands, bezel, and case shape. Render it as a clean, professional product shot with: white background, professional studio lighting, sharp focus showing all dial details and text, slight angle to show depth. The watch is a ${brand} ${model}${dialColor ? ` with ${dialColor} dial` : ''}. Make it look like a high-end catalog photo. The watch must be standing UPRIGHT. Ultra high resolution.`;
       messages = [
         {
           role: "user",
           content: [
-            {
-              type: "text",
-              text: `Based on this watch photo, create a professional studio product photograph. Keep the watch design accurate to the reference but render it as a clean, professional product shot with: white background, professional studio lighting, sharp focus showing all dial details and text, slight angle to show depth. The watch is a ${brand} ${model}${dialColor ? ` with ${dialColor} dial` : ''}. Make it look like a high-end catalog photo. Ultra high resolution.`
-            },
-            {
-              type: "image_url",
-              image_url: {
-                url: referenceImageBase64
-              }
-            }
+            { type: "text", text: editPrompt },
+            { type: "image_url", image_url: { url: resolvedReferenceBase64 } }
           ]
         }
       ];
@@ -91,7 +109,7 @@ serve(async (req) => {
       messages = [
         {
           role: "user",
-          content: watchDescription
+          content: customPrompt || watchDescription
         }
       ];
     }
