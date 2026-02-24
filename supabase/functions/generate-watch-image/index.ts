@@ -115,7 +115,7 @@ async function fetchImageAsBase64(imageUrl: string): Promise<string | null> {
 
 // Build the AI prompt for image generation
 function buildEditPrompt(brand: string, model: string, dialColor?: string, customPrompt?: string): string {
-  return customPrompt || `Based on this watch photo, create a professional studio product photograph. Keep the watch design EXACTLY accurate to the reference - same dial layout, number of subdials, hands, bezel, and case shape. Render it as a clean, professional product shot with: DARK background (deep navy or charcoal black, NOT white), professional studio lighting, sharp focus showing all dial details and text, slight angle to show depth. Frame the watch LARGE filling 80-85% of the image. The watch is a ${brand} ${model}${dialColor ? ` with ${dialColor} dial` : ''}. Make it look like a high-end catalog photo. The watch must be standing UPRIGHT. Ultra high resolution.`;
+  return customPrompt || `Based on this watch photo, create a professional studio product photograph. Keep the watch design EXACTLY accurate to the reference - same dial layout, number of subdials, hands, bezel, and case shape. Render it as a clean, professional product shot with: DARK background (deep navy or charcoal black, NOT white), professional studio lighting, sharp focus showing all dial details and text. The watch MUST be shown from the FRONT, facing the camera directly so the entire dial is fully visible - NOT from the side or at an extreme angle. A very slight angle (5-10 degrees) is acceptable to show minimal depth, but the dial must be the primary focus. Frame the watch LARGE filling 80-85% of the image. The watch is a ${brand} ${model}${dialColor ? ` with ${dialColor} dial` : ''}. Make it look like a high-end catalog photo. The watch must be standing UPRIGHT. Ultra high resolution.`;
 }
 
 function buildGenerationPrompt(brand: string, model: string, dialColor?: string, type?: string, caseSize?: string, movement?: string, customPrompt?: string): string {
@@ -128,7 +128,9 @@ function buildGenerationPrompt(brand: string, model: string, dialColor?: string,
     movement ? `Movement: ${movement}` : '',
     'Professional studio lighting with a DARK background - deep navy or charcoal black, NOT white',
     'The background should be a smooth, dark gradient reminiscent of luxury velvet or suede',
-    'The watch must be standing UPRIGHT facing the camera at a slight angle, NOT laying on its side',
+    'The watch MUST be shown from the FRONT, facing the camera directly so the entire dial is fully visible - NOT from the side or at an extreme angle',
+    'A very slight angle (5-10 degrees) is acceptable but the dial must be the primary focus, fully readable',
+    'The watch must be standing UPRIGHT, NOT laying on its side',
     'Frame the watch LARGE in the image - it should fill about 80-85% of the frame with minimal empty space around it',
     'Show the dial face clearly with all markers, indices, and subdials visible',
     'Ultra high resolution, luxury catalog product photography quality',

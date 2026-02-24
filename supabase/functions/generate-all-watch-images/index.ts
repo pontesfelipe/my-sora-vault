@@ -66,7 +66,7 @@ async function generateImageForWatch(
     let messages: any[];
     if (referenceBase64) {
       console.log(`Using reference image for ${watch.brand} ${watch.model}`);
-      const editPrompt = `Based on this watch photo, create a professional studio product photograph. Keep the watch design EXACTLY accurate to the reference - same dial layout, subdials, hands, bezel, and case shape. DARK background (deep navy or charcoal black, NOT white). Professional studio lighting. The watch must be standing UPRIGHT. Frame the watch LARGE filling 80-85% of the image. The watch is a ${watch.brand} ${watch.model}${watch.dial_color ? ` with ${watch.dial_color} dial` : ''}. Ultra high resolution.`;
+      const editPrompt = `Based on this watch photo, create a professional studio product photograph. Keep the watch design EXACTLY accurate to the reference - same dial layout, subdials, hands, bezel, and case shape. DARK background (deep navy or charcoal black, NOT white). Professional studio lighting. The watch MUST be shown from the FRONT, facing the camera directly so the entire dial is fully visible - NOT from the side. A very slight angle (5-10 degrees max) is acceptable. The watch must be standing UPRIGHT. Frame the watch LARGE filling 80-85% of the image. The watch is a ${watch.brand} ${watch.model}${watch.dial_color ? ` with ${watch.dial_color} dial` : ''}. Ultra high resolution.`;
       messages = [{ role: "user", content: [{ type: "text", text: editPrompt }, { type: "image_url", image_url: { url: referenceBase64 } }] }];
     } else {
       console.log(`No reference found for ${watch.brand} ${watch.model}, using pure generation`);
@@ -78,7 +78,9 @@ async function generateImageForWatch(
         watch.movement ? `featuring ${watch.movement} movement` : '',
         'Professional studio lighting with a DARK background - deep navy or charcoal black, NOT white',
         'The background should be a smooth, dark gradient reminiscent of luxury velvet',
-        'The watch should be displayed UPRIGHT at a slight angle to show the dial and case details',
+        'The watch MUST be shown from the FRONT, facing the camera directly so the entire dial is fully visible - NOT from the side',
+        'A very slight angle (5-10 degrees max) is acceptable but the dial must be the primary focus',
+        'The watch must be standing UPRIGHT, NOT laying on its side',
         'Frame the watch LARGE filling 80-85% of the image',
         'Ultra high resolution, 4K quality product photography',
       ].filter(Boolean).join('. ');
