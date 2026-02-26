@@ -61,7 +61,7 @@ function buildReferencePrompt(
     opts.specialEditionHint ? `Edition/reference cue: ${opts.specialEditionHint}` : '',
   ].filter(Boolean).join('. ');
 
-  return `IMPORTANT: Use the reference image ONLY to identify design details (dial layout, hand style, bezel markings, bracelet pattern, crown shape). Do NOT copy the framing, zoom level, angle, or proportions from the reference photo. Instead, generate a completely new studio product shot following these STRICT composition rules. This is a ${brand} ${model}. ${specificCues}. CRITICAL OVERRIDE - IGNORE THE REFERENCE IMAGE'S FRAMING: ${COMPOSITION_RULES}`;
+  return `IMPORTANT: Use the reference image ONLY to identify design details (dial layout, hand style, bezel markings, bracelet pattern, crown shape). Do NOT copy the framing, zoom level, angle, or proportions from the reference photo. Never output a generic or placeholder-style watch; it must be recognizably the exact ${brand} ${model} reference with accurate dial layout, bezel markings, hand set, indices, crown, and bracelet/strap architecture. Instead, generate a completely new studio product shot following these STRICT composition rules. This is a ${brand} ${model}. ${specificCues}. CRITICAL OVERRIDE - IGNORE THE REFERENCE IMAGE'S FRAMING: ${COMPOSITION_RULES}`;
 }
 
 function buildPureGenerationPrompt(
@@ -220,14 +220,36 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabaseClient = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Resolve reference image: direct base64 > provided URL > auto-search
-    let resolvedBase64 = referenceImageBase64 || null;
-    if (!resolvedBase64 && referenceImageUrl) {
-      resolvedBase64 = await fetchImageAsBase64(referenceImageUrl);
+    // Resolve reference image with quality priority: explicit URL > official model search > uploaded photo
+    let resolvedBase64: string | null = null;
+    let referenceSource: 'provided-url' | 'official-search' | 'uploaded-photo' | 'none' = 'none';
+
+    if (referenceImageUrl) {
+      const fromProvidedUrl = await fetchImageAsBase64(referenceImageUrl);
+      if (fromProvidedUrl) {
+        resolvedBase64 = fromProvidedUrl;
+        referenceSource = 'provided-url';
+      }
     }
+
     if (!resolvedBase64) {
       const foundUrl = await findReferenceImageUrl(brand, model, LOVABLE_API_KEY);
-      if (foundUrl) resolvedBase64 = await fetchImageAsBase64(foundUrl);
+      if (foundUrl) {
+        const fromOfficialSearch = await fetchImageAsBase64(foundUrl);
+        if (fromOfficialSearch) {
+          resolvedBase64 = fromOfficialSearch;
+          referenceSource = 'official-search';
+        }
+      }
+    }
+
+    if (!resolvedBase64 && referenceImageBase64) {
+      resolvedBase64 = referenceImageBase64;
+      referenceSource = 'uploaded-photo';
+    }
+
+    if (resolvedBase64) {
+      console.log(`Reference source selected: ${referenceSource}`);
     }
 
     // Build messages with standardized prompts
@@ -236,7 +258,7 @@ serve(async (req) => {
 
     if (resolvedBase64) {
       generationMethod = 'reference-enhanced';
-      console.log('Using reference image for enhanced generation');
+      console.log(`Using reference image for enhanced generation (${referenceSource})`);
       const prompt = customPrompt || buildReferencePrompt(brand, model, {
         dialColor,
         type,
