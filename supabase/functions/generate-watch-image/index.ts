@@ -61,7 +61,7 @@ function buildReferencePrompt(
     opts.specialEditionHint ? `Edition/reference cue: ${opts.specialEditionHint}` : '',
   ].filter(Boolean).join('. ');
 
-  return `IMPORTANT: Recreate this EXACT watch as a studio product photo. This is a ${brand} ${model}. Preserve every identifying detail (subdials, hands, numerals, slide rule/bezel markings, bracelet links, crown and pushers). ${specificCues}. ${COMPOSITION_RULES}`;
+  return `IMPORTANT: Use the reference image ONLY to identify design details (dial layout, hand style, bezel markings, bracelet pattern, crown shape). Do NOT copy the framing, zoom level, angle, or proportions from the reference photo. Instead, generate a completely new studio product shot following these STRICT composition rules. This is a ${brand} ${model}. ${specificCues}. CRITICAL OVERRIDE - IGNORE THE REFERENCE IMAGE'S FRAMING: ${COMPOSITION_RULES}`;
 }
 
 function buildPureGenerationPrompt(
