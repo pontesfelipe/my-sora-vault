@@ -46,18 +46,18 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: 'google/gemini-3-flash-preview',
         messages: [
           {
             role: 'system',
-            content: 'You are an expert watch identifier with deep knowledge of luxury watches, microbrands, and vintage timepieces. Analyze watch photos to identify brand, model, and specifications with high accuracy.'
+            content: 'You are a world-class watch identification expert with encyclopedic knowledge of every watch brand, reference number, and edition ever produced — from mainstream luxury (Rolex, Omega, Breitling, etc.) to microbrands and vintage pieces. You must identify not just the general model line but the EXACT reference/edition. Pay close attention to: dial color and texture, bezel type and markings (GMT, tachymeter, dive scale), bracelet/strap type and material, subdial layout, hand style, crown guards, case shape, lume plot pattern, date window position, and any text/logos on the dial. Distinguish between standard editions, limited editions, special editions, anniversary models, and regional variants. Always provide the most specific reference number you can determine.'
           },
           {
             role: 'user',
             content: [
               {
                 type: 'text',
-                text: 'Identify this watch from the photo. Extract as much detail as possible including brand, model reference, dial color, watch type, case size, movement type, and any other visible specifications. Be specific with model names and references if identifiable. Return the data in JSON format.'
+                text: 'Identify this watch with maximum specificity. I need the EXACT edition and reference number, not just the model line. Analyze: 1) Dial color and finish (sunburst, matte, lacquer, fumé, etc.) 2) Bezel type (ceramic, aluminum, fixed, rotating, GMT, tachymeter, countdown) 3) Bracelet/strap (oyster, jubilee, president, NATO, leather, rubber, mesh, specific endlink style) 4) Complications visible (GMT, chronograph, moonphase, date, day-date, annual calendar) 5) Case details (material, polished vs brushed, crown guards, case shape) 6) Any special edition markers (engravings, unique colorways, anniversary text, collaboration branding). For example: not just "Rolex Submariner" but "Rolex Submariner Date 126610LN with black ceramic bezel and Oyster bracelet". Not just "Omega Speedmaster" but "Omega Speedmaster Professional Moonwatch 310.30.42.50.01.001 hesalite crystal".'
               },
               {
                 type: 'image_url',
