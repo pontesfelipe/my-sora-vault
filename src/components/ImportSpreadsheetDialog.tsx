@@ -6,7 +6,8 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Upload } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
+
 export const ImportSpreadsheetDialog = () => {
   const [open, setOpen] = useState(false);
   const [importing, setImporting] = useState(false);
@@ -21,83 +22,92 @@ export const ImportSpreadsheetDialog = () => {
   };
 
   const parseSpreadsheet = async (file: File): Promise<any> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      
-      reader.onload = (e) => {
-        try {
-          const data = e.target?.result;
-          const workbook = XLSX.read(data, { type: 'binary' });
-          
-          // Parse Page 1 - Monthly wear data
-          const sheet1 = workbook.Sheets[workbook.SheetNames[0]];
-          const rawData1 = XLSX.utils.sheet_to_json(sheet1, { header: 1 }) as any[][];
-          const page1 = rawData1.slice(2).filter((row: any) => row[0] && row[1]).map((row: any) => ({
-            brand: row[0],
-            model: row[1],
-            jan: parseFloat(row[4]) || 0,
-            feb: parseFloat(row[5]) || 0,
-            mar: parseFloat(row[6]) || 0,
-            apr: parseFloat(row[7]) || 0,
-            may: parseFloat(row[8]) || 0,
-            jun: parseFloat(row[9]) || 0,
-            jul: parseFloat(row[10]) || 0,
-            aug: parseFloat(row[11]) || 0,
-            sep: parseFloat(row[12]) || 0,
-            oct: parseFloat(row[13]) || 0,
-            nov: parseFloat(row[14]) || 0,
-            dec: parseFloat(row[15]) || 0,
-          }));
+    const arrayBuffer = await file.arrayBuffer();
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(arrayBuffer);
 
-          // Parse Page 3 - Watch specs
-          const sheet3 = workbook.Sheets[workbook.SheetNames[2]];
-          const rawData3 = XLSX.utils.sheet_to_json(sheet3, { header: 1 }) as any[][];
-          const page3 = rawData3.slice(1).filter((row: any) => row[0] && row[1]).map((row: any) => ({
-            brand: row[0],
-            model: row[1],
-            price: row[2],
-            movement: row[3],
-            powerReserve: row[4],
-            crystal: row[5],
-            caseMaterial: row[6],
-            caseSize: row[7],
-            lugToLug: row[8],
-            waterResistance: row[9],
-            caseback: row[10],
-            band: row[11],
-          }));
-
-          // Parse Page 4 - Personal notes
-          const sheet4 = workbook.Sheets[workbook.SheetNames[3]];
-          const rawData4 = XLSX.utils.sheet_to_json(sheet4, { header: 1 }) as any[][];
-          const page4 = rawData4.slice(1).filter((row: any) => row[0] && row[1]).map((row: any) => ({
-            brand: row[0],
-            model: row[1],
-            whyBought: row[2],
-            whenBought: row[3],
-            whatILike: row[4],
-            whatIDontLike: row[5],
-          }));
-
-          // Parse Page 5 - Wishlist
-          const sheet5 = workbook.Sheets[workbook.SheetNames[4]];
-          const rawData5 = XLSX.utils.sheet_to_json(sheet5, { header: 1 }) as any[][];
-          const page5 = rawData5.slice(1).filter((row: any) => row[0] && row[1]).map((row: any) => ({
-            brand: row[0],
-            model: row[1],
-            dialColors: row[2],
-            rank: parseInt(row[3]) || 0,
-          }));
-
-          resolve({ page1, page3, page4, page5 });
-        } catch (error) {
-          reject(error);
-        }
-      };
-      
-      reader.onerror = () => reject(new Error('Failed to read file'));
-      reader.readAsBinaryString(file);
+    // Parse Page 1 - Monthly wear data
+    const sheet1 = workbook.worksheets[0];
+    const page1: any[] = [];
+    sheet1.eachRow((row, rowNumber) => {
+      if (rowNumber <= 2) return; // skip header rows
+      const vals = row.values as any[];
+      // ExcelJS row.values is 1-indexed (index 0 is undefined)
+      if (!vals[1] || !vals[2]) return;
+      page1.push({
+        brand: vals[1],
+        model: vals[2],
+        jan: parseFloat(vals[5]) || 0,
+        feb: parseFloat(vals[6]) || 0,
+        mar: parseFloat(vals[7]) || 0,
+        apr: parseFloat(vals[8]) || 0,
+        may: parseFloat(vals[9]) || 0,
+        jun: parseFloat(vals[10]) || 0,
+        jul: parseFloat(vals[11]) || 0,
+        aug: parseFloat(vals[12]) || 0,
+        sep: parseFloat(vals[13]) || 0,
+        oct: parseFloat(vals[14]) || 0,
+        nov: parseFloat(vals[15]) || 0,
+        dec: parseFloat(vals[16]) || 0,
+      });
     });
+
+    // Parse Page 3 - Watch specs
+    const sheet3 = workbook.worksheets[2];
+    const page3: any[] = [];
+    sheet3.eachRow((row, rowNumber) => {
+      if (rowNumber <= 1) return;
+      const vals = row.values as any[];
+      if (!vals[1] || !vals[2]) return;
+      page3.push({
+        brand: vals[1],
+        model: vals[2],
+        price: vals[3],
+        movement: vals[4],
+        powerReserve: vals[5],
+        crystal: vals[6],
+        caseMaterial: vals[7],
+        caseSize: vals[8],
+        lugToLug: vals[9],
+        waterResistance: vals[10],
+        caseback: vals[11],
+        band: vals[12],
+      });
+    });
+
+    // Parse Page 4 - Personal notes
+    const sheet4 = workbook.worksheets[3];
+    const page4: any[] = [];
+    sheet4.eachRow((row, rowNumber) => {
+      if (rowNumber <= 1) return;
+      const vals = row.values as any[];
+      if (!vals[1] || !vals[2]) return;
+      page4.push({
+        brand: vals[1],
+        model: vals[2],
+        whyBought: vals[3],
+        whenBought: vals[4],
+        whatILike: vals[5],
+        whatIDontLike: vals[6],
+      });
+    });
+
+    // Parse Page 5 - Wishlist
+    const sheet5 = workbook.worksheets[4];
+    const page5: any[] = [];
+    sheet5.eachRow((row, rowNumber) => {
+      if (rowNumber <= 1) return;
+      const vals = row.values as any[];
+      if (!vals[1] || !vals[2]) return;
+      page5.push({
+        brand: vals[1],
+        model: vals[2],
+        dialColors: vals[3],
+        rank: parseInt(vals[4]) || 0,
+      });
+    });
+
+    return { page1, page3, page4, page5 };
   };
 
   const handleImport = async () => {
@@ -134,7 +144,7 @@ export const ImportSpreadsheetDialog = () => {
         window.location.reload();
       }, 2000);
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Import error:', error);
       toast.error("Failed to import data", {
         description: error.message,
