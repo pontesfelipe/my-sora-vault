@@ -82,6 +82,7 @@ const WatchDetail = () => {
   const [showCost, setShowCost] = useState(isAdmin);
   const [editingEntry, setEditingEntry] = useState<WearEntry | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [isDeletingWatch, setIsDeletingWatch] = useState(false);
 
   const handleToggleCost = () => {
     if (!showCost) {
@@ -150,6 +151,40 @@ const WatchDetail = () => {
     });
   };
 
+  const handleDeleteWatch = () => {
+    if (!watch) return;
+
+    requestVerification(async () => {
+      setIsDeletingWatch(true);
+      try {
+        await supabase.from("wear_entries").delete().eq("watch_id", watch.id);
+        await supabase.from("water_usage").delete().eq("watch_id", watch.id);
+        await supabase.from("watch_specs").delete().eq("watch_id", watch.id);
+        await (supabase.from("sneaker_specs" as any) as any).delete().eq("item_id", watch.id);
+        await (supabase.from("purse_specs" as any) as any).delete().eq("item_id", watch.id);
+
+        const { error } = await supabase.from("watches").delete().eq("id", watch.id);
+        if (error) throw error;
+
+        toast({
+          title: "Deleted",
+          description: `${watch.brand} ${watch.model} has been removed from your collection`,
+        });
+
+        navigate("/", { replace: true });
+      } catch (error) {
+        console.error("Error deleting watch:", error);
+        toast({
+          title: "Error",
+          description: "Failed to delete watch",
+          variant: "destructive",
+        });
+      } finally {
+        setIsDeletingWatch(false);
+      }
+    });
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -194,6 +229,31 @@ const WatchDetail = () => {
             </div>
             <div className="flex gap-2 items-start">
               <EditWatchDialog watch={watch} onSuccess={fetchData} />
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" size="icon" aria-label="Delete watch">
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent className="bg-card border-border">
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="text-foreground">Delete {watch.brand} {watch.model}?</AlertDialogTitle>
+                    <AlertDialogDescription className="text-muted-foreground">
+                      This will permanently remove this watch and all related data (wear logs, specs, and water usage). This action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel disabled={isDeletingWatch}>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleDeleteWatch}
+                      disabled={isDeletingWatch}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      {isDeletingWatch ? "Deleting..." : "Delete"}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
               <Badge variant="secondary" className="text-sm">
                 {watch.type}
               </Badge>
