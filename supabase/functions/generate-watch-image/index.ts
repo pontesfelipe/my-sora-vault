@@ -61,9 +61,20 @@ function buildPureGenerationPrompt(brand: string, model: string, dialColor?: str
 }
 
 // Try to find a reference image URL for a watch using AI web search
+function normalizeModelForSearch(model: string): string {
+  return model
+    .replace(/\(likely[^)]*\)/gi, '')
+    .replace(/\(reference[^)]*\)/gi, '')
+    .replace(/\([^)]*generation[^)]*\)/gi, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 async function findReferenceImageUrl(brand: string, model: string, LOVABLE_API_KEY: string): Promise<string | null> {
   try {
-    console.log(`Searching for reference image: ${brand} ${model}`);
+    const searchModel = normalizeModelForSearch(model);
+    console.log(`Searching for reference image: ${brand} ${searchModel}`);
+
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -73,34 +84,77 @@ async function findReferenceImageUrl(brand: string, model: string, LOVABLE_API_K
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
-          { role: "system", content: "You are a watch image search assistant. Return ONLY a direct image URL (ending in .jpg, .jpeg, .png, or .webp) from a reputable source. No markdown, no explanation, just the URL. If you cannot find one, return the word NONE." },
-          { role: "user", content: `Find a high-quality product photo URL of the ${brand} ${model} watch. Look on the official brand website first, then Hodinkee, Chrono24, or other reputable watch sites. Return ONLY the URL.` }
+          {
+            role: "system",
+            content: "You are a watch image search assistant. Return ONLY one URL. Prefer a DIRECT image URL from the official brand product page. If direct image is unavailable, return the product page URL that contains the watch hero image. No markdown, no explanation. If unavailable, return NONE."
+          },
+          {
+            role: "user",
+            content: `Find a high-quality product image for ${brand} ${searchModel}. Prioritize official brand sources first, then reputable watch publications/marketplaces.`
+          }
         ],
         temperature: 0.2,
       }),
     });
+
     if (!response.ok) return null;
     const data = await response.json();
     const content = data.choices?.[0]?.message?.content?.trim();
     if (!content || content === 'NONE' || content.length > 2000) return null;
-    const urlMatch = content.match(/https?:\/\/[^\s"'<>]+\.(jpg|jpeg|png|webp)[^\s"'<>]*/i);
-    if (urlMatch) return urlMatch[0];
-    return content.startsWith('http') ? content : null;
-  } catch { return null; }
+
+    const urlMatch = content.match(/https?:\/\/[^\s"'<>]+/i);
+    return urlMatch ? urlMatch[0] : null;
+  } catch {
+    return null;
+  }
+}
+
+async function resolveImageUrlFromHtmlPage(pageUrl: string): Promise<string | null> {
+  try {
+    const resp = await fetch(pageUrl, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; WatchVault/1.0)' } });
+    if (!resp.ok) return null;
+
+    const contentType = resp.headers.get('content-type') || '';
+    if (!contentType.toLowerCase().includes('text/html')) return null;
+
+    const html = await resp.text();
+    const metaMatch = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)
+      || html.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i);
+
+    if (!metaMatch?.[1]) return null;
+    return new URL(metaMatch[1], pageUrl).toString();
+  } catch {
+    return null;
+  }
 }
 
 async function fetchImageAsBase64(imageUrl: string): Promise<string | null> {
   try {
-    const resp = await fetch(imageUrl, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; WatchVault/1.0)' } });
+    let candidateUrl = imageUrl;
+
+    // If AI returns a webpage URL, try to extract og:image first
+    if (!/\.(jpg|jpeg|png|webp)(\?|#|$)/i.test(candidateUrl)) {
+      const extracted = await resolveImageUrlFromHtmlPage(candidateUrl);
+      if (extracted) candidateUrl = extracted;
+    }
+
+    const resp = await fetch(candidateUrl, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; WatchVault/1.0)' } });
     if (!resp.ok) return null;
+
+    const ct = (resp.headers.get('content-type') || '').toLowerCase();
+    if (!ct.startsWith('image/')) return null;
+
     const buf = await resp.arrayBuffer();
     const bytes = new Uint8Array(buf);
     if (bytes.length < 5000) return null;
+
     let binary = '';
     for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
-    const ct = resp.headers.get('content-type') || 'image/jpeg';
+
     return `data:${ct};base64,${btoa(binary)}`;
-  } catch { return null; }
+  } catch {
+    return null;
+  }
 }
 
 serve(async (req) => {
