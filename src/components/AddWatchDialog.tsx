@@ -58,6 +58,12 @@ const watchSchema = z.object({
   historicalSignificance: z.enum(['regular', 'notable', 'historically_significant']).optional(),
 });
 
+interface PhotoIdentificationHints {
+  bezelType?: string;
+  strapType?: string;
+  notes?: string;
+}
+
 export const AddWatchDialog = ({ onSuccess }: { onSuccess: () => void }) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -65,6 +71,7 @@ export const AddWatchDialog = ({ onSuccess }: { onSuccess: () => void }) => {
   const [purchaseDate, setPurchaseDate] = useState<Date | undefined>();
   const [uploadedPhotoBase64, setUploadedPhotoBase64] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("manual");
+  const [photoHints, setPhotoHints] = useState<PhotoIdentificationHints | null>(null);
   const [formValues, setFormValues] = useState({
     brand: "",
     model: "",
@@ -310,6 +317,9 @@ export const AddWatchDialog = ({ onSuccess }: { onSuccess: () => void }) => {
               type: data.type,
               caseSize: formValues.caseSize || undefined,
               movement: formValues.movement || undefined,
+              ...(photoHints?.bezelType ? { bezelType: photoHints.bezelType } : {}),
+              ...(photoHints?.strapType ? { strapType: photoHints.strapType } : {}),
+              ...(photoHints?.notes ? { specialEditionHint: photoHints.notes } : {}),
               ...(uploadedPhotoBase64 ? { referenceImageBase64: uploadedPhotoBase64 } : {}),
             }
           }).then(() => {
@@ -331,6 +341,7 @@ export const AddWatchDialog = ({ onSuccess }: { onSuccess: () => void }) => {
       setModelRef("");
       setPurchaseDate(undefined);
       setUploadedPhotoBase64(null);
+      setPhotoHints(null);
       setFormValues({
         brand: "",
         model: "",
@@ -401,6 +412,12 @@ export const AddWatchDialog = ({ onSuccess }: { onSuccess: () => void }) => {
                   movement: info.movement || prev.movement,
                   casebackMaterial: info.case_material || prev.casebackMaterial,
                 }));
+
+                setPhotoHints({
+                  bezelType: info.bezel_type,
+                  strapType: info.strap_type,
+                  notes: info.notes,
+                });
                 
                 // Show additional details in toast if available
                 const additionalInfo = [];

@@ -10,11 +10,14 @@ const corsHeaders = {
 const inputSchema = z.object({
   watchId: z.string().uuid().optional(),
   brand: z.string().min(1).max(100).regex(/^[a-zA-Z0-9\s\-\.&']+$/, 'Invalid brand format'),
-  model: z.string().min(1).max(200).regex(/^[a-zA-Z0-9\s\-\.\/&'()]+$/, 'Invalid model format'),
+  model: z.string().min(1).max(200).regex(/^[a-zA-Z0-9\s\-\.\/&'(),:]+$/, 'Invalid model format'),
   dialColor: z.string().max(50).optional(),
   type: z.string().max(50).optional(),
   caseSize: z.string().max(20).optional(),
   movement: z.string().max(100).optional(),
+  bezelType: z.string().max(120).optional(),
+  strapType: z.string().max(120).optional(),
+  specialEditionHint: z.string().max(500).optional(),
   referenceImageBase64: z.string().max(15000000, 'Image too large (max 10MB)').optional(),
   referenceImageUrl: z.string().url().max(2000).optional(),
   customPrompt: z.string().max(2000).optional(),
@@ -43,18 +46,39 @@ const COMPOSITION_RULES = [
   'Ultra high resolution, photorealistic, luxury catalog quality',
 ].join('. ');
 
-function buildReferencePrompt(brand: string, model: string, dialColor?: string): string {
-  return `IMPORTANT: Recreate this EXACT watch as a studio product photo. This is a ${brand} ${model}${dialColor ? ` with a ${dialColor} dial - the dial color MUST be ${dialColor}, this is critical` : ''}. Keep EVERY design detail identical to the reference: dial layout, subdial positions, hand styles, bezel markings, case shape, crown, and pushers. ${COMPOSITION_RULES}`;
+function buildReferencePrompt(
+  brand: string,
+  model: string,
+  opts: { dialColor?: string; type?: string; caseSize?: string; movement?: string; bezelType?: string; strapType?: string; specialEditionHint?: string }
+): string {
+  const specificCues = [
+    opts.dialColor ? `Dial color/finish MUST match exactly: ${opts.dialColor}` : '',
+    opts.type ? `Complication/category cues: ${opts.type}` : '',
+    opts.caseSize ? `Case size target: ${opts.caseSize}` : '',
+    opts.movement ? `Movement cue: ${opts.movement}` : '',
+    opts.bezelType ? `Bezel cue: ${opts.bezelType}` : '',
+    opts.strapType ? `Bracelet/strap cue: ${opts.strapType}` : '',
+    opts.specialEditionHint ? `Edition/reference cue: ${opts.specialEditionHint}` : '',
+  ].filter(Boolean).join('. ');
+
+  return `IMPORTANT: Recreate this EXACT watch as a studio product photo. This is a ${brand} ${model}. Preserve every identifying detail (subdials, hands, numerals, slide rule/bezel markings, bracelet links, crown and pushers). ${specificCues}. ${COMPOSITION_RULES}`;
 }
 
-function buildPureGenerationPrompt(brand: string, model: string, dialColor?: string, type?: string, caseSize?: string, movement?: string): string {
+function buildPureGenerationPrompt(
+  brand: string,
+  model: string,
+  opts: { dialColor?: string; type?: string; caseSize?: string; movement?: string; bezelType?: string; strapType?: string; specialEditionHint?: string }
+): string {
   const details = [
     `Create an ACCURATE photorealistic product photograph of the ${brand} ${model} wristwatch`,
-    `The dial color is ${dialColor || 'as per the original model'} - this MUST be accurately depicted`,
-    type ? `Watch style: ${type}` : '',
-    caseSize ? `Case diameter: ${caseSize}` : '',
-    movement ? `Movement type: ${movement}` : '',
-    `Research and accurately depict the real ${brand} ${model}: correct number of subdials, correct bezel style, correct hand design, correct hour markers`,
+    opts.dialColor ? `Dial color/finish MUST be: ${opts.dialColor}` : 'Dial color must match the real production model',
+    opts.type ? `Complication/category: ${opts.type}` : '',
+    opts.caseSize ? `Case diameter cue: ${opts.caseSize}` : '',
+    opts.movement ? `Movement cue: ${opts.movement}` : '',
+    opts.bezelType ? `Bezel cue: ${opts.bezelType}` : '',
+    opts.strapType ? `Bracelet/strap cue: ${opts.strapType}` : '',
+    opts.specialEditionHint ? `Edition/reference cue: ${opts.specialEditionHint}` : '',
+    `Render the exact real-world reference/edition when identifiable; avoid generic lookalikes`,
     COMPOSITION_RULES,
   ].filter(Boolean);
   return details.join('. ');
@@ -82,15 +106,15 @@ async function findReferenceImageUrl(brand: string, model: string, LOVABLE_API_K
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "google/gemini-3-flash-preview",
         messages: [
           {
             role: "system",
-            content: "You are a watch image search assistant. Return ONLY one URL. Prefer a DIRECT image URL from the official brand product page. If direct image is unavailable, return the product page URL that contains the watch hero image. No markdown, no explanation. If unavailable, return NONE."
+            content: "You are a watch reference image hunter. Return ONLY ONE URL. Prioritize official product pages and direct official image URLs for the EXACT reference/edition requested. If possible return a direct image URL; otherwise return the official product page URL containing hero images. No markdown, no commentary, no extra text. If not found, return NONE."
           },
           {
             role: "user",
-            content: `Find a high-quality product image for ${brand} ${searchModel}. Prioritize official brand sources first, then reputable watch publications/marketplaces.`
+            content: `Find the best official reference image for the EXACT watch edition: ${brand} ${searchModel}. Match dial color, bezel style, bracelet type, and complications.`
           }
         ],
         temperature: 0.2,
@@ -172,7 +196,21 @@ serve(async (req) => {
       );
     }
 
-    const { watchId, brand, model, dialColor, type, caseSize, movement, referenceImageBase64, referenceImageUrl, customPrompt } = parseResult.data;
+    const {
+      watchId,
+      brand,
+      model,
+      dialColor,
+      type,
+      caseSize,
+      movement,
+      bezelType,
+      strapType,
+      specialEditionHint,
+      referenceImageBase64,
+      referenceImageUrl,
+      customPrompt,
+    } = parseResult.data;
     console.log(`Generating AI image for: ${brand} ${model} (dial: ${dialColor || 'unspecified'})`);
 
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
@@ -199,12 +237,28 @@ serve(async (req) => {
     if (resolvedBase64) {
       generationMethod = 'reference-enhanced';
       console.log('Using reference image for enhanced generation');
-      const prompt = customPrompt || buildReferencePrompt(brand, model, dialColor);
+      const prompt = customPrompt || buildReferencePrompt(brand, model, {
+        dialColor,
+        type,
+        caseSize,
+        movement,
+        bezelType,
+        strapType,
+        specialEditionHint,
+      });
       messages = [{ role: "user", content: [{ type: "text", text: prompt }, { type: "image_url", image_url: { url: resolvedBase64 } }] }];
     } else {
       generationMethod = 'pure-generation';
       console.log('No reference image found, using pure AI generation');
-      const prompt = customPrompt || buildPureGenerationPrompt(brand, model, dialColor, type, caseSize, movement);
+      const prompt = customPrompt || buildPureGenerationPrompt(brand, model, {
+        dialColor,
+        type,
+        caseSize,
+        movement,
+        bezelType,
+        strapType,
+        specialEditionHint,
+      });
       messages = [{ role: "user", content: prompt }];
     }
 
