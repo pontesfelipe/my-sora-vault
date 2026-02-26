@@ -111,11 +111,11 @@ export const WatchShowcaseCard = ({ watch, totalDays, index, onDelete }: WatchSh
               
               {/* Delete button - appears on hover */}
               {onDelete && (
-                <div className="absolute bottom-3 right-3 z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <div className="absolute bottom-3 right-3 z-30">
                   <Button
                     variant="destructive"
                     size="icon"
-                    className="h-8 w-8 rounded-full shadow-lg"
+                    className="h-7 w-7 rounded-full shadow-lg opacity-80 hover:opacity-100 transition-opacity"
                     onClick={(e) => {
                       e.stopPropagation();
                       setShowDeleteDialog(true);
