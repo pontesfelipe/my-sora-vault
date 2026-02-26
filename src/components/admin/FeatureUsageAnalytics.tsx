@@ -8,6 +8,7 @@ import { useFeatureUsageStats } from "@/hooks/useFeatureUsageStats";
 import { useFeatureToggles } from "@/hooks/useFeatureToggles";
 import { Watch, Loader2, BarChart3, Users, Activity, TrendingUp, RefreshCw } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
+import { CollectionType, COLLECTION_CONFIGS } from "@/types/collection";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Cell, Legend } from "recharts";
 
 const collectionIcons: Record<string, React.ReactNode> = {
@@ -38,7 +39,7 @@ export const FeatureUsageAnalytics = () => {
   }
 
   const topFeatures = getTopFeatures(10);
-  const collectionTypes: string[] = ['watches'];
+  const collectionTypes: CollectionType[] = ['watches'];
 
   // Prepare data for collection type comparison chart
   const collectionData = collectionTypes.map(type => {

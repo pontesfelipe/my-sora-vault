@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useFeatureToggles } from "@/hooks/useFeatureToggles";
 import { Watch, Loader2, Trash2, Plus, X, ToggleRight, BarChart3 } from "lucide-react";
 import { AddFeatureDialog } from "./AddFeatureDialog";
+import { CollectionType, COLLECTION_CONFIGS } from "@/types/collection";
 import { FeatureUsageAnalytics } from "./FeatureUsageAnalytics";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -69,7 +70,7 @@ export const FeatureMatrixTab = () => {
 
   const matrix = getFeatureMatrix();
   const featureKeys = Object.keys(matrix);
-  const collectionTypes: string[] = ['watches'];
+  const collectionTypes: CollectionType[] = ['watches'];
 
   const handleToggle = async (collectionType: CollectionType, featureKey: string, currentValue: boolean) => {
     const toggleId = getToggleId(collectionType, featureKey);
