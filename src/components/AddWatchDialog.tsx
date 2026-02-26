@@ -50,7 +50,7 @@ const watchSchema = z.object({
   model: z.string().trim().min(1, "Model is required").max(200),
   dialColor: z.string().trim().min(1, "Dial color is required").max(50),
   type: z.string().trim().min(1, "Type is required").max(100),
-  cost: z.number().min(0, "Cost must be positive"),
+  cost: z.number().min(0, "Cost must be positive").optional(),
   msrp: z.number().min(0, "MSRP must be positive").optional(),
   averageResalePrice: z.number().min(0, "Resale price must be positive").optional(),
   warrantyDate: z.string().optional(),
@@ -202,7 +202,7 @@ export const AddWatchDialog = ({ onSuccess }: { onSuccess: () => void }) => {
         model: formValues.model,
         dialColor: formValues.dialColor,
         type: formValues.type,
-        cost: parseFloat(formValues.cost),
+        cost: formValues.cost ? parseFloat(formValues.cost) : undefined,
         msrp: formValues.msrp ? parseFloat(formValues.msrp) : undefined,
         averageResalePrice: formValues.averageResalePrice ? parseFloat(formValues.averageResalePrice) : undefined,
         warrantyDate: formValues.warrantyDate || undefined,
@@ -262,7 +262,7 @@ export const AddWatchDialog = ({ onSuccess }: { onSuccess: () => void }) => {
         model: data.model,
         dial_color: data.dialColor,
         type: data.type,
-        cost: data.cost,
+        cost: data.cost ?? 0,
         msrp: data.msrp || null,
         case_size: formValues.caseSize || null,
         lug_to_lug_size: formValues.lugToLugSize || null,
@@ -532,9 +532,8 @@ export const AddWatchDialog = ({ onSuccess }: { onSuccess: () => void }) => {
                 type="number"
                 step="0.01"
                 min="0"
-                required
                 className="bg-background border-border"
-                placeholder="Amount you paid"
+                placeholder="Amount you paid (optional)"
               />
             </div>
 
