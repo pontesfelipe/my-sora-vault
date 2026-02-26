@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Plus, Watch } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { CollectionType, COLLECTION_CONFIGS } from "@/types/collection";
 
 interface AddFeatureDialogProps {
   onSuccess: () => void;
@@ -24,7 +25,7 @@ export const AddFeatureDialog = ({ onSuccess, existingFeatureKeys }: AddFeatureD
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const collectionTypes: string[] = ['watches'];
+  const collectionTypes: CollectionType[] = ['watches'];
 
   const generateFeatureKey = (name: string): string => {
     return name
