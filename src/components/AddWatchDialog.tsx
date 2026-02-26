@@ -70,7 +70,7 @@ export const AddWatchDialog = ({ onSuccess }: { onSuccess: () => void }) => {
   const [modelRef, setModelRef] = useState("");
   const [purchaseDate, setPurchaseDate] = useState<Date | undefined>();
   const [uploadedPhotoBase64, setUploadedPhotoBase64] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState("manual");
+  const [activeTab, setActiveTab] = useState("photo");
   const [photoHints, setPhotoHints] = useState<PhotoIdentificationHints | null>(null);
   const [formValues, setFormValues] = useState({
     brand: "",
