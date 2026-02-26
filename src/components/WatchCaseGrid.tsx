@@ -17,9 +17,10 @@ interface Watch {
 interface WatchCaseGridProps {
   watches: Watch[];
   wearEntries: { watch_id: string }[];
+  onDelete?: () => void;
 }
 
-export const WatchCaseGrid = ({ watches, wearEntries }: WatchCaseGridProps) => {
+export const WatchCaseGrid = ({ watches, wearEntries, onDelete }: WatchCaseGridProps) => {
   return (
     <div className="relative">
       {/* Watch case frame */}
@@ -51,6 +52,7 @@ export const WatchCaseGrid = ({ watches, wearEntries }: WatchCaseGridProps) => {
                 watch={watch}
                 totalDays={wearEntries.filter(w => w.watch_id === watch.id).length}
                 index={index}
+                onDelete={onDelete}
               />
             ))}
           </motion.div>

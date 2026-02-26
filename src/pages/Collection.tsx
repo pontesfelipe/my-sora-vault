@@ -447,7 +447,7 @@ const Collection = () => {
               </p>
             </div>
           ) : (
-            <WatchCaseGrid watches={filteredWatches} wearEntries={wearEntries} />
+            <WatchCaseGrid watches={filteredWatches} wearEntries={wearEntries} onDelete={refetch} />
           )}
 
           {/* Past Items Section */}
