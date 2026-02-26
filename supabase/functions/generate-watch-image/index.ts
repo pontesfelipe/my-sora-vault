@@ -234,11 +234,18 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabaseClient = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Resolve reference image with quality priority: explicit URL > official model search > uploaded photo
+    // Resolve reference image with quality priority:
+    // - If user uploaded a photo, use it DIRECTLY (skip slow AI reference search)
+    // - Otherwise: explicit URL > official model search > none
     let resolvedBase64: string | null = null;
     let referenceSource: 'provided-url' | 'official-search' | 'uploaded-photo' | 'none' = 'none';
 
-    if (referenceImageUrl) {
+    if (referenceImageBase64) {
+      // User already uploaded a photo — use it directly, no need for expensive search
+      resolvedBase64 = referenceImageBase64;
+      referenceSource = 'uploaded-photo';
+      console.log('Using uploaded photo as reference (skipping reference search for speed)');
+    } else if (referenceImageUrl) {
       const fromProvidedUrl = await fetchImageAsBase64(referenceImageUrl);
       if (fromProvidedUrl) {
         resolvedBase64 = fromProvidedUrl;
@@ -246,6 +253,7 @@ serve(async (req) => {
       }
     }
 
+    // Only do the slow AI reference search if no reference image available yet
     if (!resolvedBase64) {
       const foundUrl = await findReferenceImageUrl(brand, model, LOVABLE_API_KEY);
       if (foundUrl) {
@@ -255,11 +263,6 @@ serve(async (req) => {
           referenceSource = 'official-search';
         }
       }
-    }
-
-    if (!resolvedBase64 && referenceImageBase64) {
-      resolvedBase64 = referenceImageBase64;
-      referenceSource = 'uploaded-photo';
     }
 
     if (resolvedBase64) {
