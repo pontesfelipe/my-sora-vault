@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Download, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import * as XLSX from 'xlsx';
+import ExcelJS from "exceljs";
 
 interface CollectionWithOwner {
   id: string;
@@ -30,7 +30,6 @@ export function ExportWearLogsDialog() {
   const fetchCollections = async () => {
     setIsLoading(true);
     try {
-      // Fetch all collections
       const { data: collectionsData, error: collectionsError } = await supabase
         .from('collections')
         .select('id, name, created_by')
@@ -38,7 +37,6 @@ export function ExportWearLogsDialog() {
 
       if (collectionsError) throw collectionsError;
 
-      // Fetch owner profiles
       const ownerIds = [...new Set(collectionsData?.map(c => c.created_by) || [])];
       const { data: profilesData } = await supabase
         .from('profiles')
@@ -74,7 +72,6 @@ export function ExportWearLogsDialog() {
 
     setIsExporting(true);
     try {
-      // Fetch watches for the selected collection
       const { data: watches, error: watchesError } = await supabase
         .from('watches')
         .select('*')
@@ -90,7 +87,6 @@ export function ExportWearLogsDialog() {
         return;
       }
 
-      // Fetch wear entries for these watches
       const { data: wearEntries, error: wearError } = await supabase
         .from('wear_entries')
         .select('*')
@@ -105,7 +101,6 @@ export function ExportWearLogsDialog() {
         return;
       }
 
-      // Fetch related data
       const tripIds = wearEntries.filter(e => e.trip_id).map(e => e.trip_id);
       const eventIds = wearEntries.filter(e => e.event_id).map(e => e.event_id);
       const waterIds = wearEntries.filter(e => e.water_usage_id).map(e => e.water_usage_id);
@@ -122,14 +117,12 @@ export function ExportWearLogsDialog() {
       const waterUsages = waterResult.data || [];
       const watchSpecs = specsResult.data || [];
 
-      // Create maps for quick lookups
       const watchMap = new Map(watches?.map(w => [w.id, w]));
       const tripMap = new Map(trips.map((t: any) => [t.id, t]));
       const eventMap = new Map(events.map((e: any) => [e.id, e]));
       const waterMap = new Map(waterUsages.map((w: any) => [w.id, w]));
       const specsMap = new Map(watchSpecs.map((s: any) => [s.watch_id, s]));
 
-      // Flatten the data
       const exportData = wearEntries.map(entry => {
         const watch = watchMap.get(entry.watch_id);
         const trip = entry.trip_id ? tripMap.get(entry.trip_id) : null;
@@ -185,18 +178,30 @@ export function ExportWearLogsDialog() {
         };
       });
 
-      // Create workbook
-      const ws = XLSX.utils.json_to_sheet(exportData);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, 'Wear Logs');
+      // Create workbook with ExcelJS
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet('Wear Logs');
 
-      // Get collection name for filename
+      if (exportData.length > 0) {
+        worksheet.columns = Object.keys(exportData[0]).map(key => ({ header: key, key }));
+        exportData.forEach(row => worksheet.addRow(row));
+      }
+
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
       const selectedCollection = collections.find(c => c.id === selectedCollectionId);
       const collectionName = selectedCollection?.name.replace(/[^a-zA-Z0-9]/g, '_') || 'collection';
       const timestamp = new Date().toISOString().split('T')[0];
       const filename = `wear_logs_${collectionName}_${timestamp}.xlsx`;
 
-      XLSX.writeFile(wb, filename);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+
       toast.success(`Exported ${exportData.length} wear entries`);
       setOpen(false);
     } catch (error) {

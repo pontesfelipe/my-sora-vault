@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Package, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import * as XLSX from 'xlsx';
+import ExcelJS from "exceljs";
 
 interface CollectionWithOwner {
   id: string;
@@ -72,7 +72,6 @@ export function ExportWatchInventoryDialog() {
 
     setIsExporting(true);
     try {
-      // Fetch watches for the selected collection
       const { data: watches, error: watchesError } = await supabase
         .from('watches')
         .select('*')
@@ -89,7 +88,6 @@ export function ExportWatchInventoryDialog() {
 
       const watchIds = watches.map(w => w.id);
 
-      // Fetch watch specs
       const { data: watchSpecs } = await supabase
         .from('watch_specs')
         .select('*')
@@ -97,10 +95,8 @@ export function ExportWatchInventoryDialog() {
 
       const specsMap = new Map(watchSpecs?.map(s => [s.watch_id, s]) || []);
 
-      // Flatten the data
       const exportData = watches.map(watch => {
         const specs = specsMap.get(watch.id);
-
         return {
           'Brand': watch.brand || '',
           'Model': watch.model || '',
@@ -135,18 +131,30 @@ export function ExportWatchInventoryDialog() {
         };
       });
 
-      // Create workbook
-      const ws = XLSX.utils.json_to_sheet(exportData);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, 'Watch Inventory');
+      // Create workbook with ExcelJS
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet('Watch Inventory');
 
-      // Get collection name for filename
+      if (exportData.length > 0) {
+        worksheet.columns = Object.keys(exportData[0]).map(key => ({ header: key, key }));
+        exportData.forEach(row => worksheet.addRow(row));
+      }
+
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
       const selectedCollection = collections.find(c => c.id === selectedCollectionId);
       const collectionName = selectedCollection?.name.replace(/[^a-zA-Z0-9]/g, '_') || 'collection';
       const timestamp = new Date().toISOString().split('T')[0];
       const filename = `watch_inventory_${collectionName}_${timestamp}.xlsx`;
 
-      XLSX.writeFile(wb, filename);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+
       toast.success(`Exported ${exportData.length} watches`);
       setOpen(false);
     } catch (error) {
