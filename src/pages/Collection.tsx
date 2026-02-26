@@ -9,7 +9,6 @@ import { WatchCaseGrid } from "@/components/WatchCaseGrid";
 import { PastWatchCard } from "@/components/PastWatchCard";
 import { PastWatchesStats } from "@/components/PastWatchesStats";
 import { AddWatchDialog } from "@/components/AddWatchDialog";
-import { AddItemDialog } from "@/components/AddItemDialog";
 import { QuickAddWearDialog } from "@/components/QuickAddWearDialog";
 import { EditCollectionDialog } from "@/components/EditCollectionDialog";
 import { CreateFirstCollectionDialog } from "@/components/CreateFirstCollectionDialog";
@@ -388,12 +387,8 @@ const Collection = () => {
           {/* Action buttons */}
           <div className="flex flex-wrap gap-2 justify-between items-center">
             <div className="flex gap-2">
-              {currentCollectionType === 'watches' && <QuickAddWearDialog watches={watches} onSuccess={refetch} />}
-              {currentCollectionType === 'watches' ? (
-                <AddWatchDialog onSuccess={refetch} />
-              ) : (
-                <AddItemDialog onSuccess={refetch} />
-              )}
+              <QuickAddWearDialog watches={watches} onSuccess={refetch} />
+              <AddWatchDialog onSuccess={refetch} />
             </div>
             <div className="flex flex-wrap gap-2">
               {isAdmin && <ImportSpreadsheetDialog />}

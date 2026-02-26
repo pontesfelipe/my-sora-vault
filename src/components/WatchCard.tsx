@@ -9,11 +9,7 @@ import { useState, useEffect } from "react";
 import { usePasscode } from "@/contexts/PasscodeContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { EditWatchDialog } from "@/components/EditWatchDialog";
-import { EditSneakerSpecsDialog } from "@/components/EditSneakerSpecsDialog";
-import { EditPurseSpecsDialog } from "@/components/EditPurseSpecsDialog";
 import { useCollection } from "@/contexts/CollectionContext";
-import { ItemTypeIcon } from "@/components/ItemTypeIcon";
-import { isSneakerCollection, isPurseCollection } from "@/types/collection";
 import {
   Dialog,
   DialogContent,
@@ -61,9 +57,6 @@ export const WatchCard = ({ watch, totalDays, onDelete }: WatchCardProps) => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isFetchingPrice, setIsFetchingPrice] = useState(false);
   const [showReasoningDialog, setShowReasoningDialog] = useState(false);
-  
-  const isSneaker = currentCollectionType ? isSneakerCollection(currentCollectionType) : false;
-  const isPurse = currentCollectionType ? isPurseCollection(currentCollectionType) : false;
 
   const handleToggleCost = () => {
     if (!showCost) {
@@ -214,7 +207,7 @@ export const WatchCard = ({ watch, totalDays, onDelete }: WatchCardProps) => {
         <div className="flex items-start justify-between mb-3 sm:mb-4 gap-2">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5 sm:gap-2 mb-0.5 sm:mb-1">
-              <ItemTypeIcon type={currentCollectionType} className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+              <WatchIcon className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
               <h3 className="font-semibold text-sm sm:text-[17px] text-textMain truncate">{watch.brand}</h3>
             </div>
             <p className="text-xs sm:text-sm text-textSoft truncate">{watch.model}</p>
@@ -385,21 +378,6 @@ export const WatchCard = ({ watch, totalDays, onDelete }: WatchCardProps) => {
 
           <EditWatchDialog watch={watch} onSuccess={onDelete} />
 
-          {isSneaker && (
-            <EditSneakerSpecsDialog 
-              itemId={watch.id} 
-              itemName={`${watch.brand} ${watch.model}`}
-              onSuccess={onDelete} 
-            />
-          )}
-
-          {isPurse && (
-            <EditPurseSpecsDialog 
-              itemId={watch.id} 
-              itemName={`${watch.brand} ${watch.model}`}
-              onSuccess={onDelete} 
-            />
-          )}
 
           <Button
             variant="outline" 

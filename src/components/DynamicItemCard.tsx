@@ -2,18 +2,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { MoreVertical, DollarSign, TrendingUp, Edit2, Trash2, ArrowUpDown, CheckCircle, Sparkles } from "lucide-react";
+import { MoreVertical, DollarSign, TrendingUp, Edit2, Trash2, ArrowUpDown, Watch } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { CollectionType, getCollectionConfig, SNEAKER_CONDITIONS, PURSE_SIZES } from "@/types/collection";
-import { ItemTypeIcon } from "./ItemTypeIcon";
 import { formatCurrency } from "@/utils/format";
 import watchHero from "@/assets/watch-hero.jpg";
-import sneakerHero from "@/assets/sneaker-hero.jpg";
-import purseHero from "@/assets/purse-hero.jpg";
 
 interface DynamicItemCardProps {
   item: any;
-  collectionType: CollectionType;
+  collectionType?: string;
   totalWearDays?: number;
   onEdit?: () => void;
   onDelete?: () => void;
@@ -24,7 +20,6 @@ interface DynamicItemCardProps {
 
 export const DynamicItemCard = ({
   item,
-  collectionType,
   totalWearDays = 0,
   onEdit,
   onDelete,
@@ -33,125 +28,23 @@ export const DynamicItemCard = ({
   isDraggable = false,
 }: DynamicItemCardProps) => {
   const navigate = useNavigate();
-  const config = getCollectionConfig(collectionType);
 
   const handleCardClick = (e: React.MouseEvent) => {
-    // Don't navigate if clicking on buttons/menus
     if ((e.target as HTMLElement).closest('button, [role="menu"]')) return;
     navigate(`/watch/${item.id}`);
   };
 
-  // Get type-specific display values
-  const getPrimaryColorDisplay = () => {
-    if (collectionType === 'sneakers' && item.specs?.colorway) {
-      return item.specs.colorway;
-    }
-    if (collectionType === 'purses' && item.specs?.color) {
-      return item.specs.color;
-    }
-    return item.dial_color;
-  };
+  const cost = item.cost || 0;
+  const resalePrice = item.average_resale_price;
+  const appreciation = resalePrice ? ((resalePrice - cost) / cost * 100).toFixed(0) : null;
 
-  const getSecondaryInfo = () => {
-    switch (collectionType) {
-      case 'sneakers':
-        const specs = item.specs;
-        if (!specs) return null;
-        return (
-          <div className="flex flex-wrap gap-1.5">
-            {specs.shoe_size && (
-              <Badge variant="outline" className="text-xs">
-                Size {specs.shoe_size} {specs.size_type}
-              </Badge>
-            )}
-            {specs.condition && (
-              <Badge variant="secondary" className="text-xs">
-                {SNEAKER_CONDITIONS[specs.condition]?.label || specs.condition}
-              </Badge>
-            )}
-            {specs.limited_edition && (
-              <Badge className="text-xs bg-amber-500/10 text-amber-600 border-amber-500/30">
-                <Sparkles className="w-3 h-3 mr-1" />
-                Limited
-              </Badge>
-            )}
-          </div>
-        );
-      case 'purses':
-        const purseSpecs = item.specs;
-        if (!purseSpecs) return null;
-        return (
-          <div className="flex flex-wrap gap-1.5">
-            {purseSpecs.size_category && (
-              <Badge variant="outline" className="text-xs">
-                {PURSE_SIZES[purseSpecs.size_category]?.label || purseSpecs.size_category}
-              </Badge>
-            )}
-            {purseSpecs.material && (
-              <Badge variant="secondary" className="text-xs">
-                {purseSpecs.material}
-              </Badge>
-            )}
-            {purseSpecs.authenticity_verified && (
-              <Badge className="text-xs bg-green-500/10 text-green-600 border-green-500/30">
-                <CheckCircle className="w-3 h-3 mr-1" />
-                Verified
-              </Badge>
-            )}
-          </div>
-        );
-      case 'watches':
-      default:
-        return (
-          <div className="flex flex-wrap gap-1.5">
-            {item.movement && (
-              <Badge variant="outline" className="text-xs">
-                {item.movement}
-              </Badge>
-            )}
-            {item.case_size && (
-              <Badge variant="secondary" className="text-xs">
-                {item.case_size}
-              </Badge>
-            )}
-            {item.rarity && item.rarity !== 'common' && (
-              <Badge className="text-xs bg-accent/10 text-accent border-accent/30">
-                {item.rarity.replace('_', ' ')}
-              </Badge>
-            )}
-          </div>
-        );
-    }
-  };
-
-  const getPriceMetrics = () => {
-    const cost = item.cost || 0;
-    const resalePrice = item.average_resale_price;
-    const appreciation = resalePrice ? ((resalePrice - cost) / cost * 100).toFixed(0) : null;
-    
-    return { cost, resalePrice, appreciation };
-  };
-
-  const { cost, resalePrice, appreciation } = getPriceMetrics();
-
-  // Get placeholder image based on collection type
-  const getPlaceholderImage = () => {
-    switch (collectionType) {
-      case 'sneakers': return sneakerHero;
-      case 'purses': return purseHero;
-      case 'watches':
-      default: return watchHero;
-    }
-  };
-
-  const imageUrl = item.ai_image_url || getPlaceholderImage();
+  const imageUrl = item.ai_image_url || watchHero;
 
   return (
     <Card 
       className="group hover:shadow-luxury transition-all duration-300 cursor-pointer overflow-hidden border-0 shadow-card"
       onClick={handleCardClick}
     >
-      {/* Image with gradient overlay */}
       <div className="relative aspect-square overflow-hidden bg-muted">
         <img 
           src={imageUrl} 
@@ -160,11 +53,10 @@ export const DynamicItemCard = ({
         />
         <div className="absolute inset-0 bg-gradient-to-t from-card via-card/20 to-transparent" />
         
-        {/* Brand/Model overlay on image */}
         <div className="absolute bottom-0 left-0 right-0 p-4">
           <div className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-background/80 backdrop-blur-sm">
-              <ItemTypeIcon type={collectionType} size="sm" className="text-accent" />
+              <Watch className="w-4 h-4 text-accent" />
             </div>
             <div className="min-w-0">
               <h3 className="font-bold text-sm text-foreground truncate drop-shadow-sm">{item.brand}</h3>
@@ -173,7 +65,6 @@ export const DynamicItemCard = ({
           </div>
         </div>
         
-        {/* Actions dropdown */}
         <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -204,7 +95,6 @@ export const DynamicItemCard = ({
           </DropdownMenu>
         </div>
         
-        {/* Trade badge on image */}
         {item.available_for_trade && (
           <div className="absolute top-2 left-2">
             <Badge className="text-xs bg-accent/90 text-accent-foreground backdrop-blur-sm">
@@ -216,18 +106,31 @@ export const DynamicItemCard = ({
       </div>
       
       <CardContent className="space-y-3 p-4">
-        {/* Primary color/colorway */}
         <div className="flex items-center gap-2">
-          <span className="text-xs text-muted-foreground">{config.primaryColorLabel}:</span>
+          <span className="text-xs text-muted-foreground">Dial Color:</span>
           <Badge variant="outline" className="text-xs font-medium">
-            {getPrimaryColorDisplay()}
+            {item.dial_color}
           </Badge>
         </div>
         
-        {/* Type-specific secondary info */}
-        {getSecondaryInfo()}
+        <div className="flex flex-wrap gap-1.5">
+          {item.movement && (
+            <Badge variant="outline" className="text-xs">
+              {item.movement}
+            </Badge>
+          )}
+          {item.case_size && (
+            <Badge variant="secondary" className="text-xs">
+              {item.case_size}
+            </Badge>
+          )}
+          {item.rarity && item.rarity !== 'common' && (
+            <Badge className="text-xs bg-accent/10 text-accent border-accent/30">
+              {item.rarity.replace('_', ' ')}
+            </Badge>
+          )}
+        </div>
         
-        {/* Price and metrics */}
         <div className="flex items-center justify-between pt-3 border-t border-border">
           <div className="flex items-center gap-1.5">
             <DollarSign className="w-4 h-4 text-muted-foreground" />
@@ -241,7 +144,7 @@ export const DynamicItemCard = ({
             </div>
           )}
           
-          {collectionType === 'watches' && totalWearDays > 0 && (
+          {totalWearDays > 0 && (
             <Badge variant="secondary" className="text-xs font-medium">
               {totalWearDays} day{totalWearDays !== 1 ? 's' : ''}
             </Badge>

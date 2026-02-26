@@ -1,4 +1,4 @@
-import { Plus, Check, Crown, Edit3, Eye } from "lucide-react";
+import { Plus, Check, Crown, Edit3, Eye, Watch } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -14,11 +14,9 @@ import { useCollectionData } from "@/hooks/useCollectionData";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
 import { CreateCollectionTypeDialog } from "./CreateCollectionTypeDialog";
-import { ItemTypeIcon } from "./ItemTypeIcon";
-import { getCollectionConfig } from "@/types/collection";
 
 export const CollectionSwitcher = () => {
-  const { selectedCollectionId, setSelectedCollectionId, currentCollection, currentCollectionType } = useCollection();
+  const { selectedCollectionId, setSelectedCollectionId, currentCollection } = useCollection();
   const { collections, refetch } = useCollectionData();
   const { isAdmin } = useAuth();
   const [showCreateDialog, setShowCreateDialog] = useState(false);
@@ -41,7 +39,6 @@ export const CollectionSwitcher = () => {
     }
   };
 
-  // Count collections the user owns (created)
   const ownedCollections = collections.filter(c => c.role === 'owner');
   const canCreateCollection = isAdmin || ownedCollections.length === 0;
 
@@ -50,7 +47,7 @@ export const CollectionSwitcher = () => {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline" className="gap-2">
-            <ItemTypeIcon type={currentCollectionType} size="sm" />
+            <Watch className="w-4 h-4" />
             {currentCollection?.name || "Select Collection"}
             {currentCollection && (
               <Badge variant={getRoleBadgeVariant(currentCollection.role || 'viewer')} className="gap-1">
@@ -64,34 +61,30 @@ export const CollectionSwitcher = () => {
           <DropdownMenuLabel>My Collections</DropdownMenuLabel>
           <DropdownMenuSeparator />
           
-          {collections.map((collection) => {
-            const config = getCollectionConfig(collection.collection_type);
-            return (
-              <DropdownMenuItem
-                key={collection.id}
-                onClick={() => setSelectedCollectionId(collection.id)}
-                className="flex items-center justify-between cursor-pointer"
-              >
-                <div className="flex items-center gap-2 min-w-0 flex-1">
-                  {collection.id === selectedCollectionId && <Check className="w-4 h-4 flex-shrink-0" />}
-                  <ItemTypeIcon type={collection.collection_type} size="sm" className="flex-shrink-0" />
-                  <div className="flex flex-col min-w-0">
-                    <span className="truncate">{collection.name}</span>
+          {collections.map((collection) => (
+            <DropdownMenuItem
+              key={collection.id}
+              onClick={() => setSelectedCollectionId(collection.id)}
+              className="flex items-center justify-between cursor-pointer"
+            >
+              <div className="flex items-center gap-2 min-w-0 flex-1">
+                {collection.id === selectedCollectionId && <Check className="w-4 h-4 flex-shrink-0" />}
+                <Watch className="w-4 h-4 flex-shrink-0" />
+                <div className="flex flex-col min-w-0">
+                  <span className="truncate">{collection.name}</span>
+                  {isAdmin && (collection.ownerName || collection.ownerEmail) && (
                     <span className="text-xs text-muted-foreground truncate">
-                      {config.label}
-                      {isAdmin && (collection.ownerName || collection.ownerEmail) && (
-                        <> • by {collection.ownerName || collection.ownerEmail}</>
-                      )}
+                      by {collection.ownerName || collection.ownerEmail}
                     </span>
-                  </div>
+                  )}
                 </div>
-                <Badge variant={getRoleBadgeVariant(collection.role || 'viewer')} className="gap-1 flex-shrink-0 ml-2">
-                  {getRoleIcon(collection.role)}
-                  {collection.role}
-                </Badge>
-              </DropdownMenuItem>
-            );
-          })}
+              </div>
+              <Badge variant={getRoleBadgeVariant(collection.role || 'viewer')} className="gap-1 flex-shrink-0 ml-2">
+                {getRoleIcon(collection.role)}
+                {collection.role}
+              </Badge>
+            </DropdownMenuItem>
+          ))}
 
           {canCreateCollection && (
             <>

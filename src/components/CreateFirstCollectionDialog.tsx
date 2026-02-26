@@ -4,14 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, AlertCircle } from "lucide-react";
+import { Loader2, AlertCircle, Watch } from "lucide-react";
 import { useAllowedUserCheck } from "@/hooks/useAllowedUserCheck";
 import { useAuth } from "@/contexts/AuthContext";
-import { CollectionType, COLLECTION_CONFIGS, getCollectionConfig } from "@/types/collection";
-import { ItemTypeIcon } from "./ItemTypeIcon";
 
 interface CreateFirstCollectionDialogProps {
   onSuccess: () => void;
@@ -19,8 +16,7 @@ interface CreateFirstCollectionDialogProps {
 
 export const CreateFirstCollectionDialog = ({ onSuccess }: CreateFirstCollectionDialogProps) => {
   const { user } = useAuth();
-  const [name, setName] = useState("My Collection");
-  const [collectionType, setCollectionType] = useState<CollectionType>("watches");
+  const [name, setName] = useState("My Watch Collection");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const { isAllowed, loading: checkingAccess, refresh } = useAllowedUserCheck();
@@ -40,20 +36,18 @@ export const CreateFirstCollectionDialog = ({ onSuccess }: CreateFirstCollection
     setLoading(true);
 
     try {
-      // Create the collection with type
       const { data: collectionData, error: collectionError } = await supabase
         .from('collections' as any)
         .insert({
           name: name.trim(),
           created_by: user.id,
-          collection_type: collectionType,
+          collection_type: 'watches',
         } as any)
         .select()
         .single();
 
       if (collectionError) throw collectionError;
 
-      // Link user to collection as owner
       const { error: linkError } = await supabase
         .from('user_collections' as any)
         .insert({
@@ -64,10 +58,9 @@ export const CreateFirstCollectionDialog = ({ onSuccess }: CreateFirstCollection
 
       if (linkError) throw linkError;
 
-      const config = getCollectionConfig(collectionType);
       toast({
         title: "Success",
-        description: `Your ${config.singularLabel.toLowerCase()} collection has been created!`,
+        description: "Your watch collection has been created!",
       });
 
       onSuccess();
@@ -128,39 +121,18 @@ export const CreateFirstCollectionDialog = ({ onSuccess }: CreateFirstCollection
     <Dialog open={true} onOpenChange={(open) => !open && window.history.back()}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Welcome! Create Your First Collection</DialogTitle>
+          <DialogTitle>Welcome! Create Your Watch Collection</DialogTitle>
           <DialogDescription>
-            Choose what type of collection you want to track and give it a name.
+            Give your collection a name to start tracking your watches.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-3">
-            <Label>What would you like to collect?</Label>
-            <RadioGroup
-              value={collectionType}
-              onValueChange={(value) => setCollectionType(value as CollectionType)}
-              className="grid gap-3"
-            >
-              {Object.values(COLLECTION_CONFIGS).map((config) => (
-                <div key={config.type} className="relative">
-                  <RadioGroupItem
-                    value={config.type}
-                    id={`first-${config.type}`}
-                    className="peer sr-only"
-                  />
-                  <Label
-                    htmlFor={`first-${config.type}`}
-                    className="flex items-start gap-3 rounded-lg border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary cursor-pointer transition-colors"
-                  >
-                    <ItemTypeIcon type={config.type} size="lg" className="mt-0.5 shrink-0" />
-                    <div className="space-y-1">
-                      <p className="font-medium leading-none">{config.label}</p>
-                      <p className="text-sm text-muted-foreground">{config.description}</p>
-                    </div>
-                  </Label>
-                </div>
-              ))}
-            </RadioGroup>
+          <div className="flex items-center gap-3 rounded-lg border-2 border-primary bg-popover p-4">
+            <Watch className="w-6 h-6 shrink-0" />
+            <div className="space-y-1">
+              <p className="font-medium leading-none">Watches</p>
+              <p className="text-sm text-muted-foreground">Track your watch collection with movement, case size, and water resistance details</p>
+            </div>
           </div>
           
           <div className="space-y-2">
@@ -169,7 +141,7 @@ export const CreateFirstCollectionDialog = ({ onSuccess }: CreateFirstCollection
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g., My Collection"
+              placeholder="e.g., My Watch Collection"
               disabled={loading}
               autoFocus
             />

@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, RotateCcw, Trash2 } from "lucide-react";
+import { Calendar, RotateCcw, Trash2, Watch as WatchIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
@@ -13,7 +13,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useCollection } from "@/contexts/CollectionContext";
-import { ItemTypeIcon } from "@/components/ItemTypeIcon";
 
 interface PastWatchCardProps {
   watch: {
@@ -106,7 +105,7 @@ export const PastWatchCard = ({ watch, totalDays, onUpdate, collectionId }: Past
         <div className="flex items-start justify-between mb-3">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
-              <ItemTypeIcon type={currentCollectionType} className="w-4 h-4 text-textMuted" />
+              <WatchIcon className="w-4 h-4 text-textMuted" />
               <h3 className="font-semibold text-sm text-textMain">{watch.brand}</h3>
             </div>
             <p className="text-xs text-textSoft">{watch.model}</p>

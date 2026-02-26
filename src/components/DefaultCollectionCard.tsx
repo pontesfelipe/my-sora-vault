@@ -3,8 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCollection } from "@/contexts/CollectionContext";
-import { ItemTypeIcon } from "@/components/ItemTypeIcon";
-import { getCollectionConfig } from "@/types/collection";
+import { Watch } from "lucide-react";
 import { Loader2, FolderOpen } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -157,18 +156,14 @@ export const DefaultCollectionCard = () => {
                   Automatic (your owned collection)
                 </span>
               </SelectItem>
-              {collections.map((collection) => {
-                const config = getCollectionConfig(collection.collection_type);
-                return (
+              {collections.map((collection) => (
                   <SelectItem key={collection.id} value={collection.id}>
                     <span className="flex items-center gap-2">
-                      <ItemTypeIcon type={collection.collection_type} size="sm" />
+                      <Watch className="w-4 h-4" />
                       {collection.name}
-                      <span className="text-muted-foreground text-xs">({config.label})</span>
                     </span>
                   </SelectItem>
-                );
-              })}
+                ))}
             </SelectContent>
           </Select>
           <p className="text-sm text-muted-foreground mt-2">

@@ -1,7 +1,6 @@
 import { Card } from "@/components/ui/card";
-import { TrendingUp, DollarSign, Calendar } from "lucide-react";
+import { TrendingUp, DollarSign, Calendar, Watch } from "lucide-react";
 import { useCollection } from "@/contexts/CollectionContext";
-import { ItemTypeIcon } from "@/components/ItemTypeIcon";
 
 interface PastItem {
   id: string;
@@ -68,7 +67,7 @@ export const PastWatchesStats = ({ pastWatches, wearEntries }: PastWatchesStatsP
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
       <Card className="p-4 bg-surfaceMuted/50 border-borderSubtle">
         <div className="flex items-center gap-2 mb-2">
-          <ItemTypeIcon type={currentCollectionType} className="w-4 h-4 text-textMuted" />
+          <Watch className="w-4 h-4 text-textMuted" />
           <span className="text-xs text-textMuted">Total</span>
         </div>
         <p className="text-2xl font-bold text-textMain">{totalPastItems}</p>

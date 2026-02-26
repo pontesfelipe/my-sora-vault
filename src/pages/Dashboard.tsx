@@ -1,4 +1,4 @@
-import { Watch, Calendar, TrendingUp, Target, Palette, Shirt, Flame, Plane, Droplets, TrendingDown, DollarSign, Footprints, ShoppingBag } from "lucide-react";
+import { Watch, Calendar, TrendingUp, Target, Palette, Flame, Plane, Droplets, TrendingDown, DollarSign } from "lucide-react";
 import { StatsCard } from "@/components/StatsCard";
 import { UsageChart } from "@/components/UsageChart";
 import { QuickAddWearDialog } from "@/components/QuickAddWearDialog";
@@ -7,52 +7,22 @@ import { DepreciationChart } from "@/components/DepreciationChart";
 
 import { MonthlyUsageTable } from "@/components/MonthlyUsageTable";
 import { CollectionSwitcher } from "@/components/CollectionSwitcher";
-import { SneakerStatsCards } from "@/components/SneakerStatsCards";
-import { PurseStatsCards } from "@/components/PurseStatsCards";
 
 import { useWatchData } from "@/hooks/useWatchData";
 import { useTripData } from "@/hooks/useTripData";
 import { useWaterUsageData } from "@/hooks/useWaterUsageData";
 import { useStatsCalculations } from "@/hooks/useStatsCalculations";
-import { useSneakerStats } from "@/hooks/useSneakerStats";
-import { usePurseStats } from "@/hooks/usePurseStats";
 import { useCollection } from "@/contexts/CollectionContext";
-import { isWatchCollection, isSneakerCollection, isPurseCollection, getCollectionConfig } from "@/types/collection";
+import { getCollectionConfig } from "@/types/collection";
 
 const Dashboard = () => {
-  const { selectedCollectionId, currentCollection, currentCollectionType, currentCollectionConfig } = useCollection();
+  const { selectedCollectionId, currentCollection, currentCollectionConfig } = useCollection();
   const { watches, wearEntries, loading: watchLoading, refetch } = useWatchData(selectedCollectionId);
   const { trips, loading: tripLoading } = useTripData();
   const { waterUsages, loading: waterLoading } = useWaterUsageData();
 
   const stats = useStatsCalculations(watches, wearEntries, trips, waterUsages);
-  
-  const isWatch = currentCollectionType ? isWatchCollection(currentCollectionType) : true;
-  const isSneaker = currentCollectionType ? isSneakerCollection(currentCollectionType) : false;
-  const isPurse = currentCollectionType ? isPurseCollection(currentCollectionType) : false;
-  const config = currentCollectionType ? getCollectionConfig(currentCollectionType) : getCollectionConfig('watches');
-  
-  // Fetch sneaker-specific stats
-  const { stats: sneakerStats, loading: sneakerStatsLoading } = useSneakerStats({
-    itemIds: watches.map(w => w.id),
-    enabled: isSneaker,
-  });
-  
-  // Fetch purse-specific stats
-  const { stats: purseStats, loading: purseStatsLoading } = usePurseStats({
-    itemIds: watches.map(w => w.id),
-    enabled: isPurse,
-  });
-  
-  // Get dynamic icon based on collection type
-  const getCollectionIcon = () => {
-    switch (currentCollectionType) {
-      case 'sneakers': return Footprints;
-      case 'purses': return ShoppingBag;
-      default: return Watch;
-    }
-  };
-  const CollectionIcon = getCollectionIcon();
+  const config = currentCollectionConfig;
 
   if (watchLoading || tripLoading || waterLoading) {
     return (
@@ -81,7 +51,7 @@ const Dashboard = () => {
           <CollectionSwitcher />
         </div>
         <div className="mt-4 flex justify-center">
-          <QuickAddWearDialog watches={watches} onSuccess={refetch} collectionType={currentCollectionType} />
+          <QuickAddWearDialog watches={watches} onSuccess={refetch} />
         </div>
       </div>
 
@@ -101,7 +71,7 @@ const Dashboard = () => {
         </div>
         <div className="flex items-center gap-3">
           <CollectionSwitcher />
-          <QuickAddWearDialog watches={watches} onSuccess={refetch} collectionType={currentCollectionType} />
+          <QuickAddWearDialog watches={watches} onSuccess={refetch} />
         </div>
       </div>
 
@@ -112,7 +82,7 @@ const Dashboard = () => {
           <StatsCard
             title={`Total ${config.pluralLabel}`}
             value={stats.totalWatches}
-            icon={CollectionIcon}
+            icon={Watch}
             variant="compact"
           />
           <StatsCard
@@ -145,7 +115,7 @@ const Dashboard = () => {
           <StatsCard
             title={`Most ${config.usageVerbPast.charAt(0).toUpperCase() + config.usageVerbPast.slice(1)} ${config.typeLabel}`}
             value={stats.mostWornStyle || "N/A"}
-            icon={Shirt}
+            icon={Target}
             variant="compact"
           />
           <StatsCard
@@ -170,7 +140,7 @@ const Dashboard = () => {
             variant="compact"
             itemId={stats.topTripWatch?.id}
           />
-          {isWatch && (
+          {true && (
             <StatsCard
               title="#1 Water Usage"
               value={stats.topWaterWatch ? `${stats.topWaterWatch.brand} ${stats.topWaterWatch.model}` : "N/A"}
@@ -182,25 +152,6 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Sneaker-specific stats */}
-      {isSneaker && (
-        <div className="space-y-3">
-          <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-textMuted">
-            Sneaker Details
-          </h3>
-          <SneakerStatsCards stats={sneakerStats} totalSneakers={stats.totalWatches} />
-        </div>
-      )}
-
-      {/* Purse-specific stats */}
-      {isPurse && (
-        <div className="space-y-3">
-          <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-textMuted">
-            Purse Details
-          </h3>
-          <PurseStatsCards stats={purseStats} totalPurses={stats.totalWatches} />
-        </div>
-      )}
 
       <UsageChart watches={watches} wearEntries={wearEntries} />
 

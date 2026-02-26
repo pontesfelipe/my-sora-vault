@@ -18,7 +18,6 @@ import { useCollection } from "@/contexts/CollectionContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserAvatar } from "@/components/UserAvatar";
 import { AddWatchDialog } from "@/components/AddWatchDialog";
-import { AddItemDialog } from "@/components/AddItemDialog";
 import { CollectionSwitcher } from "@/components/CollectionSwitcher";
 import { WishlistTable } from "@/components/WishlistTable";
 import { AddWishlistDialog } from "@/components/AddWishlistDialog";
@@ -254,11 +253,7 @@ const Profile = () => {
                 className="pl-9 rounded-full bg-surfaceMuted border-none text-sm"
               />
             </div>
-            {currentCollectionType === "watches" ? (
-              <AddWatchDialog onSuccess={refetch} />
-            ) : (
-              <AddItemDialog onSuccess={refetch} />
-            )}
+            <AddWatchDialog onSuccess={refetch} />
           </div>
 
           {/* Collection Grid - "infinite watch box" */}
