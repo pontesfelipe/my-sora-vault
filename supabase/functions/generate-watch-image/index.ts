@@ -51,6 +51,8 @@ function buildReferencePrompt(
   model: string,
   opts: { dialColor?: string; type?: string; caseSize?: string; movement?: string; bezelType?: string; strapType?: string; specialEditionHint?: string }
 ): string {
+  const canonicalModel = canonicalizeModelForPrompt(brand, model);
+
   const specificCues = [
     opts.dialColor ? `Dial color/finish MUST match exactly: ${opts.dialColor}` : '',
     opts.type ? `Complication/category cues: ${opts.type}` : '',
@@ -61,7 +63,7 @@ function buildReferencePrompt(
     opts.specialEditionHint ? `Edition/reference cue: ${opts.specialEditionHint}` : '',
   ].filter(Boolean).join('. ');
 
-  return `IMPORTANT: Use the reference image ONLY to identify design details (dial layout, hand style, bezel markings, bracelet pattern, crown shape). Do NOT copy the framing, zoom level, angle, or proportions from the reference photo. Never output a generic or placeholder-style watch; it must be recognizably the exact ${brand} ${model} reference with accurate dial layout, bezel markings, hand set, indices, crown, and bracelet/strap architecture. Instead, generate a completely new studio product shot following these STRICT composition rules. This is a ${brand} ${model}. ${specificCues}. CRITICAL OVERRIDE - IGNORE THE REFERENCE IMAGE'S FRAMING: ${COMPOSITION_RULES}`;
+  return `IMPORTANT: Use the reference image ONLY to identify design details (dial layout, hand style, bezel markings, bracelet pattern, crown shape). Do NOT copy the framing, zoom level, angle, or proportions from the reference photo. Never output a generic or placeholder-style watch; it must be recognizably the exact ${brand} ${canonicalModel} reference with accurate dial layout, bezel markings, hand set, indices, crown, and bracelet/strap architecture. Instead, generate a completely new studio product shot following these STRICT composition rules. This is a ${brand} ${canonicalModel}. ${specificCues}. CRITICAL OVERRIDE - IGNORE THE REFERENCE IMAGE'S FRAMING: ${COMPOSITION_RULES}`;
 }
 
 function buildPureGenerationPrompt(
@@ -69,8 +71,10 @@ function buildPureGenerationPrompt(
   model: string,
   opts: { dialColor?: string; type?: string; caseSize?: string; movement?: string; bezelType?: string; strapType?: string; specialEditionHint?: string }
 ): string {
+  const canonicalModel = canonicalizeModelForPrompt(brand, model);
+
   const details = [
-    `Create an ACCURATE photorealistic product photograph of the ${brand} ${model} wristwatch`,
+    `Create an ACCURATE photorealistic product photograph of the ${brand} ${canonicalModel} wristwatch`,
     opts.dialColor ? `Dial color/finish MUST be: ${opts.dialColor}` : 'Dial color must match the real production model',
     opts.type ? `Complication/category: ${opts.type}` : '',
     opts.caseSize ? `Case diameter cue: ${opts.caseSize}` : '',
@@ -94,6 +98,16 @@ function normalizeModelForSearch(model: string): string {
     .trim();
 }
 
+function canonicalizeModelForPrompt(brand: string, model: string): string {
+  const normalizedBrand = brand.trim().toLowerCase();
+  const cleanedModel = normalizeModelForSearch(model);
+
+  return cleanedModel
+    .replace(new RegExp(`^${normalizedBrand}\\s+`, 'i'), '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 async function findReferenceImageUrl(brand: string, model: string, LOVABLE_API_KEY: string): Promise<string | null> {
   try {
     const searchModel = normalizeModelForSearch(model);
@@ -110,11 +124,11 @@ async function findReferenceImageUrl(brand: string, model: string, LOVABLE_API_K
         messages: [
           {
             role: "system",
-            content: "You are a watch reference image hunter. Return ONLY ONE URL. Prioritize official product pages and direct official image URLs for the EXACT reference/edition requested. If possible return a direct image URL; otherwise return the official product page URL containing hero images. No markdown, no commentary, no extra text. If not found, return NONE."
+            content: "You are a watch reference image hunter. Return ONLY ONE URL. Prioritize official brand product pages or direct official studio product image URLs for the EXACT reference/edition requested. Strongly prefer front-facing catalog shots that clearly show dial layout, bezel text, and bracelet architecture. Avoid marketplace listings, user photos, wrist shots, and lifestyle/editorial images. If possible return a direct image URL; otherwise return the official product page URL containing hero images. No markdown, no commentary, no extra text. If not found, return NONE."
           },
           {
             role: "user",
-            content: `Find the best official reference image for the EXACT watch edition: ${brand} ${searchModel}. Match dial color, bezel style, bracelet type, and complications.`
+            content: `Find the best official reference image for the EXACT watch edition: ${brand} ${searchModel}. Must match dial color, bezel style, bracelet type, and complications; prioritize a straight-on product shot.`
           }
         ],
         temperature: 0.2,
