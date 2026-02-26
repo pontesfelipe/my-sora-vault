@@ -6,21 +6,16 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useFeatureUsageStats } from "@/hooks/useFeatureUsageStats";
 import { useFeatureToggles } from "@/hooks/useFeatureToggles";
-import { CollectionType, COLLECTION_CONFIGS } from "@/types/collection";
-import { Watch, Footprints, ShoppingBag, Loader2, BarChart3, Users, Activity, TrendingUp, RefreshCw } from "lucide-react";
+import { Watch, Loader2, BarChart3, Users, Activity, TrendingUp, RefreshCw } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Cell, Legend } from "recharts";
 
-const collectionIcons: Record<CollectionType, React.ReactNode> = {
+const collectionIcons: Record<string, React.ReactNode> = {
   watches: <Watch className="h-4 w-4" />,
-  sneakers: <Footprints className="h-4 w-4" />,
-  purses: <ShoppingBag className="h-4 w-4" />,
 };
 
-const collectionColors: Record<CollectionType, string> = {
+const collectionColors: Record<string, string> = {
   watches: "hsl(var(--primary))",
-  sneakers: "hsl(142, 76%, 36%)",
-  purses: "hsl(280, 65%, 60%)",
 };
 
 export const FeatureUsageAnalytics = () => {
@@ -43,7 +38,7 @@ export const FeatureUsageAnalytics = () => {
   }
 
   const topFeatures = getTopFeatures(10);
-  const collectionTypes: CollectionType[] = ['watches', 'sneakers', 'purses'];
+  const collectionTypes: string[] = ['watches'];
 
   // Prepare data for collection type comparison chart
   const collectionData = collectionTypes.map(type => {

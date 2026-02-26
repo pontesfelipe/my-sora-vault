@@ -4,30 +4,27 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Plus, Watch, Footprints, ShoppingBag } from "lucide-react";
+import { Plus, Watch } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { CollectionType, COLLECTION_CONFIGS } from "@/types/collection";
 
 interface AddFeatureDialogProps {
   onSuccess: () => void;
   existingFeatureKeys: string[];
 }
 
-const collectionIcons: Record<CollectionType, React.ReactNode> = {
+const collectionIcons: Record<string, React.ReactNode> = {
   watches: <Watch className="h-4 w-4" />,
-  sneakers: <Footprints className="h-4 w-4" />,
-  purses: <ShoppingBag className="h-4 w-4" />,
 };
 
 export const AddFeatureDialog = ({ onSuccess, existingFeatureKeys }: AddFeatureDialogProps) => {
   const [open, setOpen] = useState(false);
   const [featureName, setFeatureName] = useState("");
   const [featureKey, setFeatureKey] = useState("");
-  const [selectedTypes, setSelectedTypes] = useState<CollectionType[]>([]);
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const collectionTypes: CollectionType[] = ['watches', 'sneakers', 'purses'];
+  const collectionTypes: string[] = ['watches'];
 
   const generateFeatureKey = (name: string): string => {
     return name

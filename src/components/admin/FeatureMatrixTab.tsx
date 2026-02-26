@@ -6,8 +6,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useFeatureToggles } from "@/hooks/useFeatureToggles";
-import { CollectionType, COLLECTION_CONFIGS } from "@/types/collection";
-import { Watch, Footprints, ShoppingBag, Loader2, Trash2, Plus, X, ToggleRight, BarChart3 } from "lucide-react";
+import { Watch, Loader2, Trash2, Plus, X, ToggleRight, BarChart3 } from "lucide-react";
 import { AddFeatureDialog } from "./AddFeatureDialog";
 import { FeatureUsageAnalytics } from "./FeatureUsageAnalytics";
 import { supabase } from "@/integrations/supabase/client";
@@ -30,10 +29,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-const collectionIcons: Record<CollectionType, React.ReactNode> = {
+const collectionIcons: Record<string, React.ReactNode> = {
   watches: <Watch className="h-4 w-4" />,
-  sneakers: <Footprints className="h-4 w-4" />,
-  purses: <ShoppingBag className="h-4 w-4" />,
 };
 
 // Core features that cannot be deleted or extended
@@ -57,8 +54,8 @@ const PROTECTED_FEATURE_KEYS = [
 
 export const FeatureMatrixTab = () => {
   const { toggles, loading, updateToggle, getFeatureMatrix, getToggleId, refetch } = useFeatureToggles();
-  const [extendingFeature, setExtendingFeature] = useState<{ featureKey: string; collectionType: CollectionType } | null>(null);
-  const [removingFeature, setRemovingFeature] = useState<{ featureKey: string; collectionType: CollectionType; featureName: string } | null>(null);
+  const [extendingFeature, setExtendingFeature] = useState<{ featureKey: string; collectionType: string } | null>(null);
+  const [removingFeature, setRemovingFeature] = useState<{ featureKey: string; collectionType: string; featureName: string } | null>(null);
 
   if (loading) {
     return (
@@ -72,7 +69,7 @@ export const FeatureMatrixTab = () => {
 
   const matrix = getFeatureMatrix();
   const featureKeys = Object.keys(matrix);
-  const collectionTypes: CollectionType[] = ['watches', 'sneakers', 'purses'];
+  const collectionTypes: string[] = ['watches'];
 
   const handleToggle = async (collectionType: CollectionType, featureKey: string, currentValue: boolean) => {
     const toggleId = getToggleId(collectionType, featureKey);
