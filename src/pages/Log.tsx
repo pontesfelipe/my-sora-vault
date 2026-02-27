@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { PageTransition } from "@/components/PageTransition";
 import { useNavigate } from "react-router-dom";
-import { Camera, Check, Plus, Watch, Tag, X, ChevronDown, Sparkles, Loader2, Calendar } from "lucide-react";
+import { Camera, Check, Plus, Watch, Tag, X, ChevronDown, Sparkles, Loader2, Calendar, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -23,6 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { AddWatchDialog } from "@/components/AddWatchDialog";
 
 const SUGGESTED_TAGS = [
   "Daily", "Office", "Casual", "Formal", "Trip", "Event",
@@ -63,7 +64,10 @@ const Log = () => {
   const [isIdentifying, setIsIdentifying] = useState(false);
   const [identifiedWatch, setIdentifiedWatch] = useState<any>(null);
   const [watchSearch, setWatchSearch] = useState("");
+  const [showAddWatch, setShowAddWatch] = useState(false);
+  const [addWatchPrefill, setAddWatchPrefill] = useState<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const uploadInputRef = useRef<HTMLInputElement>(null);
 
   const selectedWatch = watches.find((w) => w.id === selectedWatchId);
 
@@ -72,6 +76,43 @@ const Log = () => {
       w.brand.toLowerCase().includes(watchSearch.toLowerCase()) ||
       w.model.toLowerCase().includes(watchSearch.toLowerCase())
   );
+
+  // Fuzzy match: checks if brand matches and model shares significant keywords
+  const findBestMatch = (brand: string, model: string) => {
+    const b = brand?.toLowerCase().trim() || "";
+    const m = model?.toLowerCase().trim() || "";
+    if (!b) return null;
+
+    // Try exact match first
+    const exact = watches.find(
+      (w) => w.brand.toLowerCase() === b && w.model.toLowerCase() === m
+    );
+    if (exact) return exact;
+
+    // Try brand match + model keyword overlap
+    const brandMatches = watches.filter(
+      (w) => w.brand.toLowerCase().includes(b) || b.includes(w.brand.toLowerCase())
+    );
+
+    if (brandMatches.length === 0) return null;
+
+    // Score each by shared model words (4+ char)
+    const modelWords = m.replace(/[^a-z0-9 ]/g, " ").split(/\s+/).filter((w) => w.length >= 3);
+    let best: { watch: any; score: number } | null = null;
+
+    for (const w of brandMatches) {
+      const wWords = w.model.toLowerCase().replace(/[^a-z0-9 ]/g, " ").split(/\s+/).filter((x: string) => x.length >= 3);
+      const score = modelWords.filter((word) => wWords.some((ww: string) => ww.includes(word) || word.includes(ww))).length;
+      if (score > 0 && (!best || score > best.score)) {
+        best = { watch: w, score };
+      }
+    }
+
+    // If only one brand match and no model keywords, still suggest it
+    if (!best && brandMatches.length === 1) return brandMatches[0];
+
+    return best?.watch || null;
+  };
 
   const handlePhotoCapture = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -92,7 +133,16 @@ const Log = () => {
 
       if (!error && data) {
         setIdentifiedWatch(data);
-        toast.success(`Identified: ${data.brand || ""} ${data.model || ""}`.trim() || "Watch identified!");
+
+        // Auto-match to collection
+        const match = findBestMatch(data.brand, data.model);
+        if (match) {
+          setSelectedWatchId(match.id);
+          toast.success(`Matched: ${match.brand} ${match.model}`);
+          setIdentifiedWatch(null); // Clear since we auto-matched
+        } else {
+          toast.info(`Identified: ${data.brand || ""} ${data.model || ""}`.trim() + " — not in your collection");
+        }
       }
     } catch (err) {
       console.error("AI identification failed:", err);
@@ -194,13 +244,19 @@ const Log = () => {
       {/* Photo Capture */}
       <Card
         className="border-dashed border-2 border-borderSubtle rounded-2xl overflow-hidden cursor-pointer hover:border-accent/50 transition-colors"
-        onClick={() => fileInputRef.current?.click()}
       >
         <input
           ref={fileInputRef}
           type="file"
           accept="image/*"
           capture="environment"
+          onChange={handlePhotoCapture}
+          className="hidden"
+        />
+        <input
+          ref={uploadInputRef}
+          type="file"
+          accept="image/*"
           onChange={handlePhotoCapture}
           className="hidden"
         />
@@ -225,6 +281,7 @@ const Log = () => {
                 setPhotoPreview(null);
                 setPhotoFile(null);
                 setIdentifiedWatch(null);
+                setSelectedWatchId("");
               }}
               className="absolute top-2 right-2 h-8 w-8 bg-background/80 rounded-full flex items-center justify-center"
             >
@@ -232,15 +289,27 @@ const Log = () => {
             </button>
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center py-10 text-textMuted">
-            <Camera className="h-8 w-8 mb-2" />
-            <p className="text-sm font-medium">Take a photo</p>
-            <p className="text-xs">AI will identify your watch</p>
+          <div className="flex items-center justify-center gap-4 py-10">
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="flex flex-col items-center gap-2 text-textMuted hover:text-accent transition-colors px-4"
+            >
+              <Camera className="h-8 w-8" />
+              <span className="text-sm font-medium">Take Photo</span>
+            </button>
+            <div className="w-px h-12 bg-borderSubtle" />
+            <button
+              onClick={() => uploadInputRef.current?.click()}
+              className="flex flex-col items-center gap-2 text-textMuted hover:text-accent transition-colors px-4"
+            >
+              <Upload className="h-8 w-8" />
+              <span className="text-sm font-medium">Upload</span>
+            </button>
           </div>
         )}
       </Card>
 
-      {/* AI Identified Info */}
+      {/* AI Identified — not in collection */}
       <AnimatePresence>
         {identifiedWatch && !selectedWatchId && (
           <motion.div
@@ -258,37 +327,31 @@ const Log = () => {
                   {identifiedWatch.reference && (
                     <p className="text-xs text-textMuted">Ref: {identifiedWatch.reference}</p>
                   )}
+                  <p className="text-xs text-textMuted mt-1">Not found in your collection</p>
                   <div className="flex gap-2 mt-2">
                     <Button size="sm" variant="default" onClick={() => {
-                      // Try to find matching watch in collection
-                      const match = watches.find(
-                        (w) =>
-                          w.brand.toLowerCase() === identifiedWatch.brand?.toLowerCase() &&
-                          w.model.toLowerCase() === identifiedWatch.model?.toLowerCase()
-                      );
+                      // Try fuzzy match one more time
+                      const match = findBestMatch(identifiedWatch.brand, identifiedWatch.model);
                       if (match) {
                         setSelectedWatchId(match.id);
-                        toast.success("Matched to your collection!");
+                        setIdentifiedWatch(null);
+                        toast.success(`Matched: ${match.brand} ${match.model}`);
                       } else {
-                        // Navigate to collection page with pre-filled data to add the watch
-                        navigate("/collection", {
-                          state: {
-                            addWatch: true,
-                            prefill: {
-                              brand: identifiedWatch.brand || "",
-                              model: identifiedWatch.model || "",
-                              dial_color: identifiedWatch.dial_color || "",
-                              type: identifiedWatch.type || "automatic",
-                              case_size: identifiedWatch.case_size || "",
-                              movement: identifiedWatch.movement || "",
-                            },
-                          },
+                        // Open AddWatchDialog with pre-filled data
+                        setAddWatchPrefill({
+                          brand: identifiedWatch.brand || "",
+                          model: identifiedWatch.model || "",
+                          dial_color: identifiedWatch.dial_color || "",
+                          type: identifiedWatch.type || "automatic",
+                          case_size: identifiedWatch.case_size || "",
+                          movement: identifiedWatch.movement || "",
                         });
-                        toast.info("Watch not in collection — let's add it!");
+                        setShowAddWatch(true);
+                        setIdentifiedWatch(null);
                       }
                     }}>
-                      <Check className="h-4 w-4 mr-1" />
-                      Confirm
+                      <Plus className="h-4 w-4 mr-1" />
+                      Add to Collection
                     </Button>
                     <Button size="sm" variant="ghost" onClick={() => setIdentifiedWatch(null)}>
                       Dismiss
@@ -353,12 +416,8 @@ const Log = () => {
                           variant="outline"
                           className="gap-1.5"
                           onClick={() => {
-                            navigate("/collection", {
-                              state: {
-                                addWatch: true,
-                                prefill: { brand: watchSearch.trim(), model: "" },
-                              },
-                            });
+                            setAddWatchPrefill({ brand: watchSearch.trim(), model: "" });
+                            setShowAddWatch(true);
                           }}
                         >
                           <Plus className="h-4 w-4" />
@@ -482,6 +541,19 @@ const Log = () => {
           </>
         )}
       </Button>
+
+      {/* Inline AddWatchDialog for adding from wrist check */}
+      <AddWatchDialog
+        onSuccess={() => {
+          refetch();
+          setShowAddWatch(false);
+          setAddWatchPrefill(null);
+          toast.success("Watch added! Now select it to log your wrist check.");
+        }}
+        externalOpen={showAddWatch}
+        onExternalOpenChange={setShowAddWatch}
+        prefill={addWatchPrefill}
+      />
     </div>
     </PageTransition>
   );
