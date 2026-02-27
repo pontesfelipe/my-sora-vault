@@ -17,7 +17,7 @@ export function MethodologyTab() {
               <AccordionTrigger>Data Model Design</AccordionTrigger>
               <AccordionContent className="space-y-3 text-muted-foreground">
                 <p>
-                  <strong>User-Centric Architecture:</strong> All data is organized around users and their collections. 
+                  <strong>User-Centric Architecture:</strong> All data is organized around users and their watch collections. 
                   Each user can own one collection (or multiple for admins), and all watches, entries, and preferences 
                   are scoped to specific users.
                 </p>
@@ -36,7 +36,7 @@ export function MethodologyTab() {
               <AccordionTrigger>Security Approach</AccordionTrigger>
               <AccordionContent className="space-y-3 text-muted-foreground">
                 <p>
-                  <strong>Authentication:</strong> Uses Supabase Auth with email/password authentication. 
+                  <strong>Authentication:</strong> Uses secure email/password and Google OAuth authentication. 
                   All sessions are managed securely with JWT tokens.
                 </p>
                 <p>
@@ -46,6 +46,10 @@ export function MethodologyTab() {
                 <p>
                   <strong>Data Protection:</strong> All database tables use RLS policies. Admin functions 
                   use SECURITY DEFINER with restricted search paths to prevent SQL injection.
+                </p>
+                <p>
+                  <strong>Access Control:</strong> Invite-only registration system. Users must be pre-approved 
+                  via the allowed users list or submit a registration request for admin approval.
                 </p>
               </AccordionContent>
             </AccordionItem>
@@ -62,7 +66,7 @@ export function MethodologyTab() {
                 </p>
                 <p>
                   <strong>Features:</strong> Collection analysis, watch suggestions, sentiment analysis, 
-                  metadata extraction, and price fetching.
+                  metadata extraction, price fetching, photo identification, and the Vault Pal chatbot.
                 </p>
               </AccordionContent>
             </AccordionItem>

@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format } from "date-fns";
 import { RefreshCw, Search, Download } from "lucide-react";
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import { toast } from "sonner";
 
 export function AccessLogsTab() {
@@ -56,7 +56,7 @@ export function AccessLogsTab() {
     return matchesSearch && matchesAction;
   });
 
-  const handleExport = () => {
+  const handleExport = async () => {
     if (!filteredLogs?.length) {
       toast.error("No logs to export");
       return;
@@ -72,11 +72,24 @@ export function AccessLogsTab() {
       'User Agent': log.user_agent || 'N/A',
     }));
 
-    const ws = XLSX.utils.json_to_sheet(exportData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Access Logs');
-    const filename = `access_logs_${format(new Date(), 'yyyy-MM-dd')}.xlsx`;
-    XLSX.writeFile(wb, filename);
+    const workbook = new ExcelJS.Workbook();
+    const ws = workbook.addWorksheet('Access Logs');
+    
+    const headers = Object.keys(exportData[0]);
+    ws.addRow(headers);
+    exportData.forEach(row => ws.addRow(Object.values(row)));
+    
+    // Style header row
+    ws.getRow(1).font = { bold: true };
+    
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `access_logs_${format(new Date(), 'yyyy-MM-dd')}.xlsx`;
+    a.click();
+    URL.revokeObjectURL(url);
     toast.success("Access logs exported");
   };
 

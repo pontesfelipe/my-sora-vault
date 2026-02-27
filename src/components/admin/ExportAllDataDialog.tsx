@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { FileSpreadsheet, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 
 interface CollectionWithOwner {
   id: string;
@@ -64,6 +64,15 @@ export function ExportAllDataDialog() {
     }
   };
 
+  const addSheetFromData = (workbook: ExcelJS.Workbook, sheetName: string, data: Record<string, any>[]) => {
+    if (data.length === 0) return;
+    const ws = workbook.addWorksheet(sheetName);
+    const headers = Object.keys(data[0]);
+    ws.addRow(headers);
+    data.forEach(row => ws.addRow(Object.values(row)));
+    ws.getRow(1).font = { bold: true };
+  };
+
   const handleExport = async () => {
     if (!selectedCollectionId) {
       toast.error('Please select a collection');
@@ -72,7 +81,6 @@ export function ExportAllDataDialog() {
 
     setIsExporting(true);
     try {
-      // Fetch watches for the selected collection
       const { data: watches, error: watchesError } = await supabase
         .from('watches')
         .select('*')
@@ -89,7 +97,6 @@ export function ExportAllDataDialog() {
 
       const watchIds = watches.map(w => w.id);
 
-      // Fetch all related data in parallel
       const [wearResult, specsResult, tripsResult, eventsResult, waterResult] = await Promise.all([
         supabase.from('wear_entries').select('*').in('watch_id', watchIds).order('wear_date', { ascending: false }),
         supabase.from('watch_specs').select('*').in('watch_id', watchIds),
@@ -104,15 +111,13 @@ export function ExportAllDataDialog() {
       const events = eventsResult.data || [];
       const waterUsages = waterResult.data || [];
 
-      // Create maps for quick lookups
       const watchMap = new Map(watches.map(w => [w.id, w]));
       const specsMap = new Map(watchSpecs.map(s => [s.watch_id, s]));
       const tripMap = new Map(trips.map(t => [t.id, t]));
       const eventMap = new Map(events.map(e => [e.id, e]));
       const waterMap = new Map(waterUsages.map(w => [w.id, w]));
 
-      // Create workbook
-      const wb = XLSX.utils.book_new();
+      const workbook = new ExcelJS.Workbook();
 
       // Sheet 1: Watch Inventory
       const inventoryData = watches.map(watch => {
@@ -150,8 +155,7 @@ export function ExportAllDataDialog() {
           'Updated At': watch.updated_at ? new Date(watch.updated_at).toLocaleDateString() : '',
         };
       });
-      const wsInventory = XLSX.utils.json_to_sheet(inventoryData);
-      XLSX.utils.book_append_sheet(wb, wsInventory, 'Watch Inventory');
+      addSheetFromData(workbook, 'Watch Inventory', inventoryData);
 
       // Sheet 2: Wear Logs
       const wearData = wearEntries.map(entry => {
@@ -159,7 +163,6 @@ export function ExportAllDataDialog() {
         const trip = entry.trip_id ? tripMap.get(entry.trip_id) : null;
         const event = entry.event_id ? eventMap.get(entry.event_id) : null;
         const water = entry.water_usage_id ? waterMap.get(entry.water_usage_id) : null;
-
         return {
           'Wear Date': entry.wear_date,
           'Days Worn': entry.days,
@@ -184,10 +187,7 @@ export function ExportAllDataDialog() {
           'Water Notes': water?.notes || '',
         };
       });
-      if (wearData.length > 0) {
-        const wsWear = XLSX.utils.json_to_sheet(wearData);
-        XLSX.utils.book_append_sheet(wb, wsWear, 'Wear Logs');
-      }
+      addSheetFromData(workbook, 'Wear Logs', wearData);
 
       // Sheet 3: Trips
       const tripData = trips.map(trip => ({
@@ -198,10 +198,7 @@ export function ExportAllDataDialog() {
         'Notes': trip.notes || '',
         'Created At': trip.created_at ? new Date(trip.created_at).toLocaleDateString() : '',
       }));
-      if (tripData.length > 0) {
-        const wsTrips = XLSX.utils.json_to_sheet(tripData);
-        XLSX.utils.book_append_sheet(wb, wsTrips, 'Trips');
-      }
+      addSheetFromData(workbook, 'Trips', tripData);
 
       // Sheet 4: Events
       const eventData = events.map(event => ({
@@ -211,10 +208,7 @@ export function ExportAllDataDialog() {
         'Days': event.days || '',
         'Created At': event.created_at ? new Date(event.created_at).toLocaleDateString() : '',
       }));
-      if (eventData.length > 0) {
-        const wsEvents = XLSX.utils.json_to_sheet(eventData);
-        XLSX.utils.book_append_sheet(wb, wsEvents, 'Events');
-      }
+      addSheetFromData(workbook, 'Events', eventData);
 
       // Sheet 5: Water Usage
       const waterData = waterUsages.map(water => {
@@ -230,20 +224,24 @@ export function ExportAllDataDialog() {
           'Created At': water.created_at ? new Date(water.created_at).toLocaleDateString() : '',
         };
       });
-      if (waterData.length > 0) {
-        const wsWater = XLSX.utils.json_to_sheet(waterData);
-        XLSX.utils.book_append_sheet(wb, wsWater, 'Water Usage');
-      }
+      addSheetFromData(workbook, 'Water Usage', waterData);
 
-      // Get collection name for filename
+      // Download
       const selectedCollection = collections.find(c => c.id === selectedCollectionId);
       const collectionName = selectedCollection?.name.replace(/[^a-zA-Z0-9]/g, '_') || 'collection';
       const timestamp = new Date().toISOString().split('T')[0];
       const filename = `collection_export_${collectionName}_${timestamp}.xlsx`;
 
-      XLSX.writeFile(wb, filename);
-      
-      const sheetCount = wb.SheetNames.length;
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      const sheetCount = workbook.worksheets.length;
       toast.success(`Exported ${watches.length} watches across ${sheetCount} sheets`);
       setOpen(false);
     } catch (error) {
