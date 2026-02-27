@@ -1,14 +1,12 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { ResponsiveDialog } from "@/components/ResponsiveDialog";
 
 interface AddWishlistDialogProps {
   open: boolean;
@@ -59,13 +57,7 @@ export const AddWishlistDialog = ({ open, onOpenChange, onSuccess }: AddWishlist
         description: "Watch added to wishlist",
       });
 
-      setFormValues({
-        brand: "",
-        model: "",
-        dial_colors: "",
-        rank: 0,
-        notes: "",
-      });
+      setFormValues({ brand: "", model: "", dial_colors: "", rank: 0, notes: "" });
       onOpenChange(false);
       onSuccess?.();
     } catch (error) {
@@ -81,77 +73,72 @@ export const AddWishlistDialog = ({ open, onOpenChange, onSuccess }: AddWishlist
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Add Watch to Wishlist</DialogTitle>
-        </DialogHeader>
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="brand">Brand *</Label>
-              <Input
-                id="brand"
-                value={formValues.brand}
-                onChange={(e) => setFormValues({ ...formValues, brand: e.target.value })}
-                placeholder="e.g., Rolex"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="model">Model *</Label>
-              <Input
-                id="model"
-                value={formValues.model}
-                onChange={(e) => setFormValues({ ...formValues, model: e.target.value })}
-                placeholder="e.g., Submariner Date"
-              />
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="dial_colors">Dial Colors *</Label>
-              <Input
-                id="dial_colors"
-                value={formValues.dial_colors}
-                onChange={(e) => setFormValues({ ...formValues, dial_colors: e.target.value })}
-                placeholder="e.g., Blue or black"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="rank">Priority Rank</Label>
-              <Input
-                id="rank"
-                type="number"
-                min="0"
-                value={formValues.rank}
-                onChange={(e) => setFormValues({ ...formValues, rank: parseInt(e.target.value) || 0 })}
-                placeholder="0"
-              />
-            </div>
-          </div>
-
+    <ResponsiveDialog open={open} onOpenChange={onOpenChange} title="Add Watch to Wishlist">
+      <div className="space-y-4">
+        <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="notes">Notes</Label>
-            <Textarea
-              id="notes"
-              value={formValues.notes}
-              onChange={(e) => setFormValues({ ...formValues, notes: e.target.value })}
-              placeholder="Any additional notes about this watch..."
-              rows={3}
+            <Label htmlFor="brand">Brand *</Label>
+            <Input
+              id="brand"
+              value={formValues.brand}
+              onChange={(e) => setFormValues({ ...formValues, brand: e.target.value })}
+              placeholder="e.g., Rolex"
             />
           </div>
-
-          <div className="flex gap-2 justify-end pt-4">
-            <Button variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleSubmit} disabled={loading}>
-              {loading ? "Adding..." : "Add to Wishlist"}
-            </Button>
+          <div className="space-y-2">
+            <Label htmlFor="model">Model *</Label>
+            <Input
+              id="model"
+              value={formValues.model}
+              onChange={(e) => setFormValues({ ...formValues, model: e.target.value })}
+              placeholder="e.g., Submariner Date"
+            />
           </div>
         </div>
-      </DialogContent>
-    </Dialog>
+        
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="dial_colors">Dial Colors *</Label>
+            <Input
+              id="dial_colors"
+              value={formValues.dial_colors}
+              onChange={(e) => setFormValues({ ...formValues, dial_colors: e.target.value })}
+              placeholder="e.g., Blue or black"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="rank">Priority Rank</Label>
+            <Input
+              id="rank"
+              type="number"
+              min="0"
+              value={formValues.rank}
+              onChange={(e) => setFormValues({ ...formValues, rank: parseInt(e.target.value) || 0 })}
+              placeholder="0"
+            />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="notes">Notes</Label>
+          <Textarea
+            id="notes"
+            value={formValues.notes}
+            onChange={(e) => setFormValues({ ...formValues, notes: e.target.value })}
+            placeholder="Any additional notes about this watch..."
+            rows={3}
+          />
+        </div>
+
+        <div className="flex gap-2 justify-end pt-4">
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+          <Button onClick={handleSubmit} disabled={loading}>
+            {loading ? "Adding..." : "Add to Wishlist"}
+          </Button>
+        </div>
+      </div>
+    </ResponsiveDialog>
   );
 };
