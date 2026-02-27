@@ -90,7 +90,7 @@ const Home = () => {
       >
         <Button
           onClick={() => navigate("/log")}
-          className="w-full h-14 rounded-2xl text-base font-semibold gap-3 shadow-luxury"
+          className="w-full h-14 rounded-2xl text-base font-semibold gap-3 shadow-luxury active:scale-[0.98] transition-transform"
           size="lg"
         >
           <Plus className="h-5 w-5" />
