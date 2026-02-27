@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { PageTransition } from "@/components/PageTransition";
 import { useNavigate } from "react-router-dom";
-import { Camera, Check, Plus, Watch, Tag, X, ChevronDown, Sparkles, Loader2 } from "lucide-react";
+import { Camera, Check, Plus, Watch, Tag, X, ChevronDown, Sparkles, Loader2, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -134,12 +134,20 @@ const Log = () => {
           <h1 className="text-2xl font-bold text-textMain">Wrist Check</h1>
           <p className="text-sm text-textMuted">What are you wearing today?</p>
         </div>
-        <Input
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          className="w-auto text-sm"
-        />
+        <button
+          onClick={() => {
+            const input = document.createElement("input");
+            input.type = "date";
+            input.value = date;
+            input.onchange = (e) => setDate((e.target as HTMLInputElement).value);
+            input.showPicker?.();
+            input.click();
+          }}
+          className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surfaceMuted text-sm font-medium text-textMain border border-borderSubtle active:scale-95 transition-transform"
+        >
+          <Calendar className="h-4 w-4 text-accent" />
+          {format(new Date(date + "T00:00:00"), "MMM d")}
+        </button>
       </div>
 
       {/* Photo Capture */}

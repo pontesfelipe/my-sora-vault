@@ -473,17 +473,15 @@ const VaultPal = () => {
                   I'm your personal collection expert. I know everything about your {itemLabel.toLowerCase()}, 
                   wear patterns, trips, events, and preferences. Ask me anything!
                 </p>
-                <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2 max-w-lg mx-auto px-4 snap-x snap-mandatory">
+                <div className="flex gap-2.5 overflow-x-auto scrollbar-hide pb-2 w-full px-4 snap-x snap-mandatory touch-pan-y">
                   {suggestedQuestions.map((question, idx) => (
-                    <Button
+                    <button
                       key={idx}
-                      variant="outline"
-                      size="sm"
                       onClick={() => sendMessage(question)}
-                      className="text-xs whitespace-nowrap shrink-0 snap-start py-2 px-4"
+                      className="text-xs whitespace-nowrap shrink-0 snap-start py-2.5 px-5 rounded-full bg-accent/10 text-accent font-medium border border-accent/20 hover:bg-accent/20 active:scale-95 transition-all"
                     >
                       {question}
-                    </Button>
+                    </button>
                   ))}
                 </div>
               </div>
