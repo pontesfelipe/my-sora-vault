@@ -1,6 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
+import { rateLimitResponse } from "../_shared/rate-limiter.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -31,6 +32,11 @@ serve(async (req) => {
     }
     
     const { image } = parseResult.data;
+
+    // Rate limit by IP (no auth on this endpoint): 10 per minute
+    const clientIp = req.headers.get("x-forwarded-for") || "unknown";
+    const rlResponse = rateLimitResponse(clientIp, "identify-watch-from-photo", corsHeaders, 10, 60_000);
+    if (rlResponse) return rlResponse;
 
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
