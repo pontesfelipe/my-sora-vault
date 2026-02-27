@@ -68,6 +68,8 @@ export default {
         textMuted: "hsl(var(--text-muted))",
         textSoft: "hsl(var(--text-soft))",
         danger: "hsl(var(--danger))",
+        gold: "hsl(var(--gold))",
+        goldMuted: "hsl(var(--gold-muted))",
       },
       borderRadius: {
         lg: "var(--radius-lg)",
