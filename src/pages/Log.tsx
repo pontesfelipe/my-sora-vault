@@ -361,7 +361,7 @@ const Log = () => {
             <Badge
               key={tag}
               variant={tags.includes(tag) ? "default" : "outline"}
-              className={`cursor-pointer transition-colors ${
+              className={`cursor-pointer transition-colors py-2 px-4 ${
                 tags.includes(tag)
                   ? "bg-accent text-accent-foreground"
                   : "hover:bg-surfaceMuted"
