@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, Calendar, DollarSign, Eye, EyeOff, Trash2, Info, Pencil } from "lucide-react";
+import { PinchZoomImage } from "@/components/PinchZoomImage";
+import watchHero from "@/assets/watch-hero.jpg";
 import { AddWearDialog } from "@/components/AddWearDialog";
 import { EditWatchDialog } from "@/components/EditWatchDialog";
 import { EditWearEntryDialog } from "@/components/EditWearEntryDialog";
@@ -291,7 +293,18 @@ const WatchDetail = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        <Tabs defaultValue="specs" className="w-full">
+        {/* Watch Hero Image */}
+          {(watch.ai_image_url || watchHero) && (
+            <div className="mb-6 rounded-2xl overflow-hidden bg-muted aspect-square max-w-sm mx-auto shadow-lg">
+              <PinchZoomImage
+                src={watch.ai_image_url || watchHero}
+                alt={`${watch.brand} ${watch.model}`}
+                className="w-full h-full"
+              />
+            </div>
+          )}
+
+          <Tabs defaultValue="specs" className="w-full">
           <TabsList className="grid w-full max-w-md mx-auto grid-cols-3 mb-8">
             <TabsTrigger value="specs">Specifications</TabsTrigger>
             <TabsTrigger value="stats">Statistics</TabsTrigger>

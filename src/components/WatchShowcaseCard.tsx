@@ -114,8 +114,8 @@ export const WatchShowcaseCard = ({ watch, totalDays, index, onDelete }: WatchSh
               
               <motion.img
                 src={imageUrl}
-                alt={`${watch.brand} ${watch.model}`}
                 className="relative z-10 w-full h-full object-cover rounded-lg drop-shadow-[0_8px_24px_rgba(0,0,0,0.4)] group-hover:scale-105 transition-transform duration-500"
+                alt={`${watch.brand} ${watch.model}`}
                 whileHover={{ rotateY: 5, rotateX: -3 }}
                 style={{ transformStyle: "preserve-3d" }}
               />
@@ -127,6 +127,7 @@ export const WatchShowcaseCard = ({ watch, totalDays, index, onDelete }: WatchSh
                     variant="destructive"
                     size="icon"
                     className="h-7 w-7 rounded-full shadow-lg opacity-80 hover:opacity-100 transition-opacity"
+                    aria-label={`Delete ${watch.brand} ${watch.model}`}
                     onClick={(e) => {
                       e.stopPropagation();
                       setShowDeleteDialog(true);
