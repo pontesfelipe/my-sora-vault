@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { cacheWatchData, getCachedWatchData } from "@/utils/offlineSync";
 
 interface Watch {
   id: string;
@@ -49,6 +50,13 @@ export const useWatchData = (collectionId?: string | null) => {
       return;
     }
 
+    // Show cached data instantly while fetching fresh data
+    const cacheKey = collectionId || user.id;
+    const cached = getCachedWatchData(cacheKey);
+    if (cached && cached.length > 0 && watches.length === 0) {
+      setWatches(cached);
+    }
+
     setLoading(true);
     try {
       let watchesQuery: any = (supabase.from('watches' as any) as any).select('*');
@@ -76,6 +84,7 @@ export const useWatchData = (collectionId?: string | null) => {
 
       if (watchesResult.data) {
         setWatches(watchesResult.data);
+        cacheWatchData(cacheKey, watchesResult.data);
         
         // Fetch wear entries for the watches in this collection
         const watchIds = watchesResult.data.map((w: Watch) => w.id);
