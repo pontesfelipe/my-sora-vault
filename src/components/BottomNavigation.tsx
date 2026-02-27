@@ -59,6 +59,7 @@ export function BottomNavigation() {
           <button
             onClick={() => triggerHaptic('selection')}
             className="flex flex-col items-center justify-center flex-1 h-full py-2 transition-colors touch-target text-textMuted"
+            aria-label="More options"
           >
             <Menu className="h-6 w-6 mb-1" />
             <span className="text-[10px] font-medium">More</span>

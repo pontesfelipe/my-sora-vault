@@ -299,6 +299,7 @@ const VaultPal = () => {
                   size="icon"
                   onClick={() => setShowHistory(!showHistory)}
                   className="shrink-0"
+                  aria-label="Chat history"
                 >
                   <MessageSquare className="w-5 h-5" />
                 </Button>
@@ -366,7 +367,7 @@ const VaultPal = () => {
                     className="h-7 w-7 shrink-0 text-accent hover:text-accent/80"
                     onClick={refreshInsights}
                     disabled={isRefreshingInsights}
-                    title="Refresh insights"
+                    aria-label="Refresh insights"
                   >
                     {isRefreshingInsights ? (
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
