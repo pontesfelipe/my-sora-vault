@@ -267,7 +267,7 @@ const Profile = () => {
               </p>
             </Card>
           ) : (
-            <WatchCaseGrid watches={filteredWatches} wearEntries={wearEntries} onDelete={refetch} />
+            <WatchCaseGrid watches={filteredWatches} wearEntries={wearEntries} onDelete={refetch} isLoading={loading} />
           )}
           <p className="text-xs text-textMuted text-center">
             {watches.length} {watches.length === 1 ? currentCollectionConfig.singularLabel.toLowerCase() : currentCollectionConfig.pluralLabel.toLowerCase()}
