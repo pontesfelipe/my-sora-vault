@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -382,16 +382,12 @@ export const AddWatchDialog = ({ onSuccess }: { onSuccess: () => void }) => {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <>
       <Button onClick={() => setOpen(true)} className="gap-2">
         <Plus className="w-4 h-4" />
         Add to Collection
       </Button>
-      <DialogContent className="bg-card border-border max-w-md max-h-[90vh] flex flex-col">
-        <DialogHeader>
-          <DialogTitle className="text-foreground">Add New Watch</DialogTitle>
-        </DialogHeader>
-        
+      <ResponsiveDialog open={open} onOpenChange={setOpen} title="Add New Watch" className="max-w-md max-h-[90vh] flex flex-col">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col flex-1 min-h-0">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="photo">📸 Photo Upload</TabsTrigger>
@@ -787,7 +783,7 @@ export const AddWatchDialog = ({ onSuccess }: { onSuccess: () => void }) => {
         </form>
           </TabsContent>
         </Tabs>
-      </DialogContent>
-    </Dialog>
+      </ResponsiveDialog>
+    </>
   );
 };

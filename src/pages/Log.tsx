@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { PageTransition } from "@/components/PageTransition";
 import { useNavigate } from "react-router-dom";
 import { Camera, Check, Plus, Watch, Tag, X, ChevronDown, Sparkles, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -125,6 +126,7 @@ const Log = () => {
   };
 
   return (
+    <PageTransition>
     <div className="space-y-5 pb-8 max-w-lg mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -432,6 +434,7 @@ const Log = () => {
         )}
       </Button>
     </div>
+    </PageTransition>
   );
 };
 

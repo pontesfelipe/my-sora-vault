@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { PageTransition } from "@/components/PageTransition";
 import { MessageCircle, Heart, MessageSquare, Search, Loader2, Users, Camera, Plus } from "lucide-react";
 import { useForumData, FORUM_CATEGORIES } from "@/hooks/useForumData";
 import { useAuth } from "@/contexts/AuthContext";
@@ -23,6 +24,7 @@ export default function Feed() {
   const { user } = useAuth();
 
   return (
+    <PageTransition>
     <div className="space-y-4 pb-4">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-2">
@@ -45,6 +47,7 @@ export default function Feed() {
         </TabsContent>
       </Tabs>
     </div>
+    </PageTransition>
   );
 }
 

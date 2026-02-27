@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { PageTransition } from "@/components/PageTransition";
 import { useNavigate } from "react-router-dom";
 import {
   Watch, Settings, Heart, List, Plus, Search, Users, ChevronRight,
@@ -110,6 +111,7 @@ const Profile = () => {
   }
 
   return (
+    <PageTransition>
     <div className="space-y-5 pb-4">
       {/* Profile Header */}
       <div className="flex items-start gap-4">
@@ -283,6 +285,7 @@ const Profile = () => {
         </TabsContent>
       </Tabs>
     </div>
+    </PageTransition>
   );
 };
 
