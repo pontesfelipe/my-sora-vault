@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { WatchShowcaseCard } from "./WatchShowcaseCard";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Watch {
   id: string;
@@ -18,9 +19,24 @@ interface WatchCaseGridProps {
   watches: Watch[];
   wearEntries: { watch_id: string }[];
   onDelete?: () => void;
+  isLoading?: boolean;
 }
 
-export const WatchCaseGrid = ({ watches, wearEntries, onDelete }: WatchCaseGridProps) => {
+const WatchCardSkeleton = () => (
+  <div className="rounded-2xl overflow-hidden bg-gradient-to-b from-[hsl(var(--watch-case-top))] to-[hsl(var(--watch-case-bottom))] p-[2px]">
+    <div className="rounded-[13px] overflow-hidden bg-gradient-to-br from-[hsl(var(--watch-velvet-start))] to-[hsl(var(--watch-velvet-end))]">
+      <Skeleton className="aspect-square w-full rounded-none bg-muted/30" />
+      <div className="px-3 pb-3 pt-1">
+        <div className="bg-background/70 backdrop-blur-xl rounded-xl px-3 py-2.5 border border-border/20 space-y-1.5">
+          <Skeleton className="h-3 w-2/3 bg-muted/40" />
+          <Skeleton className="h-2.5 w-1/2 bg-muted/30" />
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+export const WatchCaseGrid = ({ watches, wearEntries, onDelete, isLoading }: WatchCaseGridProps) => {
   return (
     <div className="relative">
       {/* Watch case frame */}
@@ -43,25 +59,33 @@ export const WatchCaseGrid = ({ watches, wearEntries, onDelete }: WatchCaseGridP
           <div className="absolute inset-0 rounded-2xl shadow-[inset_0_2px_8px_rgba(0,0,0,0.3)]" />
           
           {/* Watch grid */}
-          <motion.div 
-            className="relative grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4"
-            initial="hidden"
-            animate="visible"
-            variants={{
-              hidden: {},
-              visible: { transition: { staggerChildren: 0.06 } }
-            }}
-          >
-            {watches.map((watch, index) => (
-              <WatchShowcaseCard
-                key={watch.id}
-                watch={watch}
-                totalDays={wearEntries.filter(w => w.watch_id === watch.id).length}
-                index={index}
-                onDelete={onDelete}
-              />
-            ))}
-          </motion.div>
+          {isLoading ? (
+            <div className="relative grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <WatchCardSkeleton key={i} />
+              ))}
+            </div>
+          ) : (
+            <motion.div 
+              className="relative grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4"
+              initial="hidden"
+              animate="visible"
+              variants={{
+                hidden: {},
+                visible: { transition: { staggerChildren: 0.06 } }
+              }}
+            >
+              {watches.map((watch, index) => (
+                <WatchShowcaseCard
+                  key={watch.id}
+                  watch={watch}
+                  totalDays={wearEntries.filter(w => w.watch_id === watch.id).length}
+                  index={index}
+                  onDelete={onDelete}
+                />
+              ))}
+            </motion.div>
+          )}
         </div>
         
         {/* Bottom edge shadow & clasp detail */}

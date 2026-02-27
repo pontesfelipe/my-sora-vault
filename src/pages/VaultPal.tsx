@@ -472,14 +472,14 @@ const VaultPal = () => {
                   I'm your personal collection expert. I know everything about your {itemLabel.toLowerCase()}, 
                   wear patterns, trips, events, and preferences. Ask me anything!
                 </p>
-                <div className="flex flex-wrap gap-2 justify-center max-w-lg">
+                <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2 max-w-lg mx-auto px-4 snap-x snap-mandatory">
                   {suggestedQuestions.map((question, idx) => (
                     <Button
                       key={idx}
                       variant="outline"
                       size="sm"
                       onClick={() => sendMessage(question)}
-                      className="text-xs"
+                      className="text-xs whitespace-nowrap shrink-0 snap-start py-2 px-4"
                     >
                       {question}
                     </Button>
@@ -526,12 +526,19 @@ const VaultPal = () => {
               <Textarea
                 ref={textareaRef}
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
+                onChange={(e) => {
+                  setInput(e.target.value);
+                  // Auto-resize textarea
+                  const ta = e.target;
+                  ta.style.height = 'auto';
+                  ta.style.height = Math.min(ta.scrollHeight, 120) + 'px';
+                }}
                 onKeyDown={handleKeyDown}
                 placeholder={isListening ? "Speak now..." : `Ask about your ${itemLabel.toLowerCase()}...`}
-                className="min-h-[44px] max-h-[120px] resize-none"
+                className="min-h-[44px] max-h-[120px] resize-none overflow-hidden"
                 rows={1}
                 disabled={isLoading}
+                style={{ height: '44px' }}
               />
               {isVoiceSupported && (
                 <Button
