@@ -10,6 +10,7 @@ import { CollectionProvider } from "@/contexts/CollectionContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { AppLayout } from "@/components/AppLayout";
 import { SplashScreen } from "@/components/SplashScreen";
+import { OfflineBanner } from "@/components/OfflineBanner";
 
 // Lazy-loaded pages for code splitting
 const Home = lazy(() => import("./pages/Home"));
@@ -59,6 +60,7 @@ function AppContent() {
   return (
     <>
       {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
+      <OfflineBanner />
       <Toaster />
       <Sonner />
       <BrowserRouter>

@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { PageTransition } from "@/components/PageTransition";
 import { useNavigate } from "react-router-dom";
 import { Camera, Check, Plus, Watch, Tag, X, ChevronDown, Sparkles, Loader2, Calendar } from "lucide-react";
@@ -14,6 +14,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
+import { useOnlineStatus } from "@/hooks/useOnlineStatus";
+import { queueWearEntry, syncWearQueue, getWearQueue } from "@/utils/offlineSync";
 import {
   Select,
   SelectContent,
@@ -32,6 +34,22 @@ const Log = () => {
   const { user } = useAuth();
   const { selectedCollectionId } = useCollection();
   const { watches, refetch } = useWatchData(selectedCollectionId);
+  const isOnline = useOnlineStatus();
+
+  // Sync queued entries when coming back online
+  useEffect(() => {
+    if (isOnline) {
+      const queue = getWearQueue();
+      if (queue.length > 0) {
+        syncWearQueue().then((synced) => {
+          if (synced > 0) {
+            toast.success(`Synced ${synced} offline wear ${synced === 1 ? "entry" : "entries"}`);
+            refetch();
+          }
+        });
+      }
+    }
+  }, [isOnline]);
 
   const [selectedWatchId, setSelectedWatchId] = useState<string>("");
   const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd"));
@@ -105,13 +123,22 @@ const Log = () => {
 
     setIsSubmitting(true);
     try {
-      const { error } = await supabase.from("wear_entries").insert({
+      const entryData = {
         watch_id: selectedWatchId,
         wear_date: date,
         days: 1,
         user_id: user.id,
         notes: [notes, ...tags.map((t) => `#${t}`)].filter(Boolean).join(" ") || null,
-      });
+      };
+
+      if (!isOnline) {
+        queueWearEntry({ ...entryData, queued_at: Date.now() });
+        toast.success("Saved offline — will sync when reconnected");
+        navigate("/");
+        return;
+      }
+
+      const { error } = await supabase.from("wear_entries").insert(entryData);
 
       if (error) throw error;
 
@@ -119,7 +146,21 @@ const Log = () => {
       refetch();
       navigate("/");
     } catch (err: any) {
-      toast.error(err.message || "Failed to log");
+      // If network error, queue offline
+      if (!navigator.onLine) {
+        queueWearEntry({
+          watch_id: selectedWatchId,
+          wear_date: date,
+          days: 1,
+          user_id: user.id,
+          notes: [notes, ...tags.map((t) => `#${t}`)].filter(Boolean).join(" ") || null,
+          queued_at: Date.now(),
+        });
+        toast.success("Saved offline — will sync when reconnected");
+        navigate("/");
+      } else {
+        toast.error(err.message || "Failed to log");
+      }
     } finally {
       setIsSubmitting(false);
     }
