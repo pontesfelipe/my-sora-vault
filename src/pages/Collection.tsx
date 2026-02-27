@@ -208,7 +208,7 @@ const Collection = () => {
     });
   };
 
-  const handleGenerateSuggestions = async (tasteDescription: string) => {
+  const handleGenerateSuggestions = async (tasteDescription: string, focusOnGaps?: boolean) => {
     if (!user) return;
     
     setIsGeneratingSuggestions(true);
@@ -228,8 +228,17 @@ const Collection = () => {
         return;
       }
 
+      // Send actual collection data for better AI analysis
+      const collectionData = watches.map(w => ({
+        brand: w.brand,
+        model: w.model,
+        dial_color: w.dial_color,
+        type: w.type,
+        cost: w.cost,
+      }));
+
       const { data, error } = await supabase.functions.invoke("suggest-watches", {
-        body: { tasteDescription },
+        body: { tasteDescription, collection: collectionData, focusOnGaps: focusOnGaps || false },
       });
 
       if (error) throw error;
