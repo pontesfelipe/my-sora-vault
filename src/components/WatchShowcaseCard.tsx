@@ -17,6 +17,8 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import watchHero from "@/assets/watch-hero.jpg";
+import { WatchContextMenu, useLongPress } from "./WatchContextMenu";
+import { QuickLogSheet } from "./QuickLogSheet";
 
 interface WatchShowcaseCardProps {
   watch: {
@@ -41,7 +43,13 @@ export const WatchShowcaseCard = ({ watch, totalDays, index, onDelete }: WatchSh
   const { toast } = useToast();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showContextMenu, setShowContextMenu] = useState(false);
+  const [showQuickLog, setShowQuickLog] = useState(false);
   const imageUrl = watch.ai_image_url || watch.image_url || watchHero;
+
+  const { handlers: longPressHandlers, isLongPress } = useLongPress(() => {
+    setShowContextMenu(true);
+  });
 
   const handleDelete = async () => {
     setIsDeleting(true);
@@ -81,8 +89,10 @@ export const WatchShowcaseCard = ({ watch, totalDays, index, onDelete }: WatchSh
         animate={{ opacity: 1, y: 0, rotateX: 0 }}
         transition={{ delay: index * 0.06, duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
         className="group cursor-pointer perspective-[1200px]"
+        {...longPressHandlers}
         onClick={(e) => {
           if ((e.target as HTMLElement).closest('button')) return;
+          if (isLongPress.current) return;
           navigate(`/watch/${watch.id}`);
         }}
       >
@@ -187,6 +197,21 @@ export const WatchShowcaseCard = ({ watch, totalDays, index, onDelete }: WatchSh
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <WatchContextMenu
+        open={showContextMenu}
+        onOpenChange={setShowContextMenu}
+        watch={watch}
+        onLogWear={() => setShowQuickLog(true)}
+        onDelete={() => setShowDeleteDialog(true)}
+      />
+
+      <QuickLogSheet
+        open={showQuickLog}
+        onOpenChange={setShowQuickLog}
+        watch={watch}
+        onSuccess={() => onDelete?.()}
+      />
     </>
   );
 };

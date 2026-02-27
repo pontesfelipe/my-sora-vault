@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -300,17 +300,18 @@ export const EditWatchDialog = ({ watch, onSuccess }: { watch: Watch; onSuccess:
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
+    <ResponsiveDialog
+      open={open}
+      onOpenChange={setOpen}
+      title="Edit Watch"
+      trigger={
         <Button variant="outline" size="sm" className="gap-2">
           <Edit className="w-4 h-4" />
           Edit
         </Button>
-      </DialogTrigger>
-      <DialogContent className="bg-card border-border max-w-md max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-foreground">Edit Watch</DialogTitle>
-        </DialogHeader>
+      }
+      className="max-w-md max-h-[90vh] overflow-y-auto"
+    >
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
@@ -671,7 +672,6 @@ export const EditWatchDialog = ({ watch, onSuccess }: { watch: Watch; onSuccess:
             </Button>
           </div>
         </form>
-      </DialogContent>
-    </Dialog>
+    </ResponsiveDialog>
   );
 };
