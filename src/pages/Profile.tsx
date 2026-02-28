@@ -140,6 +140,7 @@ const Profile = () => {
             size="icon"
             onClick={() => navigate("/vault-pal")}
             className="h-9 w-9"
+            aria-label="Vault Assistant"
           >
             <Bot className="h-4 w-4" />
           </Button>
@@ -148,6 +149,7 @@ const Profile = () => {
             size="icon"
             onClick={() => navigate("/settings")}
             className="h-9 w-9"
+            aria-label="Settings"
           >
             <Settings className="h-4 w-4" />
           </Button>
