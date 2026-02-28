@@ -8,10 +8,29 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Input validation schema - limit base64 to ~10MB
+// Input validation schema - limit image payload to ~10MB
 const inputSchema = z.object({
   image: z.string().min(1).max(15000000, 'Image too large (max 10MB)'),
 });
+
+const isLikelyBase64 = (value: string) => {
+  const compact = value.replace(/\s+/g, '');
+  return /^[A-Za-z0-9+/=]+$/.test(compact) && compact.length > 128;
+};
+
+const normalizeImageForGateway = (rawImage: string) => {
+  const image = rawImage.trim();
+
+  if (image.startsWith('data:image/')) return image;
+  if (image.startsWith('http://') || image.startsWith('https://')) return image;
+
+  // Support legacy callers that send only raw base64
+  if (isLikelyBase64(image)) {
+    return `data:image/jpeg;base64,${image.replace(/\s+/g, '')}`;
+  }
+
+  return image;
+};
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -31,7 +50,13 @@ serve(async (req) => {
       );
     }
     
-    const { image } = parseResult.data;
+    const normalizedImage = normalizeImageForGateway(parseResult.data.image);
+    if (!(normalizedImage.startsWith('data:image/') || normalizedImage.startsWith('http://') || normalizedImage.startsWith('https://'))) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid image format. Please upload a valid image.' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     // Rate limit by IP (no auth on this endpoint): 10 per minute
     const clientIp = req.headers.get("x-forwarded-for") || "unknown";
@@ -68,7 +93,7 @@ serve(async (req) => {
               {
                 type: 'image_url',
                 image_url: {
-                  url: image
+                  url: normalizedImage
                 }
               }
             ]
@@ -153,8 +178,19 @@ serve(async (req) => {
         );
       }
       const errorText = await response.text();
-      console.error('AI Gateway error:', response.status, errorText);
-      throw new Error(`AI Gateway error: ${response.status}`);
+      let gatewayMessage = `AI gateway error: ${response.status}`;
+      try {
+        const parsed = JSON.parse(errorText);
+        gatewayMessage = parsed?.error?.message || parsed?.error || gatewayMessage;
+      } catch {
+        if (errorText) gatewayMessage = errorText.slice(0, 500);
+      }
+
+      console.error('AI Gateway error:', response.status, gatewayMessage);
+      return new Response(
+        JSON.stringify({ error: gatewayMessage }),
+        { status: response.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     const data = await response.json();
