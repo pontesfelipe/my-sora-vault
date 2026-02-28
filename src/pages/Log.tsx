@@ -131,7 +131,13 @@ const Log = () => {
         body: { image: base64 },
       });
 
-      if (!error && data) {
+      if (error) {
+        console.error("Identification error:", error);
+        toast.error("Could not identify watch. Try selecting manually.");
+      } else if (data?.error) {
+        console.error("Identification error:", data.error);
+        toast.error(data.error);
+      } else if (data) {
         setIdentifiedWatch(data);
 
         // Auto-match to collection
@@ -146,6 +152,7 @@ const Log = () => {
       }
     } catch (err) {
       console.error("AI identification failed:", err);
+      toast.error("Could not identify watch. Try selecting manually.");
     } finally {
       setIsIdentifying(false);
     }
@@ -563,8 +570,8 @@ function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => {
-      const result = reader.result as string;
-      resolve(result.split(",")[1]);
+      // Return the full data URI (data:image/...;base64,...) — required by the AI Gateway
+      resolve(reader.result as string);
     };
     reader.onerror = reject;
     reader.readAsDataURL(file);
