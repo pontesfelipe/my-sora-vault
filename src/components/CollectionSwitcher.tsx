@@ -8,18 +8,28 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 import { Badge } from "@/components/ui/badge";
 import { useCollection } from "@/contexts/CollectionContext";
 import { useCollectionData } from "@/hooks/useCollectionData";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
 import { CreateCollectionTypeDialog } from "./CreateCollectionTypeDialog";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export const CollectionSwitcher = () => {
   const { selectedCollectionId, setSelectedCollectionId, currentCollection } = useCollection();
   const { collections, refetch } = useCollectionData();
   const { isAdmin } = useAuth();
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const isMobile = useIsMobile();
 
   const getRoleIcon = (role: string) => {
     switch (role) {
@@ -42,21 +52,98 @@ export const CollectionSwitcher = () => {
   const ownedCollections = collections.filter(c => c.role === 'owner');
   const canCreateCollection = isAdmin || ownedCollections.length === 0;
 
+  const triggerButton = (
+    <Button variant="outline" className="gap-2">
+      <Watch className="w-4 h-4" />
+      {currentCollection?.name || "Select Collection"}
+      {currentCollection && (
+        <Badge variant={getRoleBadgeVariant(currentCollection.role || 'viewer')} className="gap-1">
+          {getRoleIcon(currentCollection.role)}
+          {currentCollection.role}
+        </Badge>
+      )}
+    </Button>
+  );
+
+  const collectionItems = (onSelect: (id: string) => void) => (
+    <>
+      {collections.map((collection) => (
+        <button
+          key={collection.id}
+          onClick={() => onSelect(collection.id)}
+          className="flex items-center justify-between w-full px-4 py-3 hover:bg-surfaceMuted transition-colors text-left"
+        >
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            {collection.id === selectedCollectionId && <Check className="w-4 h-4 flex-shrink-0 text-accent" />}
+            <Watch className="w-4 h-4 flex-shrink-0 text-textMuted" />
+            <div className="flex flex-col min-w-0">
+              <span className="truncate text-sm text-textMain">{collection.name}</span>
+              {isAdmin && (collection.ownerName || collection.ownerEmail) && (
+                <span className="text-xs text-textMuted truncate">
+                  by {collection.ownerName || collection.ownerEmail}
+                </span>
+              )}
+            </div>
+          </div>
+          <Badge variant={getRoleBadgeVariant(collection.role || 'viewer')} className="gap-1 flex-shrink-0 ml-2">
+            {getRoleIcon(collection.role)}
+            {collection.role}
+          </Badge>
+        </button>
+      ))}
+
+      {canCreateCollection && (
+        <button
+          onClick={() => setShowCreateDialog(true)}
+          className="flex items-center gap-2 w-full px-4 py-3 hover:bg-surfaceMuted transition-colors text-left text-sm text-textMain border-t border-borderSubtle"
+        >
+          <Plus className="w-4 h-4" />
+          Create New Collection
+        </button>
+      )}
+
+      {!canCreateCollection && (
+        <div className="px-4 py-3 text-xs text-textMuted border-t border-borderSubtle">
+          You can only create one collection. Ask others to share theirs with you.
+        </div>
+      )}
+    </>
+  );
+
+  if (isMobile) {
+    return (
+      <>
+        <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
+          <DrawerTrigger asChild>{triggerButton}</DrawerTrigger>
+          <DrawerContent>
+            <DrawerHeader>
+              <DrawerTitle>My Collections</DrawerTitle>
+            </DrawerHeader>
+            <div className="max-h-[60vh] overflow-y-auto pb-safe">
+              {collectionItems((id) => {
+                setSelectedCollectionId(id);
+                setDrawerOpen(false);
+              })}
+            </div>
+          </DrawerContent>
+        </Drawer>
+
+        {showCreateDialog && (
+          <CreateCollectionTypeDialog
+            onSuccess={() => {
+              setShowCreateDialog(false);
+              refetch();
+            }}
+          />
+        )}
+      </>
+    );
+  }
+
   return (
     <>
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="gap-2">
-            <Watch className="w-4 h-4" />
-            {currentCollection?.name || "Select Collection"}
-            {currentCollection && (
-              <Badge variant={getRoleBadgeVariant(currentCollection.role || 'viewer')} className="gap-1">
-                {getRoleIcon(currentCollection.role)}
-                {currentCollection.role}
-              </Badge>
-            )}
-          </Button>
-        </DropdownMenuTrigger>
+        <DropdownMenuTrigger asChild>{triggerButton}</DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-72">
           <DropdownMenuLabel>My Collections</DropdownMenuLabel>
           <DropdownMenuSeparator />

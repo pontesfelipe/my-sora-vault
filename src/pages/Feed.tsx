@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { CreatePostDialog } from "@/components/forum/CreatePostDialog";
 import { PostCard } from "@/components/forum/PostCard";
 import { MentionNotificationsDropdown } from "@/components/forum/MentionNotificationsDropdown";
+import { FeedItemSkeleton } from "@/components/FeedItemSkeleton";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -16,6 +17,8 @@ import { ChatWindow } from "@/components/messaging/ChatWindow";
 import { AddFriendDialog } from "@/components/messaging/AddFriendDialog";
 import { FriendRequestsList } from "@/components/messaging/FriendRequestsList";
 import { TradeNotificationsList } from "@/components/messaging/TradeNotificationsList";
+import { usePullToRefresh } from "@/hooks/usePullToRefresh";
+import { PullToRefreshIndicator } from "@/components/PullToRefreshIndicator";
 import { toast } from "sonner";
 import type { Conversation } from "@/hooks/useMessaging";
 
@@ -56,13 +59,21 @@ function FeedSection() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
 
-  const { posts, loading, createPost, updatePost, deletePost, togglePinPost, votePost } = useForumData({
+  const { posts, loading, refetch, createPost, updatePost, deletePost, togglePinPost, votePost } = useForumData({
     searchQuery,
     category: selectedCategory,
   });
 
+  const { containerRef, pullDistance, refreshing, progress } = usePullToRefresh({
+    onRefresh: async () => {
+      await refetch?.();
+    },
+  });
+
   return (
-    <div className="space-y-4">
+    <div ref={containerRef} className="space-y-4">
+      <PullToRefreshIndicator pullDistance={pullDistance} refreshing={refreshing} progress={progress} />
+      
       {/* Actions */}
       <div className="flex items-center gap-2">
         <div className="relative flex-1">
@@ -82,7 +93,7 @@ function FeedSection() {
       <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
         <button
           onClick={() => setSelectedCategory("all")}
-          className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+          className={`shrink-0 px-3 py-2 rounded-full text-xs font-medium transition-colors ${
             selectedCategory === "all"
               ? "bg-accent text-accent-foreground"
               : "bg-surfaceMuted text-textMuted hover:text-textMain"
@@ -94,7 +105,7 @@ function FeedSection() {
           <button
             key={cat.value}
             onClick={() => setSelectedCategory(cat.value)}
-            className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+            className={`shrink-0 px-3 py-2 rounded-full text-xs font-medium transition-colors ${
               selectedCategory === cat.value
                 ? "bg-accent text-accent-foreground"
                 : "bg-surfaceMuted text-textMuted hover:text-textMain"
@@ -107,8 +118,10 @@ function FeedSection() {
 
       {/* Posts */}
       {loading ? (
-        <div className="flex justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-textMuted" />
+        <div className="space-y-3">
+          <FeedItemSkeleton />
+          <FeedItemSkeleton />
+          <FeedItemSkeleton />
         </div>
       ) : posts.length === 0 ? (
         <Card className="p-8 text-center border-dashed border-borderSubtle">

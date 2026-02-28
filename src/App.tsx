@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { PasscodeProvider } from "@/contexts/PasscodeContext";
 import { CollectionProvider } from "@/contexts/CollectionContext";
@@ -11,6 +11,7 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import { AppLayout } from "@/components/AppLayout";
 import { SplashScreen } from "@/components/SplashScreen";
 import { OfflineBanner } from "@/components/OfflineBanner";
+import { AnimatePresence, motion } from "framer-motion";
 
 // Lazy-loaded pages for code splitting
 const Home = lazy(() => import("./pages/Home"));
@@ -28,7 +29,16 @@ const VaultPal = lazy(() => import("./pages/VaultPal"));
 const TradeRules = lazy(() => import("./pages/TradeRules"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000,
+      gcTime: 30 * 60 * 1000,
+      retry: 2,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -54,18 +64,37 @@ const PageFallback = () => (
   </div>
 );
 
-function AppContent() {
-  const [showSplash, setShowSplash] = useState(true);
+const useReducedMotion = () => {
+  const [prefersReduced, setReduced] = useState(() =>
+    typeof window !== "undefined"
+      ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      : false
+  );
+  return prefersReduced;
+};
+
+const pageVariants = {
+  initial: { opacity: 0, y: 6 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -6 },
+};
+
+function AnimatedRoutes() {
+  const location = useLocation();
+  const prefersReduced = useReducedMotion();
 
   return (
-    <>
-      {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
-      <OfflineBanner />
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={location.pathname}
+        variants={prefersReduced ? undefined : pageVariants}
+        initial={prefersReduced ? false : "initial"}
+        animate="animate"
+        exit={prefersReduced ? undefined : "exit"}
+        transition={{ duration: 0.15, ease: "easeOut" }}
+      >
         <Suspense fallback={<PageFallback />}>
-          <Routes>
+          <Routes location={location}>
             <Route path="/auth" element={<Auth />} />
             
             {/* Core 4 tabs */}
@@ -99,6 +128,22 @@ function AppContent() {
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
+function AppContent() {
+  const [showSplash, setShowSplash] = useState(true);
+
+  return (
+    <>
+      {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
+      <OfflineBanner />
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <AnimatedRoutes />
       </BrowserRouter>
     </>
   );
