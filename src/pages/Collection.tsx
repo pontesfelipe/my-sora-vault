@@ -1,5 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Search, RefreshCw, History, ChevronDown, ChevronUp, Plus, Heart, Sparkles, Trash2 } from "lucide-react";
+import { usePullToRefresh } from "@/hooks/usePullToRefresh";
+import { PullToRefreshIndicator } from "@/components/PullToRefreshIndicator";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -71,6 +73,14 @@ const Collection = () => {
     refetch();
     refetchPast();
   };
+
+  const handlePullRefresh = useCallback(async () => {
+    await refetch();
+  }, [refetch]);
+
+  const { containerRef, pullDistance, refreshing, progress } = usePullToRefresh({
+    onRefresh: handlePullRefresh,
+  });
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -338,7 +348,8 @@ const Collection = () => {
   const aiSuggestedItems = wishlist.filter(item => item.is_ai_suggested);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" ref={containerRef}>
+      <PullToRefreshIndicator pullDistance={pullDistance} refreshing={refreshing} progress={progress} />
       {/* Header */}
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">

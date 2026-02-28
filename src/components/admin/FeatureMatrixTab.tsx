@@ -220,10 +220,11 @@ export const FeatureMatrixTab = () => {
                                     <TooltipTrigger asChild>
                                       <AlertDialog>
                                         <AlertDialogTrigger asChild>
-                                          <Button 
-                                            variant="ghost" 
-                                            size="icon" 
+                                          <Button
+                                            variant="ghost"
+                                            size="icon"
                                             className="h-6 w-6 text-muted-foreground hover:text-destructive"
+                                            aria-label="Remove feature from collection type"
                                           >
                                             <X className="h-3 w-3" />
                                           </Button>
@@ -263,6 +264,7 @@ export const FeatureMatrixTab = () => {
                                     variant="ghost"
                                     size="icon"
                                     className="h-8 w-8 text-muted-foreground hover:text-primary"
+                                    aria-label="Add feature to collection type"
                                     onClick={() => handleExtendFeature(featureKey, type, feature.name)}
                                     disabled={isExtending}
                                   >
@@ -289,7 +291,7 @@ export const FeatureMatrixTab = () => {
                         {!isProtected && (
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive">
+                              <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" aria-label="Delete feature">
                                 <Trash2 className="h-4 w-4" />
                               </Button>
                             </AlertDialogTrigger>

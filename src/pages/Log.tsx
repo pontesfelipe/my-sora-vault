@@ -1,7 +1,9 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { PageTransition } from "@/components/PageTransition";
 import { useNavigate } from "react-router-dom";
 import { Camera, Check, Plus, Watch, Tag, X, ChevronDown, Sparkles, Loader2, Calendar, Upload } from "lucide-react";
+import { usePullToRefresh } from "@/hooks/usePullToRefresh";
+import { PullToRefreshIndicator } from "@/components/PullToRefreshIndicator";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -36,6 +38,14 @@ const Log = () => {
   const { selectedCollectionId } = useCollection();
   const { watches, refetch } = useWatchData(selectedCollectionId);
   const isOnline = useOnlineStatus();
+
+  const handlePullRefresh = useCallback(async () => {
+    await refetch();
+  }, [refetch]);
+
+  const { containerRef: pullRefreshRef, pullDistance, refreshing, progress } = usePullToRefresh({
+    onRefresh: handlePullRefresh,
+  });
 
   // Sync queued entries when coming back online
   useEffect(() => {
@@ -225,7 +235,8 @@ const Log = () => {
 
   return (
     <PageTransition>
-    <div className="space-y-5 pb-8 max-w-lg mx-auto">
+    <div className="space-y-5 pb-8 max-w-lg mx-auto" ref={pullRefreshRef}>
+      <PullToRefreshIndicator pullDistance={pullDistance} refreshing={refreshing} progress={progress} />
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

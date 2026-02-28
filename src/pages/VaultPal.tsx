@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Send, Trash2, Bot, Sparkles, Loader2, User, Plus, MessageSquare, Pencil, Search, X, ChevronDown, ChevronUp, RefreshCw, Mic, MicOff } from "lucide-react";
+import { Send, Trash2, Bot, Sparkles, Loader2, User, Plus, MessageSquare, Pencil, Search, X, ChevronDown, ChevronUp, RefreshCw, Mic, MicOff, ArrowDown } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
@@ -61,7 +62,9 @@ const VaultPal = () => {
   const [newTitle, setNewTitle] = useState("");
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const bottomSentinelRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [showScrollButton, setShowScrollButton] = useState(false);
   const isMobile = useIsMobile();
 
   // Voice input hook
@@ -181,6 +184,24 @@ const VaultPal = () => {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages]);
+
+  // Detect when user scrolls away from bottom
+  useEffect(() => {
+    const sentinel = bottomSentinelRef.current;
+    if (!sentinel) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setShowScrollButton(!entry.isIntersecting),
+      { threshold: 0.1 }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, []);
+
+  const scrollToBottom = useCallback(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
+    }
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -502,8 +523,31 @@ const VaultPal = () => {
                 </div>
               </div>
             )}
+            <div ref={bottomSentinelRef} className="h-1" />
           </div>
         </ScrollArea>
+
+        {/* Scroll to latest indicator */}
+        <AnimatePresence>
+          {showScrollButton && messages.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              className="absolute bottom-24 left-1/2 -translate-x-1/2 z-10"
+            >
+              <Button
+                onClick={scrollToBottom}
+                size="sm"
+                variant="secondary"
+                className="rounded-full shadow-lg gap-1.5 px-4"
+              >
+                <ArrowDown className="h-3.5 w-3.5" />
+                New messages
+              </Button>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Input Area */}
         <div className="shrink-0 border-t border-borderSubtle bg-surface px-4 py-3">

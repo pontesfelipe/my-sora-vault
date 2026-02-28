@@ -1,13 +1,14 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, Watch, ChevronRight } from "lucide-react";
+import { Plus, Watch, ChevronRight, Clock, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { useWatchData } from "@/hooks/useWatchData";
 import { useCollection } from "@/contexts/CollectionContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { format, startOfWeek, endOfWeek, isWithinInterval, parseISO } from "date-fns";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { PageTransition } from "@/components/PageTransition";
 import { QuickLogSheet } from "@/components/QuickLogSheet";
 
@@ -18,6 +19,7 @@ const Home = () => {
   const { watches, wearEntries, loading, refetch } = useWatchData(selectedCollectionId);
   const [quickLogWatch, setQuickLogWatch] = useState<any>(null);
   const [quickLogOpen, setQuickLogOpen] = useState(false);
+  const [fabOpen, setFabOpen] = useState(false);
 
   // Calculate "Your Week" data
   const weekData = useMemo(() => {
@@ -250,6 +252,58 @@ const Home = () => {
         watch={quickLogWatch}
         onSuccess={() => refetch?.()}
       />
+
+      {/* Floating Action Button */}
+      <motion.div
+        className="fixed bottom-20 right-4 z-40"
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ delay: 0.3, type: "spring", stiffness: 260, damping: 20 }}
+      >
+        <Button
+          onClick={() => setFabOpen(true)}
+          size="icon"
+          className="h-14 w-14 rounded-full shadow-luxury"
+          aria-label="Quick actions"
+        >
+          <Plus className="h-6 w-6" />
+        </Button>
+      </motion.div>
+
+      {/* Quick Actions Bottom Sheet */}
+      <Drawer open={fabOpen} onOpenChange={setFabOpen}>
+        <DrawerContent className="px-4 pb-8">
+          <DrawerHeader className="text-center pb-2">
+            <DrawerTitle>Quick Actions</DrawerTitle>
+          </DrawerHeader>
+          <div className="flex flex-col gap-1">
+            <Button
+              variant="ghost"
+              className="w-full justify-start gap-3 h-12 text-sm font-medium"
+              onClick={() => { setFabOpen(false); navigate("/log"); }}
+            >
+              <Clock className="h-4 w-4" />
+              Log a Wear
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full justify-start gap-3 h-12 text-sm font-medium"
+              onClick={() => { setFabOpen(false); navigate("/profile"); }}
+            >
+              <Plus className="h-4 w-4" />
+              Add a Watch
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full justify-start gap-3 h-12 text-sm font-medium"
+              onClick={() => { setFabOpen(false); navigate("/log"); }}
+            >
+              <Camera className="h-4 w-4" />
+              Quick Photo ID
+            </Button>
+          </div>
+        </DrawerContent>
+      </Drawer>
     </PageTransition>
   );
 };
