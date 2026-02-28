@@ -1,9 +1,12 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
+import { PageTransition } from "@/components/PageTransition";
 import { useNavigate } from "react-router-dom";
 import {
   Watch, Settings, Heart, List, Plus, Search, Users, ChevronRight,
   Grid3X3, BookHeart, Bot, ShoppingBag, ArrowUpDown, ScrollText
 } from "lucide-react";
+import { CreateListDialog } from "@/components/CreateListDialog";
+import { ListDetailView } from "@/components/ListDetailView";
 import { useTrustLevel } from "@/hooks/useTrustLevel";
 import { TrustLevelBadge } from "@/components/TrustLevelBadge";
 import { WatchCaseGrid } from "@/components/WatchCaseGrid";
@@ -37,7 +40,7 @@ const Profile = () => {
   const [profileData, setProfileData] = useState<any>(null);
 
   // Load profile data
-  useState(() => {
+  useEffect(() => {
     if (!user) return;
     supabase
       .from("profiles")
@@ -47,13 +50,13 @@ const Profile = () => {
       .then(({ data }) => {
         if (data) setProfileData(data);
       });
-  });
+  }, [user]);
 
   // Get follower/following counts
   const [followerCount, setFollowerCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
 
-  useState(() => {
+  useEffect(() => {
     if (!user) return;
     supabase
       .from("friendships")
@@ -66,7 +69,7 @@ const Profile = () => {
       .select("id", { count: "exact" })
       .eq("friend_id", user.id)
       .then(({ count }) => setFollowerCount(count || 0));
-  });
+  }, [user]);
 
   // Recent logs
   const recentLogs = useMemo(() => {
@@ -110,6 +113,7 @@ const Profile = () => {
   }
 
   return (
+    <PageTransition>
     <div className="space-y-5 pb-4">
       {/* Profile Header */}
       <div className="flex items-start gap-4">
@@ -136,6 +140,7 @@ const Profile = () => {
             size="icon"
             onClick={() => navigate("/vault-pal")}
             className="h-9 w-9"
+            aria-label="Vault Assistant"
           >
             <Bot className="h-4 w-4" />
           </Button>
@@ -144,6 +149,7 @@ const Profile = () => {
             size="icon"
             onClick={() => navigate("/settings")}
             className="h-9 w-9"
+            aria-label="Settings"
           >
             <Settings className="h-4 w-4" />
           </Button>
@@ -265,7 +271,7 @@ const Profile = () => {
               </p>
             </Card>
           ) : (
-            <WatchCaseGrid watches={filteredWatches} wearEntries={wearEntries} onDelete={refetch} />
+            <WatchCaseGrid watches={filteredWatches} wearEntries={wearEntries} onDelete={refetch} isLoading={loading} />
           )}
           <p className="text-xs text-textMuted text-center">
             {watches.length} {watches.length === 1 ? currentCollectionConfig.singularLabel.toLowerCase() : currentCollectionConfig.pluralLabel.toLowerCase()}
@@ -283,55 +289,82 @@ const Profile = () => {
         </TabsContent>
       </Tabs>
     </div>
+    </PageTransition>
   );
 };
 
 function ListsSection({ watches }: { watches: any[] }) {
-  const navigate = useNavigate();
   const { user } = useAuth();
   const [lists, setLists] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedList, setSelectedList] = useState<any>(null);
 
-  useState(() => {
+  const fetchLists = useCallback(async () => {
     if (!user) return;
-    supabase
+    setLoading(true);
+    const { data } = await supabase
       .from("user_lists")
       .select("*, list_items(watch_id)")
       .eq("user_id", user.id)
-      .order("created_at", { ascending: false })
-      .then(({ data }) => {
-        setLists(data || []);
-        setLoading(false);
-      });
-  });
+      .order("created_at", { ascending: false });
+    setLists(data || []);
+    setLoading(false);
+  }, [user]);
 
-  // Default system lists
-  const systemLists = [
-    { name: "Trade", icon: ArrowUpDown, count: watches.filter((w) => w.available_for_trade).length },
-  ];
+  useEffect(() => {
+    fetchLists();
+  }, [fetchLists]);
+
+  // Trade list (system-level, not stored in user_lists)
+  const tradeWatches = watches.filter((w) => w.available_for_trade);
+
+  if (selectedList) {
+    if (selectedList.id === "__trade__") {
+      return (
+        <ListDetailView
+          list={{ id: "__trade__", name: "Trade", is_system: true }}
+          watches={watches}
+          onBack={() => setSelectedList(null)}
+        />
+      );
+    }
+    return (
+      <ListDetailView
+        list={selectedList}
+        watches={watches}
+        onBack={() => setSelectedList(null)}
+        onDelete={fetchLists}
+      />
+    );
+  }
 
   return (
     <div className="space-y-2">
-      {systemLists.map((list) => (
-        <Card
-          key={list.name}
-          className="flex items-center gap-3 p-3 cursor-pointer hover:bg-surfaceMuted transition-colors border-borderSubtle"
-        >
-          <div className="h-9 w-9 rounded-xl bg-accentSubtle flex items-center justify-center">
-            <list.icon className="h-4 w-4 text-accent" />
-          </div>
-          <div className="flex-1">
-            <p className="text-sm font-medium text-textMain">{list.name}</p>
-            <p className="text-xs text-textMuted">{list.count} items</p>
-          </div>
-          <ChevronRight className="h-4 w-4 text-textMuted" />
-        </Card>
-      ))}
+      <div className="flex justify-end mb-2">
+        <CreateListDialog onSuccess={fetchLists} />
+      </div>
 
+      {/* Trade system list */}
+      <Card
+        className="flex items-center gap-3 p-3 cursor-pointer hover:bg-surfaceMuted transition-colors border-borderSubtle"
+        onClick={() => setSelectedList({ id: "__trade__", name: "Trade", is_system: true })}
+      >
+        <div className="h-9 w-9 rounded-xl bg-accentSubtle flex items-center justify-center">
+          <ArrowUpDown className="h-4 w-4 text-accent" />
+        </div>
+        <div className="flex-1">
+          <p className="text-sm font-medium text-textMain">Trade</p>
+          <p className="text-xs text-textMuted">{tradeWatches.length} items</p>
+        </div>
+        <ChevronRight className="h-4 w-4 text-textMuted" />
+      </Card>
+
+      {/* Custom lists */}
       {lists.map((list) => (
         <Card
           key={list.id}
           className="flex items-center gap-3 p-3 cursor-pointer hover:bg-surfaceMuted transition-colors border-borderSubtle"
+          onClick={() => setSelectedList(list)}
         >
           <div className="h-9 w-9 rounded-xl bg-surfaceMuted flex items-center justify-center">
             <List className="h-4 w-4 text-textMuted" />
@@ -346,10 +379,12 @@ function ListsSection({ watches }: { watches: any[] }) {
         </Card>
       ))}
 
-      <Card className="p-4 text-center border-dashed border-borderSubtle text-sm text-textMuted">
-        <p>Create custom lists to organize your collection</p>
-        <p className="text-xs mt-1">e.g. "Dive Watches", "My Top 10"</p>
-      </Card>
+      {lists.length === 0 && (
+        <Card className="p-4 text-center border-dashed border-borderSubtle text-sm text-textMuted">
+          <p>Create custom lists to organize your collection</p>
+          <p className="text-xs mt-1">e.g. "Dive Watches", "My Top 10"</p>
+        </Card>
+      )}
     </div>
   );
 }

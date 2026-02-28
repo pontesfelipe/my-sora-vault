@@ -6,34 +6,34 @@
 
 @layer base {
   :root {
-    /* Light Theme - Premium Minimal Aesthetic */
-    --background: 220 14% 97%;
-    --foreground: 220 19% 13%;
+    /* Light Theme - Luxury Vault Aesthetic */
+    --background: 216 33% 97%;
+    --foreground: 222 25% 10%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 19% 13%;
+    --card-foreground: 222 25% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 19% 13%;
+    --popover-foreground: 222 25% 10%;
 
-    --primary: 219 98% 61%;
+    --primary: 215 50% 57%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 14% 95%;
-    --secondary-foreground: 220 19% 13%;
+    --secondary: 216 20% 94%;
+    --secondary-foreground: 222 25% 10%;
 
-    --muted: 220 14% 95%;
-    --muted-foreground: 220 9% 46%;
+    --muted: 216 20% 94%;
+    --muted-foreground: 215 12% 50%;
 
-    --accent: 219 98% 61%;
+    --accent: 215 50% 57%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 13% 90%;
-    --input: 220 13% 90%;
-    --ring: 219 98% 61%;
+    --border: 216 18% 89%;
+    --input: 216 18% 89%;
+    --ring: 215 50% 57%;
 
     --radius: 0.75rem;
     --radius-lg: 1.125rem;
@@ -42,114 +42,122 @@
 
     /* Custom design tokens */
     --surface: 0 0% 100%;
-    --surface-muted: 220 14% 95%;
-    --border-subtle: 220 13% 90%;
-    --border-strong: 220 11% 80%;
-    --text-main: 220 19% 13%;
-    --text-soft: 220 12% 34%;
-    --text-muted: 220 9% 46%;
-    --accent-hover: 219 72% 52%;
-    --accent-subtle: 219 100% 94%;
+    --surface-muted: 216 20% 94%;
+    --border-subtle: 216 18% 89%;
+    --border-strong: 216 14% 80%;
+    --text-main: 222 25% 10%;
+    --text-soft: 220 12% 30%;
+    --text-muted: 215 12% 50%;
+    --accent-hover: 215 55% 48%;
+    --accent-subtle: 215 70% 94%;
+
+    /* Gold accent for luxury touches */
+    --gold: 40 60% 55%;
+    --gold-muted: 40 30% 75%;
 
     /* Shadows */
     --shadow-soft: 0px 2px 6px rgba(0, 0, 0, 0.04);
     --shadow-card: 0px 4px 20px rgba(0, 0, 0, 0.06);
     --shadow-luxury: 0px 8px 30px rgba(0, 0, 0, 0.08);
-    --shadow-glow: 0 0 20px hsl(219 98% 61% / 0.15);
-    --gradient-luxury: linear-gradient(135deg, hsl(219 98% 61% / 0.08), hsl(219 98% 61% / 0.02));
+    --shadow-glow: 0 0 20px hsl(215 50% 57% / 0.15);
+    --gradient-luxury: linear-gradient(135deg, hsl(215 50% 57% / 0.08), hsl(215 50% 57% / 0.02));
 
     /* Sidebar */
     --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 220 9% 46%;
-    --sidebar-primary: 220 19% 13%;
+    --sidebar-foreground: 215 12% 50%;
+    --sidebar-primary: 222 25% 10%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 219 100% 97%;
-    --sidebar-accent-foreground: 220 19% 13%;
-    --sidebar-border: 220 13% 90%;
-    --sidebar-ring: 219 98% 61%;
+    --sidebar-accent: 215 70% 97%;
+    --sidebar-accent-foreground: 222 25% 10%;
+    --sidebar-border: 216 18% 89%;
+    --sidebar-ring: 215 50% 57%;
 
     --danger: 0 72% 51%;
 
-    /* Watch case showcase tokens - light */
-    --watch-case-top: 30 15% 78%;
-    --watch-case-bottom: 30 12% 68%;
-    --watch-case-shadow: 30 10% 30% / 0.3;
-    --watch-case-frame-start: 30 12% 82%;
-    --watch-case-frame-end: 30 10% 72%;
-    --watch-velvet-start: 240 8% 20%;
-    --watch-velvet-end: 240 10% 14%;
-    --watch-cushion-glow: 240 8% 28% / 0.4;
+    /* Watch case showcase tokens - light (cream/ivory) */
+    --watch-case-top: 35 20% 82%;
+    --watch-case-bottom: 35 15% 72%;
+    --watch-case-shadow: 35 12% 30% / 0.3;
+    --watch-case-frame-start: 35 18% 85%;
+    --watch-case-frame-end: 35 14% 74%;
+    --watch-velvet-start: 225 15% 22%;
+    --watch-velvet-end: 225 18% 15%;
+    --watch-cushion-glow: 225 12% 30% / 0.4;
   }
 
   .dark {
-    /* Dark Theme - Premium Modern Aesthetic */
-    --background: 216 28% 7%;
+    /* Dark Theme - Deep Charcoal Luxury */
+    --background: 222 25% 3%;
     --foreground: 216 20% 93%;
 
-    --card: 216 21% 11%;
+    --card: 222 22% 8%;
     --card-foreground: 216 20% 93%;
 
-    --popover: 216 21% 11%;
+    --popover: 222 22% 8%;
     --popover-foreground: 216 20% 93%;
 
-    --primary: 219 98% 61%;
+    --primary: 215 50% 57%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 216 17% 15%;
+    --secondary: 222 18% 13%;
     --secondary-foreground: 216 20% 93%;
 
-    --muted: 216 17% 15%;
-    --muted-foreground: 215 14% 58%;
+    --muted: 222 18% 13%;
+    --muted-foreground: 215 14% 55%;
 
-    --accent: 219 98% 61%;
+    --accent: 215 50% 57%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 215 18% 20%;
-    --input: 215 18% 20%;
-    --ring: 219 98% 61%;
+    --border: 222 16% 16%;
+    --input: 222 16% 16%;
+    --ring: 215 50% 57%;
 
     /* Custom design tokens - dark */
-    --surface: 216 21% 11%;
-    --surface-muted: 216 17% 15%;
-    --border-subtle: 215 18% 20%;
-    --border-strong: 215 16% 27%;
+    --surface: 222 22% 8%;
+    --surface-muted: 222 18% 13%;
+    --border-subtle: 222 16% 16%;
+    --border-strong: 222 14% 22%;
     --text-main: 216 20% 93%;
     --text-soft: 215 15% 76%;
-    --text-muted: 215 14% 58%;
-    --accent-hover: 219 72% 52%;
-    --accent-subtle: 219 98% 61% / 0.15;
+    --text-muted: 215 14% 55%;
+    --accent-hover: 215 55% 48%;
+    --accent-subtle: 215 50% 57% / 0.15;
+
+    /* Gold accent for luxury touches */
+    --gold: 40 55% 50%;
+    --gold-muted: 40 25% 35%;
 
     /* Shadows - dark */
-    --shadow-soft: 0px 2px 4px rgba(0, 0, 0, 0.25);
-    --shadow-card: 0px 4px 16px rgba(0, 0, 0, 0.35);
-    --shadow-luxury: 0px 8px 30px rgba(0, 0, 0, 0.45);
-    --shadow-glow: 0 0 20px hsl(219 98% 61% / 0.25);
-    --gradient-luxury: linear-gradient(135deg, hsl(219 98% 61% / 0.12), hsl(219 98% 61% / 0.04));
+    --shadow-soft: 0px 2px 4px rgba(0, 0, 0, 0.3);
+    --shadow-card: 0px 4px 16px rgba(0, 0, 0, 0.4);
+    --shadow-luxury: 0px 8px 30px rgba(0, 0, 0, 0.5);
+    --shadow-glow: 0 0 24px hsl(215 50% 57% / 0.2);
+    --gradient-luxury: linear-gradient(135deg, hsl(215 50% 57% / 0.12), hsl(215 50% 57% / 0.04));
 
     /* Sidebar - dark */
-    --sidebar-background: 216 21% 11%;
-    --sidebar-foreground: 215 14% 58%;
+    --sidebar-background: 222 22% 8%;
+    --sidebar-foreground: 215 14% 55%;
     --sidebar-primary: 216 20% 93%;
-    --sidebar-primary-foreground: 216 28% 7%;
-    --sidebar-accent: 219 98% 61% / 0.15;
+    --sidebar-primary-foreground: 222 25% 3%;
+    --sidebar-accent: 215 50% 57% / 0.15;
     --sidebar-accent-foreground: 216 20% 93%;
-    --sidebar-border: 215 18% 20%;
-    --sidebar-ring: 219 98% 61%;
+    --sidebar-border: 222 16% 16%;
+    --sidebar-ring: 215 50% 57%;
 
     --danger: 0 72% 51%;
 
-    /* Watch case showcase tokens - dark */
-    --watch-case-top: 30 8% 32%;
-    --watch-case-bottom: 30 6% 22%;
-    --watch-case-shadow: 0 0% 0% / 0.5;
-    --watch-case-frame-start: 30 6% 28%;
-    --watch-case-frame-end: 30 5% 18%;
-    --watch-velvet-start: 240 12% 12%;
-    --watch-velvet-end: 240 14% 8%;
-    --watch-cushion-glow: 240 10% 22% / 0.5;
+    /* Watch case showcase tokens - dark (walnut/leather) */
+    --watch-case-top: 25 10% 28%;
+    --watch-case-bottom: 25 8% 18%;
+    --watch-case-shadow: 0 0% 0% / 0.6;
+    --watch-case-frame-start: 25 8% 24%;
+    --watch-case-frame-end: 25 7% 15%;
+    --watch-velvet-start: 230 18% 10%;
+    --watch-velvet-end: 230 22% 6%;
+    --watch-cushion-glow: 230 14% 18% / 0.5;
   }
 }
 
@@ -253,6 +261,15 @@
   .focus-mobile:focus-visible {
     @apply outline-none ring-2 ring-accent ring-offset-2 ring-offset-background;
   }
+
+  /* Hide scrollbar for horizontal carousels */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 /* Table mobile responsiveness */
@@ -275,6 +292,13 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* Focus visible ring for accessibility */
+*:focus-visible {
+  outline: 2px solid hsl(var(--accent));
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
 /* Safe area for bottom navigation (iOS notch devices) */

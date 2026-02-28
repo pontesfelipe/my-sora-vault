@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { rateLimitResponse } from "../_shared/rate-limiter.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -12,6 +13,12 @@ serve(async (req) => {
 
   try {
     const { watches } = await req.json();
+
+    // Rate limit: 5 per minute per IP
+    const clientIp = req.headers.get("x-forwarded-for") || "unknown";
+    const rlResponse = rateLimitResponse(clientIp, "analyze-collection", corsHeaders, 5, 60_000);
+    if (rlResponse) return rlResponse;
+
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {

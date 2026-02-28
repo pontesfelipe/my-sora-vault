@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { rateLimitResponse } from "../_shared/rate-limiter.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -38,6 +39,10 @@ serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    // Rate limit: 20 messages per minute
+    const rlResponse = rateLimitResponse(user.id, "vault-pal-chat", corsHeaders, 20, 60_000);
+    if (rlResponse) return rlResponse;
 
     const { messages, collectionId, collectionType } = await req.json() as {
       messages: ChatMessage[];

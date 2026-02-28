@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -283,15 +283,12 @@ export const AddWearDialog = ({ watchId, onSuccess }: { watchId: string; onSucce
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <>
       <Button onClick={() => setOpen(true)} variant="outline" size="sm" className="gap-2">
         <Calendar className="w-4 h-4" />
         Log Wear
       </Button>
-      <DialogContent className="bg-card border-border max-w-md">
-        <DialogHeader>
-          <DialogTitle className="text-foreground">Add Wear Entry</DialogTitle>
-        </DialogHeader>
+      <ResponsiveDialog open={open} onOpenChange={setOpen} title="Add Wear Entry" className="max-w-md">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="wearDate">Date</Label>
@@ -608,7 +605,7 @@ export const AddWearDialog = ({ watchId, onSuccess }: { watchId: string; onSucce
             </Button>
           </div>
         </form>
-      </DialogContent>
-    </Dialog>
+      </ResponsiveDialog>
+    </>
   );
 };

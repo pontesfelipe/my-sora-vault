@@ -299,6 +299,7 @@ const VaultPal = () => {
                   size="icon"
                   onClick={() => setShowHistory(!showHistory)}
                   className="shrink-0"
+                  aria-label="Chat history"
                 >
                   <MessageSquare className="w-5 h-5" />
                 </Button>
@@ -366,7 +367,7 @@ const VaultPal = () => {
                     className="h-7 w-7 shrink-0 text-accent hover:text-accent/80"
                     onClick={refreshInsights}
                     disabled={isRefreshingInsights}
-                    title="Refresh insights"
+                    aria-label="Refresh insights"
                   >
                     {isRefreshingInsights ? (
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -472,17 +473,15 @@ const VaultPal = () => {
                   I'm your personal collection expert. I know everything about your {itemLabel.toLowerCase()}, 
                   wear patterns, trips, events, and preferences. Ask me anything!
                 </p>
-                <div className="flex flex-wrap gap-2 justify-center max-w-lg">
+                <div className="flex gap-2.5 overflow-x-auto scrollbar-hide pb-2 w-full px-4 snap-x snap-mandatory touch-pan-y">
                   {suggestedQuestions.map((question, idx) => (
-                    <Button
+                    <button
                       key={idx}
-                      variant="outline"
-                      size="sm"
                       onClick={() => sendMessage(question)}
-                      className="text-xs"
+                      className="text-xs whitespace-nowrap shrink-0 snap-start py-2.5 px-5 rounded-full bg-accent/10 text-accent font-medium border border-accent/20 hover:bg-accent/20 active:scale-95 transition-all"
                     >
                       {question}
-                    </Button>
+                    </button>
                   ))}
                 </div>
               </div>
@@ -526,12 +525,19 @@ const VaultPal = () => {
               <Textarea
                 ref={textareaRef}
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
+                onChange={(e) => {
+                  setInput(e.target.value);
+                  // Auto-resize textarea
+                  const ta = e.target;
+                  ta.style.height = 'auto';
+                  ta.style.height = Math.min(ta.scrollHeight, 120) + 'px';
+                }}
                 onKeyDown={handleKeyDown}
                 placeholder={isListening ? "Speak now..." : `Ask about your ${itemLabel.toLowerCase()}...`}
-                className="min-h-[44px] max-h-[120px] resize-none"
+                className="min-h-[44px] max-h-[120px] resize-none overflow-hidden"
                 rows={1}
                 disabled={isLoading}
+                style={{ height: '44px' }}
               />
               {isVoiceSupported && (
                 <Button

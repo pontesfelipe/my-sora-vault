@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Upload } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import ExcelJS from "exceljs";
+import { ResponsiveDialog } from "@/components/ResponsiveDialog";
 
 export const ImportSpreadsheetDialog = () => {
   const [open, setOpen] = useState(false);
@@ -26,33 +26,23 @@ export const ImportSpreadsheetDialog = () => {
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.load(arrayBuffer);
 
-    // Parse Page 1 - Monthly wear data
     const sheet1 = workbook.worksheets[0];
     const page1: any[] = [];
     sheet1.eachRow((row, rowNumber) => {
-      if (rowNumber <= 2) return; // skip header rows
+      if (rowNumber <= 2) return;
       const vals = row.values as any[];
-      // ExcelJS row.values is 1-indexed (index 0 is undefined)
       if (!vals[1] || !vals[2]) return;
       page1.push({
-        brand: vals[1],
-        model: vals[2],
-        jan: parseFloat(vals[5]) || 0,
-        feb: parseFloat(vals[6]) || 0,
-        mar: parseFloat(vals[7]) || 0,
-        apr: parseFloat(vals[8]) || 0,
-        may: parseFloat(vals[9]) || 0,
-        jun: parseFloat(vals[10]) || 0,
-        jul: parseFloat(vals[11]) || 0,
-        aug: parseFloat(vals[12]) || 0,
-        sep: parseFloat(vals[13]) || 0,
-        oct: parseFloat(vals[14]) || 0,
-        nov: parseFloat(vals[15]) || 0,
-        dec: parseFloat(vals[16]) || 0,
+        brand: vals[1], model: vals[2],
+        jan: parseFloat(vals[5]) || 0, feb: parseFloat(vals[6]) || 0,
+        mar: parseFloat(vals[7]) || 0, apr: parseFloat(vals[8]) || 0,
+        may: parseFloat(vals[9]) || 0, jun: parseFloat(vals[10]) || 0,
+        jul: parseFloat(vals[11]) || 0, aug: parseFloat(vals[12]) || 0,
+        sep: parseFloat(vals[13]) || 0, oct: parseFloat(vals[14]) || 0,
+        nov: parseFloat(vals[15]) || 0, dec: parseFloat(vals[16]) || 0,
       });
     });
 
-    // Parse Page 3 - Watch specs
     const sheet3 = workbook.worksheets[2];
     const page3: any[] = [];
     sheet3.eachRow((row, rowNumber) => {
@@ -60,22 +50,13 @@ export const ImportSpreadsheetDialog = () => {
       const vals = row.values as any[];
       if (!vals[1] || !vals[2]) return;
       page3.push({
-        brand: vals[1],
-        model: vals[2],
-        price: vals[3],
-        movement: vals[4],
-        powerReserve: vals[5],
-        crystal: vals[6],
-        caseMaterial: vals[7],
-        caseSize: vals[8],
-        lugToLug: vals[9],
-        waterResistance: vals[10],
-        caseback: vals[11],
-        band: vals[12],
+        brand: vals[1], model: vals[2], price: vals[3], movement: vals[4],
+        powerReserve: vals[5], crystal: vals[6], caseMaterial: vals[7],
+        caseSize: vals[8], lugToLug: vals[9], waterResistance: vals[10],
+        caseback: vals[11], band: vals[12],
       });
     });
 
-    // Parse Page 4 - Personal notes
     const sheet4 = workbook.worksheets[3];
     const page4: any[] = [];
     sheet4.eachRow((row, rowNumber) => {
@@ -83,16 +64,11 @@ export const ImportSpreadsheetDialog = () => {
       const vals = row.values as any[];
       if (!vals[1] || !vals[2]) return;
       page4.push({
-        brand: vals[1],
-        model: vals[2],
-        whyBought: vals[3],
-        whenBought: vals[4],
-        whatILike: vals[5],
-        whatIDontLike: vals[6],
+        brand: vals[1], model: vals[2], whyBought: vals[3],
+        whenBought: vals[4], whatILike: vals[5], whatIDontLike: vals[6],
       });
     });
 
-    // Parse Page 5 - Wishlist
     const sheet5 = workbook.worksheets[4];
     const page5: any[] = [];
     sheet5.eachRow((row, rowNumber) => {
@@ -100,9 +76,7 @@ export const ImportSpreadsheetDialog = () => {
       const vals = row.values as any[];
       if (!vals[1] || !vals[2]) return;
       page5.push({
-        brand: vals[1],
-        model: vals[2],
-        dialColors: vals[3],
+        brand: vals[1], model: vals[2], dialColors: vals[3],
         rank: parseInt(vals[4]) || 0,
       });
     });
@@ -140,15 +114,10 @@ export const ImportSpreadsheetDialog = () => {
       });
 
       setOpen(false);
-      setTimeout(() => {
-        window.location.reload();
-      }, 2000);
-
+      setTimeout(() => { window.location.reload(); }, 2000);
     } catch (error: any) {
       console.error('Import error:', error);
-      toast.error("Failed to import data", {
-        description: error.message,
-      });
+      toast.error("Failed to import data", { description: error.message });
     } finally {
       setImporting(false);
       setProgress(0);
@@ -157,27 +126,15 @@ export const ImportSpreadsheetDialog = () => {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
-          <Upload className="h-4 w-4 mr-2" />
-          Import Spreadsheet Data
-        </Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Import Spreadsheet Data</DialogTitle>
-          <DialogDescription>
-            This will import and synchronize all data from your Watch Track spreadsheet, including:
-            <ul className="list-disc list-inside mt-2 space-y-1">
-              <li>Wear entries (monthly data)</li>
-              <li>Watch specifications</li>
-              <li>Personal notes</li>
-              <li>Wishlist items</li>
-              <li>AI-powered rarity and historical analysis</li>
-            </ul>
-          </DialogDescription>
-        </DialogHeader>
+    <>
+      <Button variant="outline" size="sm" onClick={() => setOpen(true)}>
+        <Upload className="h-4 w-4 mr-2" />
+        Import Spreadsheet Data
+      </Button>
+      <ResponsiveDialog open={open} onOpenChange={setOpen} title="Import Spreadsheet Data">
+        <p className="text-sm text-muted-foreground mb-4">
+          This will import and synchronize all data from your Watch Track spreadsheet, including wear entries, specifications, personal notes, wishlist items, and AI analysis.
+        </p>
 
         {importing && (
           <div className="space-y-4">
@@ -189,23 +146,17 @@ export const ImportSpreadsheetDialog = () => {
         {!importing && (
           <div className="space-y-2">
             <label className="text-sm font-medium">Select Spreadsheet File</label>
-            <Input
-              type="file"
-              accept=".xlsx,.xls"
-              onChange={handleFileChange}
-            />
+            <Input type="file" accept=".xlsx,.xls" onChange={handleFileChange} />
           </div>
         )}
 
-        <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={() => setOpen(false)} disabled={importing}>
-            Cancel
-          </Button>
+        <div className="flex justify-end gap-2 pt-4">
+          <Button variant="outline" onClick={() => setOpen(false)} disabled={importing}>Cancel</Button>
           <Button onClick={handleImport} disabled={importing || !file}>
             {importing ? "Importing..." : "Start Import"}
           </Button>
         </div>
-      </DialogContent>
-    </Dialog>
+      </ResponsiveDialog>
+    </>
   );
 };

@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { rateLimitResponse } from "../_shared/rate-limiter.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -33,6 +34,10 @@ serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+
+    // Rate limit: 5 per minute per user
+    const rlResponse = rateLimitResponse(user.id, "analyze-taste-profile", corsHeaders, 5, 60_000);
+    if (rlResponse) return rlResponse;
 
     // Fetch all relevant data in parallel
     const [watchesResult, wearResult, tripsResult, eventsResult] = await Promise.all([

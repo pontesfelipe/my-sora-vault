@@ -130,6 +130,7 @@ export function GlobalSearch() {
           }}
           onFocus={() => setIsOpen(true)}
           className="pl-9 pr-9 h-9 rounded-full bg-surfaceMuted border-none text-sm"
+          aria-label="Search watches and people"
         />
         {query && (
           <button
@@ -138,6 +139,7 @@ export function GlobalSearch() {
               setResults([]);
             }}
             className="absolute right-3 top-1/2 -translate-y-1/2"
+            aria-label="Clear search"
           >
             <X className="h-4 w-4 text-textMuted" />
           </button>

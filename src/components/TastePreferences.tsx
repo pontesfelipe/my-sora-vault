@@ -2,12 +2,14 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Save, Wand2 } from "lucide-react";
+import { Sparkles, Save, Wand2, Target } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 interface TastePreferencesProps {
-  onSuggest: (description: string) => void;
+  onSuggest: (description: string, focusOnGaps?: boolean) => void;
   isGenerating: boolean;
   remainingUsage?: number | null;
 }
@@ -16,6 +18,7 @@ export const TastePreferences = ({ onSuggest, isGenerating, remainingUsage }: Ta
   const [tasteDescription, setTasteDescription] = useState("");
   const [saved, setSaved] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [focusOnGaps, setFocusOnGaps] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -110,10 +113,10 @@ export const TastePreferences = ({ onSuggest, isGenerating, remainingUsage }: Ta
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Sparkles className="w-5 h-5" />
-          Your Watch Taste Preferences
+          AI Wishlist Generator
         </CardTitle>
         <CardDescription>
-          Auto-generate your taste profile from your collection data or write your own description
+          Describe your taste preferences or auto-generate from your collection, then let AI suggest watches for your wishlist
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -135,28 +138,51 @@ export const TastePreferences = ({ onSuggest, isGenerating, remainingUsage }: Ta
             setTasteDescription(e.target.value);
             setSaved(false);
           }}
-          placeholder="Click 'Auto-Generate from Collection' to analyze your watches, wear logs, trips, events, and personal notes - or write your own description here."
+          placeholder="Describe what you love in watches: styles, brands, complications, price range, occasions... Or click 'Auto-Generate from Collection' to analyze your existing collection."
           rows={6}
           className="resize-none"
         />
-        <div className="flex gap-2">
-          <Button
-            onClick={handleSave}
-            variant="outline"
-            disabled={!tasteDescription.trim() || saved}
-            className="gap-2"
-          >
-            <Save className="w-4 h-4" />
-            {saved ? "Saved" : "Save Preferences"}
-          </Button>
-          <Button
-            onClick={() => onSuggest(tasteDescription)}
-            disabled={isGenerating || !tasteDescription.trim() || remainingUsage === 0}
-            className="gap-2"
-          >
-            <Sparkles className="w-4 h-4" />
-            {isGenerating ? "Generating..." : "Generate Taste Suggestions"}
-          </Button>
+
+        <div className="flex items-center gap-2">
+          <Switch
+            id="focus-gaps"
+            checked={focusOnGaps}
+            onCheckedChange={setFocusOnGaps}
+          />
+          <Label htmlFor="focus-gaps" className="flex items-center gap-1.5 text-sm cursor-pointer">
+            <Target className="w-3.5 h-3.5" />
+            Focus on collection gaps
+          </Label>
+          <span className="text-xs text-muted-foreground ml-1">
+            (suggest watches that fill missing categories)
+          </span>
+        </div>
+
+        <div className="flex flex-wrap gap-2 items-center justify-between">
+          <div className="flex gap-2">
+            <Button
+              onClick={handleSave}
+              variant="outline"
+              disabled={!tasteDescription.trim() || saved}
+              className="gap-2"
+            >
+              <Save className="w-4 h-4" />
+              {saved ? "Saved" : "Save Preferences"}
+            </Button>
+            <Button
+              onClick={() => onSuggest(tasteDescription, focusOnGaps)}
+              disabled={isGenerating || !tasteDescription.trim() || remainingUsage === 0}
+              className="gap-2"
+            >
+              <Sparkles className="w-4 h-4" />
+              {isGenerating ? "Generating..." : "Generate AI Suggestions"}
+            </Button>
+          </div>
+          {remainingUsage !== null && remainingUsage !== undefined && (
+            <span className="text-xs text-muted-foreground">
+              {remainingUsage} uses remaining this month
+            </span>
+          )}
         </div>
       </CardContent>
     </Card>

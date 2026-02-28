@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, Calendar, DollarSign, Eye, EyeOff, Trash2, Info, Pencil } from "lucide-react";
+import { PinchZoomImage } from "@/components/PinchZoomImage";
+import watchHero from "@/assets/watch-hero.jpg";
 import { AddWearDialog } from "@/components/AddWearDialog";
 import { EditWatchDialog } from "@/components/EditWatchDialog";
 import { EditWearEntryDialog } from "@/components/EditWearEntryDialog";
@@ -83,6 +85,30 @@ const WatchDetail = () => {
   const [editingEntry, setEditingEntry] = useState<WearEntry | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [isDeletingWatch, setIsDeletingWatch] = useState(false);
+
+  // Swipe-right to go back (must be before early returns)
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    if (touch.clientX < 40) {
+      touchStartX.current = touch.clientX;
+      touchStartY.current = touch.clientY;
+    }
+  }, []);
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (touchStartX.current === null || touchStartY.current === null) return;
+    const touch = e.changedTouches[0];
+    const dx = touch.clientX - touchStartX.current;
+    const dy = Math.abs(touch.clientY - touchStartY.current);
+    touchStartX.current = null;
+    touchStartY.current = null;
+    if (dx > 80 && dy < 100) {
+      navigate(-1);
+    }
+  }, [navigate]);
 
   const handleToggleCost = () => {
     if (!showCost) {
@@ -215,7 +241,11 @@ const WatchDetail = () => {
   });
 
   return (
-    <div className="min-h-screen bg-background">
+    <div
+      className="min-h-screen bg-background"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-6">
           <Button variant="ghost" onClick={() => navigate("/")} className="mb-4 gap-2">
@@ -263,7 +293,18 @@ const WatchDetail = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        <Tabs defaultValue="specs" className="w-full">
+        {/* Watch Hero Image */}
+          {(watch.ai_image_url || watchHero) && (
+            <div className="mb-6 rounded-2xl overflow-hidden bg-muted aspect-square max-w-sm mx-auto shadow-lg">
+              <PinchZoomImage
+                src={watch.ai_image_url || watchHero}
+                alt={`${watch.brand} ${watch.model}`}
+                className="w-full h-full"
+              />
+            </div>
+          )}
+
+          <Tabs defaultValue="specs" className="w-full">
           <TabsList className="grid w-full max-w-md mx-auto grid-cols-3 mb-8">
             <TabsTrigger value="specs">Specifications</TabsTrigger>
             <TabsTrigger value="stats">Statistics</TabsTrigger>

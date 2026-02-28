@@ -1,10 +1,18 @@
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import { MoreVertical, DollarSign, TrendingUp, Edit2, Trash2, ArrowUpDown, Watch } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { formatCurrency } from "@/utils/format";
+import { useIsMobile } from "@/hooks/use-mobile";
 import watchHero from "@/assets/watch-hero.jpg";
 
 interface DynamicItemCardProps {
@@ -28,6 +36,8 @@ export const DynamicItemCard = ({
   isDraggable = false,
 }: DynamicItemCardProps) => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const handleCardClick = (e: React.MouseEvent) => {
     if ((e.target as HTMLElement).closest('button, [role="menu"]')) return;
@@ -39,6 +49,19 @@ export const DynamicItemCard = ({
   const appreciation = resalePrice ? ((resalePrice - cost) / cost * 100).toFixed(0) : null;
 
   const imageUrl = item.ai_image_url || watchHero;
+
+  const menuActions = [
+    { label: "Edit", icon: Edit2, onClick: onEdit },
+    { label: "Mark as Sold", icon: DollarSign, onClick: onMarkAsSold, separator: true },
+    { label: "Mark as Traded", icon: ArrowUpDown, onClick: onMarkAsTraded },
+    { label: "Delete", icon: Trash2, onClick: onDelete, destructive: true, separator: true },
+  ];
+
+  const menuButton = (
+    <Button variant="secondary" size="icon" className="h-8 w-8 backdrop-blur-sm bg-background/80 shadow-md" aria-label="Item actions">
+      <MoreVertical className="h-4 w-4" />
+    </Button>
+  );
 
   return (
     <Card 
@@ -66,33 +89,60 @@ export const DynamicItemCard = ({
         </div>
         
         <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="secondary" size="icon" className="h-8 w-8 backdrop-blur-sm bg-background/80 shadow-md">
-                <MoreVertical className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={onEdit}>
-                <Edit2 className="w-4 h-4 mr-2" />
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={onMarkAsSold}>
-                <DollarSign className="w-4 h-4 mr-2" />
-                Mark as Sold
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={onMarkAsTraded}>
-                <ArrowUpDown className="w-4 h-4 mr-2" />
-                Mark as Traded
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={onDelete} className="text-destructive">
-                <Trash2 className="w-4 h-4 mr-2" />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {isMobile ? (
+            <>
+              <div onClick={(e) => { e.stopPropagation(); setDrawerOpen(true); }}>
+                {menuButton}
+              </div>
+              <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
+                <DrawerContent onClick={(e) => e.stopPropagation()}>
+                  <DrawerHeader>
+                    <DrawerTitle>{item.brand} {item.model}</DrawerTitle>
+                  </DrawerHeader>
+                  <div className="pb-safe">
+                    {menuActions.map((action, i) => (
+                      <div key={action.label}>
+                        {action.separator && i > 0 && <div className="h-px bg-borderSubtle mx-4" />}
+                        <button
+                          onClick={() => { setDrawerOpen(false); action.onClick?.(); }}
+                          className={`flex items-center gap-3 w-full px-4 py-3 text-left text-sm transition-colors hover:bg-surfaceMuted ${
+                            action.destructive ? "text-destructive" : "text-textMain"
+                          }`}
+                        >
+                          <action.icon className="w-4 h-4" />
+                          {action.label}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </DrawerContent>
+              </Drawer>
+            </>
+          ) : (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>{menuButton}</DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={onEdit}>
+                  <Edit2 className="w-4 h-4 mr-2" />
+                  Edit
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={onMarkAsSold}>
+                  <DollarSign className="w-4 h-4 mr-2" />
+                  Mark as Sold
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={onMarkAsTraded}>
+                  <ArrowUpDown className="w-4 h-4 mr-2" />
+                  Mark as Traded
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={onDelete} className="text-destructive">
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
         
         {item.available_for_trade && (

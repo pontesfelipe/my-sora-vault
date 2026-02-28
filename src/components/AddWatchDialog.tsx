@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -64,8 +64,27 @@ interface PhotoIdentificationHints {
   notes?: string;
 }
 
-export const AddWatchDialog = ({ onSuccess }: { onSuccess: () => void }) => {
-  const [open, setOpen] = useState(false);
+interface AddWatchDialogProps {
+  onSuccess: () => void;
+  externalOpen?: boolean;
+  onExternalOpenChange?: (open: boolean) => void;
+  prefill?: {
+    brand?: string;
+    model?: string;
+    dial_color?: string;
+    type?: string;
+    case_size?: string;
+    movement?: string;
+  };
+}
+
+export const AddWatchDialog = ({ onSuccess, externalOpen, onExternalOpenChange, prefill }: AddWatchDialogProps) => {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const open = externalOpen !== undefined ? externalOpen : internalOpen;
+  const setOpen = (v: boolean) => {
+    if (onExternalOpenChange) onExternalOpenChange(v);
+    else setInternalOpen(v);
+  };
   const [loading, setLoading] = useState(false);
   const [modelRef, setModelRef] = useState("");
   const [purchaseDate, setPurchaseDate] = useState<Date | undefined>();
@@ -93,6 +112,23 @@ export const AddWatchDialog = ({ onSuccess }: { onSuccess: () => void }) => {
   });
   const { toast } = useToast();
   const { selectedCollectionId } = useCollection();
+
+  // Apply prefill when provided
+  const [prefillApplied, setPrefillApplied] = useState(false);
+  if (prefill && open && !prefillApplied) {
+    setPrefillApplied(true);
+    setFormValues((prev) => ({
+      ...prev,
+      brand: prefill.brand || prev.brand,
+      model: prefill.model || prev.model,
+      dialColor: prefill.dial_color || prev.dialColor,
+      type: prefill.type || prev.type,
+      caseSize: prefill.case_size || prev.caseSize,
+      movement: prefill.movement || prev.movement,
+    }));
+    setActiveTab("manual");
+  }
+  if (!open && prefillApplied) setPrefillApplied(false);
 
   const handleLookupReference = async () => {
     const searchBrand = formValues.brand.trim();
@@ -381,17 +417,17 @@ export const AddWatchDialog = ({ onSuccess }: { onSuccess: () => void }) => {
     }
   };
 
+  const isExternallyControlled = externalOpen !== undefined;
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <Button onClick={() => setOpen(true)} className="gap-2">
-        <Plus className="w-4 h-4" />
-        Add to Collection
-      </Button>
-      <DialogContent className="bg-card border-border max-w-md max-h-[90vh] flex flex-col">
-        <DialogHeader>
-          <DialogTitle className="text-foreground">Add New Watch</DialogTitle>
-        </DialogHeader>
-        
+    <>
+      {!isExternallyControlled && (
+        <Button onClick={() => setOpen(true)} className="gap-2">
+          <Plus className="w-4 h-4" />
+          Add to Collection
+        </Button>
+      )}
+      <ResponsiveDialog open={open} onOpenChange={setOpen} title="Add New Watch" className="max-w-md max-h-[90vh] flex flex-col">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col flex-1 min-h-0">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="photo">📸 Photo Upload</TabsTrigger>
@@ -787,7 +823,7 @@ export const AddWatchDialog = ({ onSuccess }: { onSuccess: () => void }) => {
         </form>
           </TabsContent>
         </Tabs>
-      </DialogContent>
-    </Dialog>
+      </ResponsiveDialog>
+    </>
   );
 };
