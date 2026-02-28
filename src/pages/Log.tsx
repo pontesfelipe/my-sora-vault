@@ -63,6 +63,7 @@ const Log = () => {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [isIdentifying, setIsIdentifying] = useState(false);
   const [identifiedWatch, setIdentifiedWatch] = useState<any>(null);
+  const [identificationError, setIdentificationError] = useState<string | null>(null);
   const [watchSearch, setWatchSearch] = useState("");
   const [showAddWatch, setShowAddWatch] = useState(false);
   const [addWatchPrefill, setAddWatchPrefill] = useState<any>(null);
@@ -119,6 +120,9 @@ const Log = () => {
     if (!file) return;
 
     setPhotoFile(file);
+    setIdentifiedWatch(null);
+    setIdentificationError(null);
+
     const reader = new FileReader();
     reader.onload = (ev) => setPhotoPreview(ev.target?.result as string);
     reader.readAsDataURL(file);
@@ -133,9 +137,11 @@ const Log = () => {
 
       if (error) {
         console.error("Identification error:", error);
-        toast.error("Could not identify watch. Try selecting manually.");
+        setIdentificationError("Could not identify this watch automatically.");
+        toast.error("Could not identify watch. You can add it manually.");
       } else if (data?.error) {
         console.error("Identification error:", data.error);
+        setIdentificationError("Could not identify this watch automatically.");
         toast.error(data.error);
       } else if (data) {
         setIdentifiedWatch(data);
@@ -144,15 +150,20 @@ const Log = () => {
         const match = findBestMatch(data.brand, data.model);
         if (match) {
           setSelectedWatchId(match.id);
+          setIdentifiedWatch(null);
+          setIdentificationError(null);
           toast.success(`Matched: ${match.brand} ${match.model}`);
-          setIdentifiedWatch(null); // Clear since we auto-matched
         } else {
-          toast.info(`Identified: ${data.brand || ""} ${data.model || ""}`.trim() + " — not in your collection");
+          setIdentificationError(null);
+          toast.info(`${`Identified: ${data.brand || ""} ${data.model || ""}`.trim()} — not in your collection`);
         }
+      } else {
+        setIdentificationError("Could not identify this watch automatically.");
       }
     } catch (err) {
       console.error("AI identification failed:", err);
-      toast.error("Could not identify watch. Try selecting manually.");
+      setIdentificationError("Could not identify this watch automatically.");
+      toast.error("Could not identify watch. You can add it manually.");
     } finally {
       setIsIdentifying(false);
     }
@@ -282,14 +293,15 @@ const Log = () => {
                 </div>
               </div>
             )}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setPhotoPreview(null);
-                setPhotoFile(null);
-                setIdentifiedWatch(null);
-                setSelectedWatchId("");
-              }}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setPhotoPreview(null);
+                  setPhotoFile(null);
+                  setIdentifiedWatch(null);
+                  setIdentificationError(null);
+                  setSelectedWatchId("");
+                }}
               className="absolute top-2 right-2 h-8 w-8 bg-background/80 rounded-full flex items-center justify-center"
             >
               <X className="h-4 w-4" />
@@ -316,7 +328,7 @@ const Log = () => {
         )}
       </Card>
 
-      {/* AI Identified — not in collection */}
+      {/* AI Identification Result */}
       <AnimatePresence>
         {identifiedWatch && !selectedWatchId && (
           <motion.div
@@ -342,6 +354,7 @@ const Log = () => {
                       if (match) {
                         setSelectedWatchId(match.id);
                         setIdentifiedWatch(null);
+                        setIdentificationError(null);
                         toast.success(`Matched: ${match.brand} ${match.model}`);
                       } else {
                         // Open AddWatchDialog with pre-filled data
@@ -355,6 +368,7 @@ const Log = () => {
                         });
                         setShowAddWatch(true);
                         setIdentifiedWatch(null);
+                        setIdentificationError(null);
                       }
                     }}>
                       <Plus className="h-4 w-4 mr-1" />
@@ -364,6 +378,43 @@ const Log = () => {
                       Dismiss
                     </Button>
                   </div>
+                </div>
+              </div>
+            </Card>
+          </motion.div>
+        )}
+
+        {identificationError && !identifiedWatch && !selectedWatchId && !isIdentifying && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+          >
+            <Card className="p-4 bg-surfaceMuted border-borderSubtle">
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-textMain">Couldn’t identify this watch from the photo.</p>
+                <p className="text-xs text-textMuted">You can add it manually, then log the wrist check.</p>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      setAddWatchPrefill({});
+                      setShowAddWatch(true);
+                    }}
+                  >
+                    <Plus className="h-4 w-4 mr-1" />
+                    Add Watch Manually
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => {
+                      setIdentificationError(null);
+                      setShowWatchPicker(true);
+                    }}
+                  >
+                    Pick from Collection
+                  </Button>
                 </div>
               </div>
             </Card>
