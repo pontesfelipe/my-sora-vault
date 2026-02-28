@@ -1,65 +1,64 @@
 
 
-# Legal and Risk Boundaries -- Gap Analysis and Hardening Plan
+# Mobile UX Completion Plan
 
-## Current State
+Based on the audit documents and codebase analysis, here is what already exists and what needs to be implemented.
 
-Most of the legal and risk boundary requirements are **already implemented**:
+## Already Done (No Work Needed)
+- Offline status hook + banner (`useOnlineStatus`, `OfflineBanner`)
+- Offline wear-entry queue (`offlineSync.ts`)
+- Haptics utility (`haptics.ts`)
+- `useIsMobile` hook
+- Long-press context menu (`useLongPress` + `WatchContextMenu`)
+- Watch grid skeleton (`WatchCardSkeleton` in `WatchCaseGrid`)
+- `PageTransition` wrapper (used on Home, Log, Feed, Profile)
+- Quick-log from Home (QuickLogSheet, one-tap log icon)
+- Some whileTap on specific cards
 
-- **Trade Rules page** (`/trade-rules`) -- contains core rules, prohibited behaviors, trust framework, and escalation warnings
-- **First-trade disclaimer dialog** -- shown before first trade connection via `TradeDisclaimerDialog`, stored in localStorage
-- **Persistent chat footer** -- `TradeChatDisclaimer` shown in every trade chat with link to rules
-- **`trade_guidelines_acknowledgments` table** -- exists in database (though currently unused by the dialog)
-- **No price fields, no "For Sale" toggle, no global trade feed** -- none of these exist in the UI
-- **No sorting by value/desirability** in trade discovery
+---
 
-## Gaps to Address
+## Implementation Steps (in priority order)
 
-### 1. Disclaimer acknowledgment uses localStorage, not the database
+### 1. Global whileTap on Button component
+- In `src/components/ui/button.tsx`, wrap with `motion.button` / `motion(Slot)` from framer-motion
+- Add `whileTap={{ scale: 0.97 }}` with `prefers-reduced-motion` check
+- Single file change, affects every button in the app
 
-The `useTradeDisclaimer` hook stores acknowledgment in `localStorage` only. The `trade_guidelines_acknowledgments` database table exists but is never written to. This means acknowledgment is lost on device change or cache clear, and admins have no visibility into who has acknowledged.
+### 2. React Query cache config
+- Update `QueryClient` in `App.tsx` with `staleTime: 5min`, `gcTime: 30min`, `retry: 2`, `refetchOnWindowFocus: false`
 
-**Fix:** Write to the database table on acknowledgment and check it on load, falling back to localStorage for offline/speed.
+### 3. Replace dropdowns with Drawers on mobile
+- `CollectionSwitcher.tsx`: use `useIsMobile()` to render Drawer on mobile, keep DropdownMenu on desktop
+- `DynamicItemCard.tsx`: same pattern
+- `MentionNotificationsDropdown.tsx`: same pattern
 
-### 2. Banned terminology audit -- minor violations in edge functions
+### 4. Pull-to-refresh hook
+- Create `src/hooks/usePullToRefresh.ts` using touch events + Framer Motion indicator
+- Apply on Collection page, Feed page, Log page
+- Trigger React Query `refetch()` on pull
 
-The edge functions `fetch-watch-price` and `search-watch-info` reference "marketplace" and "resale" in their AI prompts sent to external models. These are backend-only and never shown to users, so they are safe from a UI perspective. No user-facing UI contains banned terms ("Buy", "Sell", "Marketplace", "Listing", "Auction").
+### 5. Route-level AnimatePresence
+- Wrap `<Routes>` in `App.tsx` with `<AnimatePresence mode="wait">`
+- Requires `useLocation` + key on route wrapper
+- Respects `prefers-reduced-motion`
 
-**No changes needed** -- backend prompts are internal and not user-facing.
+### 6. Feed skeleton component
+- Create `src/components/FeedItemSkeleton.tsx` (avatar circle + text lines + image placeholder)
+- Show 3 skeletons when feed `isLoading`
 
-### 3. Trade Rules page missing the "Platform Role" section
+### 7. Vault Assistant chat polish
+- Auto-resize textarea in VaultPal chat input
+- Scroll-to-latest floating pill using IntersectionObserver
+- Horizontal scrolling suggested question pills (`overflow-x-auto flex-nowrap`)
 
-The current `/trade-rules` page covers rules, prohibitions, and trust levels but does not explicitly state what the platform **is** and **is not** (the "Platform Role" section from your spec).
+### 8. Accessibility fixes
+- Add `aria-label` to icon-only buttons in admin panel tabs and Settings
+- Fix `alt` text in GlobalSearch to use watch name
+- Increase tag/pill padding to `py-2` for 44px touch targets
 
-**Fix:** Add a "Platform Role" card at the top of the Trade Rules page listing what the platform is not (broker, escrow, authenticator, insurer, payment processor) and what it is (social discovery and signaling tool).
+---
 
-### 4. Trade Rules page missing the "Language Enforcement" section
-
-The banned/approved terminology list is not shown to users on the rules page.
-
-**Fix:** Add a "Language Standards" section to the Trade Rules page showing banned terms and approved alternatives.
-
-### 5. Missing "Liability Minimization" transparency section
-
-Users are not explicitly told that the platform stores no prices, transaction records, payments, or shipping data.
-
-**Fix:** Add a brief "What We Don't Store" section to the Trade Rules page for transparency.
-
-## Implementation Details
-
-### Files Modified
-
-- **`src/components/TradeDisclaimerDialog.tsx`** -- Update `useTradeDisclaimer` to read/write from the `trade_guidelines_acknowledgments` database table in addition to localStorage
-- **`src/pages/TradeRules.tsx`** -- Add three new sections:
-  1. "Platform Role" card (is / is not)
-  2. "Language Standards" section (banned and approved terms)
-  3. "What We Don't Store" transparency section
-
-### No Database Changes Required
-
-The `trade_guidelines_acknowledgments` table already exists with `user_id` and `acknowledged_at` columns. Just needs to be used.
-
-### No New Files
-
-All changes fit within existing components.
+## Technical Notes
+- `vite-plugin-pwa` is **not recommended** here since the app uses Capacitor for native builds; a service worker may conflict with Capacitor's webview. PWA setup is skipped.
+- No new libraries needed — all work uses existing framer-motion, shadcn Drawer, Lucide icons, and Sonner toasts.
 
