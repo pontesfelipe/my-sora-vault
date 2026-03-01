@@ -102,8 +102,21 @@ const Log = () => {
   const extractReferenceTokens = (value: string): string[] =>
     normalizeForCompare(value).match(/[a-z0-9]{2,}(?:[.-][a-z0-9]{2,}){1,}/g) ?? [];
 
+  const mapTypeToFamily = (value?: string) => {
+    const v = normalizeForCompare(value || "");
+    if (!v) return "";
+    if (v.includes("diver") || v.includes("dive")) return "diver";
+    if (v.includes("chronograph") || v.includes("chrono")) return "chronograph";
+    if (v.includes("gmt")) return "gmt";
+    if (v.includes("dress")) return "dress";
+    if (v.includes("pilot") || v.includes("aviation")) return "pilot";
+    if (v.includes("field")) return "field";
+    return "";
+  };
+
   // Strict match only: prevents wrong auto-selects (e.g. Seamaster -> Speedmaster)
-  const findBestMatch = (brand: string, model: string) => {
+  const findBestMatch = (brand: string, model: string, identifiedType?: string) => {
+    const identifiedTypeFamily = mapTypeToFamily(identifiedType);
     const normalizedBrand = normalizeForCompare(brand).replace(/\s+/g, "");
     const normalizedModel = normalizeForCompare(model).replace(/[^a-z0-9]/g, "");
     if (!normalizedBrand || !normalizedModel) return null;
@@ -122,7 +135,12 @@ const Log = () => {
     const exact = brandMatches.find(
       (w) => normalizeForCompare(w.model).replace(/[^a-z0-9]/g, "") === normalizedModel
     );
-    if (exact) return exact;
+    if (exact) {
+      const exactTypeFamily = mapTypeToFamily(exact.type);
+      if (!identifiedTypeFamily || !exactTypeFamily || exactTypeFamily === identifiedTypeFamily) {
+        return exact;
+      }
+    }
 
     const identifiedTokens = extractModelTokens(model);
     const identifiedRefs = extractReferenceTokens(model);
@@ -130,6 +148,15 @@ const Log = () => {
     let best: { watch: any; score: number } | null = null;
 
     for (const candidate of brandMatches) {
+      const candidateTypeFamily = mapTypeToFamily(candidate.type);
+      if (
+        identifiedTypeFamily &&
+        candidateTypeFamily &&
+        identifiedTypeFamily !== candidateTypeFamily
+      ) {
+        continue;
+      }
+
       const candidateTokens = extractModelTokens(candidate.model);
       const candidateRefs = extractReferenceTokens(candidate.model);
       const sharedTokenCount = identifiedTokens.filter((token) =>
@@ -159,6 +186,7 @@ const Log = () => {
     if (!file) return;
 
     setPhotoFile(file);
+    setSelectedWatchId("");
     setIdentifiedWatch(null);
     setIdentificationError(null);
 
@@ -205,7 +233,7 @@ const Log = () => {
         setIdentifiedWatch(data);
 
         // Auto-match to collection
-        const match = findBestMatch(data.brand, data.model);
+        const match = findBestMatch(data.brand, data.model, data.type);
         if (match) {
           setSelectedWatchId(match.id);
           setIdentifiedWatch(null);
@@ -406,7 +434,7 @@ const Log = () => {
                   <div className="flex gap-2 mt-2">
                     <Button size="sm" variant="default" onClick={() => {
                       // Try fuzzy match one more time
-                      const match = findBestMatch(identifiedWatch.brand, identifiedWatch.model);
+                      const match = findBestMatch(identifiedWatch.brand, identifiedWatch.model, identifiedWatch.type);
                       if (match) {
                         setSelectedWatchId(match.id);
                         setIdentifiedWatch(null);
