@@ -100,7 +100,7 @@ const Log = () => {
       .filter((token) => token.length >= 3 && !modelStopWords.has(token));
 
   const extractReferenceTokens = (value: string): string[] =>
-    normalizeForCompare(value).match(/[a-z0-9]{2,}(?:[.-][a-z0-9]{2,}){1,}/g) ?? [];
+    (normalizeForCompare(value).match(/[a-z0-9]{2,}(?:[.-][a-z0-9]{2,}){1,}/g) ?? []).filter((token) => /\d/.test(token));
 
   const mapTypeToFamily = (value?: string) => {
     const v = normalizeForCompare(value || "");
@@ -170,9 +170,8 @@ const Log = () => {
         (token) => /[a-z]/.test(token) && !/^\d/.test(token) && token !== "ref"
       );
 
-      // Prevent Seamaster/Speedmaster style mismatches unless reference matches
+      // Require model family token agreement to avoid cross-line mismatches
       if (
-        !hasReferenceMatch &&
         identifiedPrimaryToken &&
         candidatePrimaryToken &&
         identifiedPrimaryToken !== candidatePrimaryToken
