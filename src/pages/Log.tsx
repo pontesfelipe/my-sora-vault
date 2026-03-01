@@ -114,12 +114,57 @@ const Log = () => {
     return "";
   };
 
-  // Strict match only: prevents wrong auto-selects (e.g. Seamaster -> Speedmaster)
-  const findBestMatch = (brand: string, model: string, identifiedType?: string) => {
+  const extractColorFamily = (value?: string) => {
+    const v = normalizeForCompare(value || "");
+    if (!v) return "";
+    const colors = ["black", "blue", "white", "silver", "green", "red", "brown", "gold", "grey", "gray", "orange", "yellow", "purple", "pink", "beige"];
+    const match = colors.find((color) => v.includes(color));
+    if (!match) return "";
+    return match === "gray" ? "grey" : match;
+  };
+
+  const mapMovementFamily = (value?: string) => {
+    const v = normalizeForCompare(value || "");
+    if (!v) return "";
+    if (v.includes("quartz")) return "quartz";
+    if (v.includes("manual") || v.includes("hand wind") || v.includes("handwound")) return "manual";
+    if (v.includes("automatic") || v.includes("self winding") || v.includes("self-winding") || v.includes("calibre") || v.includes("caliber")) return "automatic";
+    return "";
+  };
+
+  const extractCaseSizeMm = (value?: string) => {
+    const v = normalizeForCompare(value || "");
+    if (!v) return null;
+    const mmMatch = v.match(/(\d{2}(?:\.\d+)?)\s*mm/);
+    if (mmMatch?.[1]) return Number(mmMatch[1]);
+    const looseMatch = v.match(/\b(\d{2}(?:\.\d+)?)\b/);
+    if (looseMatch?.[1]) return Number(looseMatch[1]);
+    return null;
+  };
+
+  // Very strict match to avoid wrong auto-selects (e.g. Seamaster -> Speedmaster)
+  const findBestMatch = (
+    brand: string,
+    model: string,
+    identifiedType?: string,
+    identifiedDialColor?: string,
+    identifiedCaseSize?: string,
+    identifiedMovement?: string
+  ) => {
     const identifiedTypeFamily = mapTypeToFamily(identifiedType);
+    const identifiedColorFamily = extractColorFamily(identifiedDialColor);
+    const identifiedMovementFamily = mapMovementFamily(identifiedMovement);
+    const identifiedCaseMm = extractCaseSizeMm(identifiedCaseSize);
+
     const normalizedBrand = normalizeForCompare(brand).replace(/\s+/g, "");
     const normalizedModel = normalizeForCompare(model).replace(/[^a-z0-9]/g, "");
     if (!normalizedBrand || !normalizedModel) return null;
+
+    const identifiedTokens = extractModelTokens(model);
+    const identifiedRefs = extractReferenceTokens(model);
+    const identifiedPrimaryToken = identifiedTokens.find(
+      (token) => /[a-z]/.test(token) && !/^\d/.test(token) && token !== "ref"
+    );
 
     const brandMatches = watches.filter((w) => {
       const candidateBrand = normalizeForCompare(w.brand).replace(/\s+/g, "");
@@ -132,45 +177,26 @@ const Log = () => {
 
     if (brandMatches.length === 0) return null;
 
-    const exact = brandMatches.find(
-      (w) => normalizeForCompare(w.model).replace(/[^a-z0-9]/g, "") === normalizedModel
-    );
-    if (exact) {
-      const exactTypeFamily = mapTypeToFamily(exact.type);
-      // If AI gives a concrete type family, require exact type-family agreement
-      if (!identifiedTypeFamily || exactTypeFamily === identifiedTypeFamily) {
-        return exact;
-      }
-    }
-
-    const identifiedTokens = extractModelTokens(model);
-    const identifiedRefs = extractReferenceTokens(model);
-    const identifiedPrimaryToken = identifiedTokens.find(
-      (token) => /[a-z]/.test(token) && !/^\d/.test(token) && token !== "ref"
-    );
-
     let best: { watch: any; score: number } | null = null;
 
     for (const candidate of brandMatches) {
-      const candidateTypeFamily = mapTypeToFamily(candidate.type);
-      // Strict family matching: if AI knows watch family, candidate must match
-      if (identifiedTypeFamily && candidateTypeFamily !== identifiedTypeFamily) {
-        continue;
-      }
-
+      const candidateModelNormalized = normalizeForCompare(candidate.model).replace(/[^a-z0-9]/g, "");
       const candidateTokens = extractModelTokens(candidate.model);
       const candidateRefs = extractReferenceTokens(candidate.model);
-      const sharedTokenCount = identifiedTokens.filter((token) =>
-        candidateTokens.includes(token)
-      ).length;
-      const hasReferenceMatch =
-        identifiedRefs.length > 0 && candidateRefs.some((ref) => identifiedRefs.includes(ref));
-
       const candidatePrimaryToken = candidateTokens.find(
         (token) => /[a-z]/.test(token) && !/^\d/.test(token) && token !== "ref"
       );
 
-      // Require model family token agreement to avoid cross-line mismatches
+      const candidateTypeFamily = mapTypeToFamily(candidate.type);
+      const candidateColorFamily = extractColorFamily(candidate.dial_color);
+      const candidateMovementFamily = mapMovementFamily(candidate.movement);
+      const candidateCaseMm = extractCaseSizeMm(candidate.case_size);
+
+      const hasExactModel = candidateModelNormalized === normalizedModel;
+      const hasReferenceMatch =
+        identifiedRefs.length > 0 && candidateRefs.some((ref) => identifiedRefs.includes(ref));
+
+      // Hard blockers
       if (
         identifiedPrimaryToken &&
         candidatePrimaryToken &&
@@ -178,15 +204,50 @@ const Log = () => {
       ) {
         continue;
       }
+      if (identifiedTypeFamily && candidateTypeFamily && identifiedTypeFamily !== candidateTypeFamily) {
+        continue;
+      }
+      if (identifiedColorFamily && candidateColorFamily && identifiedColorFamily !== candidateColorFamily) {
+        continue;
+      }
+      if (identifiedMovementFamily && candidateMovementFamily && identifiedMovementFamily !== candidateMovementFamily) {
+        continue;
+      }
+      if (
+        identifiedCaseMm !== null &&
+        candidateCaseMm !== null &&
+        Math.abs(identifiedCaseMm - candidateCaseMm) > 2
+      ) {
+        continue;
+      }
 
+      const sharedTokenCount = identifiedTokens.filter((token) => candidateTokens.includes(token)).length;
       const coverage =
         sharedTokenCount /
         Math.max(identifiedTokens.length || 1, candidateTokens.length || 1);
 
-      // Require strong evidence before auto-selecting
-      if (!hasReferenceMatch && (sharedTokenCount < 2 || coverage < 0.35)) continue;
+      const matchedSignals = [
+        identifiedTypeFamily && candidateTypeFamily && identifiedTypeFamily === candidateTypeFamily,
+        identifiedColorFamily && candidateColorFamily && identifiedColorFamily === candidateColorFamily,
+        identifiedMovementFamily && candidateMovementFamily && identifiedMovementFamily === candidateMovementFamily,
+        identifiedCaseMm !== null && candidateCaseMm !== null && Math.abs(identifiedCaseMm - candidateCaseMm) <= 1,
+      ].filter(Boolean).length;
 
-      const score = (hasReferenceMatch ? 10 : 0) + sharedTokenCount + coverage;
+      // Only auto-select with very strong evidence
+      if (!hasExactModel && !hasReferenceMatch && (sharedTokenCount < 2 || coverage < 0.5)) {
+        continue;
+      }
+      if (!hasExactModel && !hasReferenceMatch && matchedSignals < 1) {
+        continue;
+      }
+
+      const score =
+        (hasExactModel ? 12 : 0) +
+        (hasReferenceMatch ? 10 : 0) +
+        sharedTokenCount +
+        coverage +
+        matchedSignals;
+
       if (!best || score > best.score) {
         best = { watch: candidate, score };
       }
@@ -247,7 +308,7 @@ const Log = () => {
         setIdentifiedWatch(data);
 
         // Auto-match to collection
-        const match = findBestMatch(data.brand, data.model, data.type);
+        const match = findBestMatch(data.brand, data.model, data.type, data.dial_color, data.case_size, data.movement);
         if (match) {
           setSelectedWatchId(match.id);
           setIdentifiedWatch(null);
@@ -448,7 +509,14 @@ const Log = () => {
                   <div className="flex gap-2 mt-2">
                     <Button size="sm" variant="default" onClick={() => {
                       // Try fuzzy match one more time
-                      const match = findBestMatch(identifiedWatch.brand, identifiedWatch.model, identifiedWatch.type);
+                      const match = findBestMatch(
+                        identifiedWatch.brand,
+                        identifiedWatch.model,
+                        identifiedWatch.type,
+                        identifiedWatch.dial_color,
+                        identifiedWatch.case_size,
+                        identifiedWatch.movement
+                      );
                       if (match) {
                         setSelectedWatchId(match.id);
                         setIdentifiedWatch(null);
