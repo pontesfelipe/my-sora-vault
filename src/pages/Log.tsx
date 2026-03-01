@@ -137,23 +137,24 @@ const Log = () => {
     );
     if (exact) {
       const exactTypeFamily = mapTypeToFamily(exact.type);
-      if (!identifiedTypeFamily || !exactTypeFamily || exactTypeFamily === identifiedTypeFamily) {
+      // If AI gives a concrete type family, require exact type-family agreement
+      if (!identifiedTypeFamily || exactTypeFamily === identifiedTypeFamily) {
         return exact;
       }
     }
 
     const identifiedTokens = extractModelTokens(model);
     const identifiedRefs = extractReferenceTokens(model);
+    const identifiedPrimaryToken = identifiedTokens.find(
+      (token) => /[a-z]/.test(token) && !/^\d/.test(token) && token !== "ref"
+    );
 
     let best: { watch: any; score: number } | null = null;
 
     for (const candidate of brandMatches) {
       const candidateTypeFamily = mapTypeToFamily(candidate.type);
-      if (
-        identifiedTypeFamily &&
-        candidateTypeFamily &&
-        identifiedTypeFamily !== candidateTypeFamily
-      ) {
+      // Strict family matching: if AI knows watch family, candidate must match
+      if (identifiedTypeFamily && candidateTypeFamily !== identifiedTypeFamily) {
         continue;
       }
 
@@ -164,6 +165,20 @@ const Log = () => {
       ).length;
       const hasReferenceMatch =
         identifiedRefs.length > 0 && candidateRefs.some((ref) => identifiedRefs.includes(ref));
+
+      const candidatePrimaryToken = candidateTokens.find(
+        (token) => /[a-z]/.test(token) && !/^\d/.test(token) && token !== "ref"
+      );
+
+      // Prevent Seamaster/Speedmaster style mismatches unless reference matches
+      if (
+        !hasReferenceMatch &&
+        identifiedPrimaryToken &&
+        candidatePrimaryToken &&
+        identifiedPrimaryToken !== candidatePrimaryToken
+      ) {
+        continue;
+      }
 
       const coverage =
         sharedTokenCount /
