@@ -78,41 +78,80 @@ const Log = () => {
       w.model.toLowerCase().includes(watchSearch.toLowerCase())
   );
 
-  // Fuzzy match: checks if brand matches and model shares significant keywords
+  const normalizeForCompare = (value: string) =>
+    value.toLowerCase().replace(/[^a-z0-9\s.-]/g, " ").replace(/\s+/g, " ").trim();
+
+  const modelStopWords: Set<string> = new Set([
+    "automatic",
+    "chronometer",
+    "co",
+    "axial",
+    "master",
+    "professional",
+    "watch",
+    "edition",
+    "chronograph",
+  ]);
+
+  const extractModelTokens = (value: string): string[] =>
+    normalizeForCompare(value)
+      .split(/[\s/-]+/)
+      .map((token) => token.replace(/^\.+|\.+$/g, ""))
+      .filter((token) => token.length >= 3 && !modelStopWords.has(token));
+
+  const extractReferenceTokens = (value: string): string[] =>
+    normalizeForCompare(value).match(/[a-z0-9]{2,}(?:[.-][a-z0-9]{2,}){1,}/g) ?? [];
+
+  // Strict match only: prevents wrong auto-selects (e.g. Seamaster -> Speedmaster)
   const findBestMatch = (brand: string, model: string) => {
-    const b = brand?.toLowerCase().trim() || "";
-    const m = model?.toLowerCase().trim() || "";
-    if (!b) return null;
+    const normalizedBrand = normalizeForCompare(brand).replace(/\s+/g, "");
+    const normalizedModel = normalizeForCompare(model).replace(/[^a-z0-9]/g, "");
+    if (!normalizedBrand || !normalizedModel) return null;
 
-    // Try exact match first
-    const exact = watches.find(
-      (w) => w.brand.toLowerCase() === b && w.model.toLowerCase() === m
-    );
-    if (exact) return exact;
-
-    // Try brand match + model keyword overlap
-    const brandMatches = watches.filter(
-      (w) => w.brand.toLowerCase().includes(b) || b.includes(w.brand.toLowerCase())
-    );
+    const brandMatches = watches.filter((w) => {
+      const candidateBrand = normalizeForCompare(w.brand).replace(/\s+/g, "");
+      return (
+        candidateBrand === normalizedBrand ||
+        candidateBrand.includes(normalizedBrand) ||
+        normalizedBrand.includes(candidateBrand)
+      );
+    });
 
     if (brandMatches.length === 0) return null;
 
-    // Score each by shared model words (4+ char)
-    const modelWords = m.replace(/[^a-z0-9 ]/g, " ").split(/\s+/).filter((w) => w.length >= 3);
+    const exact = brandMatches.find(
+      (w) => normalizeForCompare(w.model).replace(/[^a-z0-9]/g, "") === normalizedModel
+    );
+    if (exact) return exact;
+
+    const identifiedTokens = extractModelTokens(model);
+    const identifiedRefs = extractReferenceTokens(model);
+
     let best: { watch: any; score: number } | null = null;
 
-    for (const w of brandMatches) {
-      const wWords = w.model.toLowerCase().replace(/[^a-z0-9 ]/g, " ").split(/\s+/).filter((x: string) => x.length >= 3);
-      const score = modelWords.filter((word) => wWords.some((ww: string) => ww.includes(word) || word.includes(ww))).length;
-      if (score > 0 && (!best || score > best.score)) {
-        best = { watch: w, score };
+    for (const candidate of brandMatches) {
+      const candidateTokens = extractModelTokens(candidate.model);
+      const candidateRefs = extractReferenceTokens(candidate.model);
+      const sharedTokenCount = identifiedTokens.filter((token) =>
+        candidateTokens.includes(token)
+      ).length;
+      const hasReferenceMatch =
+        identifiedRefs.length > 0 && candidateRefs.some((ref) => identifiedRefs.includes(ref));
+
+      const coverage =
+        sharedTokenCount /
+        Math.max(identifiedTokens.length || 1, candidateTokens.length || 1);
+
+      // Require strong evidence before auto-selecting
+      if (!hasReferenceMatch && (sharedTokenCount < 2 || coverage < 0.35)) continue;
+
+      const score = (hasReferenceMatch ? 10 : 0) + sharedTokenCount + coverage;
+      if (!best || score > best.score) {
+        best = { watch: candidate, score };
       }
     }
 
-    // If only one brand match and no model keywords, still suggest it
-    if (!best && brandMatches.length === 1) return brandMatches[0];
-
-    return best?.watch || null;
+    return best?.watch ?? null;
   };
 
   const handlePhotoCapture = async (e: React.ChangeEvent<HTMLInputElement>) => {
