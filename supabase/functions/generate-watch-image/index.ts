@@ -240,6 +240,53 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabaseClient = createClient(supabaseUrl, supabaseServiceKey);
 
+    // ─── CHECK FOR EXISTING IMAGE FROM ANOTHER USER'S COLLECTION ───
+    // If another user already has this exact watch (brand + model + dial_color) with an AI image,
+    // reuse it instead of spending resources regenerating.
+    const normalizedBrand = brand.trim().toLowerCase();
+    const normalizedModel = model.trim().toLowerCase();
+    const normalizedDialColor = (dialColor || '').trim().toLowerCase();
+
+    const { data: existingMatches } = await supabaseClient
+      .from('watches')
+      .select('id, ai_image_url, brand, model, dial_color')
+      .not('ai_image_url', 'is', null)
+      .eq('status', 'active')
+      .limit(50);
+
+    if (existingMatches && existingMatches.length > 0) {
+      const match = existingMatches.find((w: any) => {
+        const wb = (w.brand || '').trim().toLowerCase();
+        const wm = (w.model || '').trim().toLowerCase();
+        const wd = (w.dial_color || '').trim().toLowerCase();
+        // Exact match on brand + model + dial color (or both have no dial color)
+        return wb === normalizedBrand && wm === normalizedModel &&
+          (wd === normalizedDialColor || (!wd && !normalizedDialColor));
+      });
+
+      if (match && match.ai_image_url) {
+        // Skip watchId check — only reuse from a DIFFERENT watch record
+        if (!watchId || match.id !== watchId) {
+          console.log(`Reusing existing AI image from watch ${match.id} for ${brand} ${model}`);
+
+          // Update the current watch record with the existing image
+          if (watchId) {
+            await supabaseClient.from('watches').update({ ai_image_url: match.ai_image_url }).eq('id', watchId);
+          }
+
+          return new Response(
+            JSON.stringify({
+              success: true,
+              imageUrl: match.ai_image_url,
+              generationMethod: 'reused-existing',
+              message: `Reused existing AI image from another collection`,
+            }),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+      }
+    }
+
     // Resolve reference image with quality priority:
     // - If user uploaded a photo, use it DIRECTLY (skip slow AI reference search)
     // - Otherwise: explicit URL > official model search > none
