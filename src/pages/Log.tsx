@@ -170,19 +170,38 @@ const Log = () => {
     setIsIdentifying(true);
     try {
       const base64 = await fileToBase64(file);
-      const { data, error } = await supabase.functions.invoke("identify-watch-from-photo", {
+      let data: any = null;
+      let lastError: string | null = null;
+
+      // Attempt 1: full-quality image
+      const res1 = await supabase.functions.invoke("identify-watch-from-photo", {
         body: { image: base64 },
       });
 
-      if (error) {
-        console.error("Identification error:", error);
+      if (res1.error || res1.data?.error) {
+        lastError = res1.data?.error || res1.error?.message || "Identification failed";
+        console.warn("Attempt 1 failed, retrying with compressed image…", lastError);
+
+        // Attempt 2: compressed image (~60% quality, max 1200px)
+        const compressed = await compressImage(file, 1200, 0.6);
+        const res2 = await supabase.functions.invoke("identify-watch-from-photo", {
+          body: { image: compressed },
+        });
+
+        if (res2.error || res2.data?.error) {
+          lastError = res2.data?.error || res2.error?.message || "Identification failed";
+        } else if (res2.data) {
+          data = res2.data;
+          lastError = null;
+        }
+      } else if (res1.data) {
+        data = res1.data;
+      }
+
+      if (lastError || !data) {
         setIdentificationError("Could not identify this watch automatically.");
-        toast.error("Could not identify watch. You can add it manually.");
-      } else if (data?.error) {
-        console.error("Identification error:", data.error);
-        setIdentificationError("Could not identify this watch automatically.");
-        toast.error(data.error);
-      } else if (data) {
+        toast.error(lastError || "Could not identify watch. You can add it manually.");
+      } else {
         setIdentifiedWatch(data);
 
         // Auto-match to collection
@@ -196,8 +215,6 @@ const Log = () => {
           setIdentificationError(null);
           toast.info(`${`Identified: ${data.brand || ""} ${data.model || ""}`.trim()} — not in your collection`);
         }
-      } else {
-        setIdentificationError("Could not identify this watch automatically.");
       }
     } catch (err) {
       console.error("AI identification failed:", err);
@@ -671,6 +688,29 @@ function fileToBase64(file: File): Promise<string> {
     };
     reader.onerror = reject;
     reader.readAsDataURL(file);
+  });
+}
+
+function compressImage(file: File, maxDim: number, quality: number): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      let { width, height } = img;
+      if (width > maxDim || height > maxDim) {
+        const ratio = Math.min(maxDim / width, maxDim / height);
+        width = Math.round(width * ratio);
+        height = Math.round(height * ratio);
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return reject(new Error("Canvas not supported"));
+      ctx.drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL("image/jpeg", quality));
+    };
+    img.onerror = reject;
+    img.src = URL.createObjectURL(file);
   });
 }
 
