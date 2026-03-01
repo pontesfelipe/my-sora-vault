@@ -65,7 +65,7 @@ interface PhotoIdentificationHints {
 }
 
 interface AddWatchDialogProps {
-  onSuccess: () => void;
+  onSuccess: (newWatchId?: string) => void;
   externalOpen?: boolean;
   onExternalOpenChange?: (open: boolean) => void;
   prefill?: {
@@ -397,7 +397,7 @@ export const AddWatchDialog = ({ onSuccess, externalOpen, onExternalOpenChange, 
         historicalSignificance: "regular",
         availableForTrade: false,
       });
-      onSuccess();
+      onSuccess(insertData?.id);
     } catch (error) {
       if (error instanceof z.ZodError) {
         toast({
