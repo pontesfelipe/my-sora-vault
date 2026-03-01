@@ -602,11 +602,17 @@ const Log = () => {
 
       {/* Inline AddWatchDialog for adding from wrist check */}
       <AddWatchDialog
-        onSuccess={() => {
-          refetch();
+        onSuccess={(newWatchId) => {
+          refetch().then(() => {
+            if (newWatchId) {
+              setSelectedWatchId(newWatchId);
+              toast.success("Watch added & selected! Ready to log.");
+            }
+          });
           setShowAddWatch(false);
           setAddWatchPrefill(null);
-          toast.success("Watch added! Now select it to log your wrist check.");
+          setIdentifiedWatch(null);
+          setIdentificationError(null);
         }}
         externalOpen={showAddWatch}
         onExternalOpenChange={setShowAddWatch}
