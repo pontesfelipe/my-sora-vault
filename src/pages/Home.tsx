@@ -1,13 +1,13 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, Watch, ChevronRight, Clock, Camera } from "lucide-react";
+import { Plus, Watch, ChevronRight, Clock, Camera, AlertCircle, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { useWatchData } from "@/hooks/useWatchData";
 import { useCollection } from "@/contexts/CollectionContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { format, startOfWeek, endOfWeek, isWithinInterval, parseISO } from "date-fns";
+import { format, startOfWeek, endOfWeek, isWithinInterval, parseISO, differenceInDays } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
 import { PageTransition } from "@/components/PageTransition";
 import { QuickLogSheet } from "@/components/QuickLogSheet";
@@ -66,6 +66,43 @@ const Home = () => {
         };
       }),
     };
+  }, [watches, wearEntries]);
+
+  // Calculate neglected watches (not worn in 30+ days)
+  const neglectedWatches = useMemo(() => {
+    const now = new Date();
+    return watches
+      .map((watch) => {
+        const entries = wearEntries.filter((e) => e.watch_id === watch.id);
+        if (entries.length === 0) {
+          return { watch, daysSince: Infinity };
+        }
+        const lastDate = entries
+          .map((e) => parseISO(e.wear_date))
+          .sort((a, b) => b.getTime() - a.getTime())[0];
+        return { watch, daysSince: differenceInDays(now, lastDate) };
+      })
+      .filter((item) => item.daysSince >= 30)
+      .sort((a, b) => b.daysSince - a.daysSince)
+      .slice(0, 3);
+  }, [watches, wearEntries]);
+
+  // Weekly rotation goal: unique watches worn this week
+  const weeklyRotation = useMemo(() => {
+    const uniqueWatchIds = new Set<string>();
+    const now = new Date();
+    const weekStart = startOfWeek(now, { weekStartsOn: 1 });
+    const weekEnd = endOfWeek(now, { weekStartsOn: 1 });
+    wearEntries.forEach((entry) => {
+      try {
+        const entryDate = parseISO(entry.wear_date);
+        if (isWithinInterval(entryDate, { start: weekStart, end: weekEnd })) {
+          uniqueWatchIds.add(entry.watch_id);
+        }
+      } catch { /* skip */ }
+    });
+    const goal = Math.min(watches.length, 5);
+    return { current: uniqueWatchIds.size, goal };
   }, [watches, wearEntries]);
 
   const handleWatchCardTap = (watch: any) => {
@@ -194,6 +231,104 @@ const Home = () => {
             </Card>
           )}
         </section>
+
+        {/* Weekly Rotation Goal */}
+        {watches.length >= 2 && (
+          <section>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-textMuted">
+                Rotation Goal
+              </h2>
+              <span className="text-xs text-textMuted">
+                {weeklyRotation.current}/{weeklyRotation.goal} unique this week
+              </span>
+            </div>
+            <Card className="p-4 border-borderSubtle">
+              <div className="flex items-center gap-4">
+                <div className="relative h-12 w-12 shrink-0">
+                  <svg viewBox="0 0 36 36" className="h-12 w-12 -rotate-90">
+                    <circle
+                      cx="18" cy="18" r="15.5"
+                      fill="none"
+                      stroke="hsl(var(--muted))"
+                      strokeWidth="3"
+                    />
+                    <circle
+                      cx="18" cy="18" r="15.5"
+                      fill="none"
+                      stroke="hsl(var(--accent))"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeDasharray={`${(Math.min(weeklyRotation.current / weeklyRotation.goal, 1) * 97.4).toFixed(1)} 97.4`}
+                      className="transition-all duration-500"
+                    />
+                  </svg>
+                  <Target className="absolute inset-0 m-auto h-4 w-4 text-accent" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-textMain">
+                    {weeklyRotation.current >= weeklyRotation.goal
+                      ? "Goal reached! Great rotation."
+                      : `Wear ${weeklyRotation.goal - weeklyRotation.current} more unique ${weeklyRotation.goal - weeklyRotation.current === 1 ? "piece" : "pieces"} this week`}
+                  </p>
+                  <p className="text-xs text-textMuted">
+                    Keep your collection in rotation
+                  </p>
+                </div>
+              </div>
+            </Card>
+          </section>
+        )}
+
+        {/* Neglected Watches */}
+        {neglectedWatches.length > 0 && (
+          <section>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-textMuted">
+                Needs Wrist Time
+              </h2>
+              <AlertCircle className="h-3.5 w-3.5 text-amber-500" />
+            </div>
+            <div className="space-y-2">
+              {neglectedWatches.map(({ watch, daysSince }, i) => (
+                <motion.div
+                  key={watch.id}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.08 }}
+                >
+                  <Card
+                    className="flex items-center gap-3 p-3 cursor-pointer hover:bg-surfaceMuted active:scale-[0.98] transition-all border-borderSubtle"
+                    onClick={() => handleWatchCardTap(watch)}
+                  >
+                    <div className="h-10 w-10 rounded-xl bg-surfaceMuted overflow-hidden shrink-0">
+                      {watch.ai_image_url ? (
+                        <img
+                          src={watch.ai_image_url}
+                          alt={`${watch.brand} ${watch.model}`}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="h-full w-full flex items-center justify-center">
+                          <Watch className="h-4 w-4 text-textMuted" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-textMain truncate">
+                        {watch.brand} {watch.model}
+                      </p>
+                      <p className="text-xs text-amber-500 font-medium">
+                        {daysSince === Infinity ? "Never worn" : `${daysSince} days ago`}
+                      </p>
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-textMuted shrink-0" />
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Most Worn Overall */}
         <section>

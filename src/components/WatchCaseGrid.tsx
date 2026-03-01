@@ -17,7 +17,7 @@ interface Watch {
 
 interface WatchCaseGridProps {
   watches: Watch[];
-  wearEntries: { watch_id: string }[];
+  wearEntries: { watch_id: string; wear_date: string }[];
   onDelete?: () => void;
   isLoading?: boolean;
 }
@@ -75,15 +75,22 @@ export const WatchCaseGrid = ({ watches, wearEntries, onDelete, isLoading }: Wat
                 visible: { transition: { staggerChildren: 0.06 } }
               }}
             >
-              {watches.map((watch, index) => (
-                <WatchShowcaseCard
-                  key={watch.id}
-                  watch={watch}
-                  totalDays={wearEntries.filter(w => w.watch_id === watch.id).length}
-                  index={index}
-                  onDelete={onDelete}
-                />
-              ))}
+              {watches.map((watch, index) => {
+                const entries = wearEntries.filter(w => w.watch_id === watch.id);
+                const lastWornDate = entries.length > 0
+                  ? entries.map(e => e.wear_date).sort((a, b) => b.localeCompare(a))[0]
+                  : undefined;
+                return (
+                  <WatchShowcaseCard
+                    key={watch.id}
+                    watch={watch}
+                    totalDays={entries.length}
+                    lastWornDate={lastWornDate}
+                    index={index}
+                    onDelete={onDelete}
+                  />
+                );
+              })}
             </motion.div>
           )}
         </div>

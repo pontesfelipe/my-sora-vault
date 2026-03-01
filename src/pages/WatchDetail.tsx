@@ -5,7 +5,8 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Calendar, DollarSign, Eye, EyeOff, Trash2, Info, Pencil } from "lucide-react";
+import { ArrowLeft, Calendar, DollarSign, Eye, EyeOff, Trash2, Info, Pencil, Flame, Clock } from "lucide-react";
+import { differenceInDays, parseISO } from "date-fns";
 import { PinchZoomImage } from "@/components/PinchZoomImage";
 import watchHero from "@/assets/watch-hero.jpg";
 import { AddWearDialog } from "@/components/AddWearDialog";
@@ -233,6 +234,33 @@ const WatchDetail = () => {
   const totalDays = wearEntries.reduce((sum, entry) => sum + parseFloat(entry.days.toString()), 0);
   const costPerUse = totalDays > 0 ? watch.cost / totalDays : watch.cost;
 
+  // Calculate wear streak and last-worn info
+  const wearStreakInfo = (() => {
+    if (wearEntries.length === 0) return { streak: 0, lastWornDaysAgo: null };
+    const sortedDates = wearEntries
+      .map((e) => e.wear_date)
+      .sort((a, b) => b.localeCompare(a)); // newest first
+    const now = new Date();
+    const today = now.toISOString().split("T")[0];
+    const lastWornDate = sortedDates[0];
+    const lastWornDaysAgo = differenceInDays(now, parseISO(lastWornDate));
+
+    // Count consecutive days ending at the most recent entry
+    let streak = 1;
+    for (let i = 1; i < sortedDates.length; i++) {
+      const curr = parseISO(sortedDates[i - 1]);
+      const prev = parseISO(sortedDates[i]);
+      if (differenceInDays(curr, prev) === 1) {
+        streak++;
+      } else {
+        break;
+      }
+    }
+    // Only count as active streak if last entry was today or yesterday
+    if (lastWornDaysAgo > 1) streak = 0;
+    return { streak, lastWornDaysAgo };
+  })();
+
   // Group by month for monthly breakdown
   const monthlyData: Record<string, number> = {};
   wearEntries.forEach(entry => {
@@ -303,6 +331,32 @@ const WatchDetail = () => {
               />
             </div>
           )}
+
+          {/* Wear streak / last worn badges */}
+          <div className="flex items-center justify-center gap-3 mb-6 flex-wrap">
+            {wearStreakInfo.streak > 0 && (
+              <Badge variant="default" className="gap-1.5 text-sm py-1 px-3">
+                <Flame className="w-3.5 h-3.5" />
+                {wearStreakInfo.streak}-day streak
+              </Badge>
+            )}
+            {wearStreakInfo.lastWornDaysAgo !== null && (
+              <Badge variant="secondary" className="gap-1.5 text-sm py-1 px-3">
+                <Clock className="w-3.5 h-3.5" />
+                {wearStreakInfo.lastWornDaysAgo === 0
+                  ? "Worn today"
+                  : wearStreakInfo.lastWornDaysAgo === 1
+                  ? "Worn yesterday"
+                  : `Last worn ${wearStreakInfo.lastWornDaysAgo} days ago`}
+              </Badge>
+            )}
+            {wearEntries.length === 0 && (
+              <Badge variant="outline" className="gap-1.5 text-sm py-1 px-3 text-muted-foreground">
+                <Clock className="w-3.5 h-3.5" />
+                Never worn
+              </Badge>
+            )}
+          </div>
 
           <Tabs defaultValue="specs" className="w-full">
           <TabsList className="grid w-full max-w-md mx-auto grid-cols-3 mb-8">

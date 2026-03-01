@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
-import { Eye, Calendar, Trash2 } from "lucide-react";
+import { Eye, Calendar, Trash2, Clock } from "lucide-react";
+import { differenceInDays, parseISO } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -34,11 +35,12 @@ interface WatchShowcaseCardProps {
     available_for_trade?: boolean;
   };
   totalDays: number;
+  lastWornDate?: string;
   index: number;
   onDelete?: () => void;
 }
 
-export const WatchShowcaseCard = ({ watch, totalDays, index, onDelete }: WatchShowcaseCardProps) => {
+export const WatchShowcaseCard = ({ watch, totalDays, lastWornDate, index, onDelete }: WatchShowcaseCardProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -172,6 +174,18 @@ export const WatchShowcaseCard = ({ watch, totalDays, index, onDelete }: WatchSh
                         <span className="text-[10px] font-semibold">{totalDays}d</span>
                       </div>
                     )}
+                    {lastWornDate && (() => {
+                      const daysAgo = differenceInDays(new Date(), parseISO(lastWornDate));
+                      if (daysAgo >= 30) {
+                        return (
+                          <div className="flex items-center gap-0.5 text-amber-500">
+                            <Clock className="w-2.5 h-2.5" />
+                            <span className="text-[10px] font-semibold">{daysAgo}d</span>
+                          </div>
+                        );
+                      }
+                      return null;
+                    })()}
                     <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
                       <Eye className="w-3 h-3 text-primary" />
                     </div>
