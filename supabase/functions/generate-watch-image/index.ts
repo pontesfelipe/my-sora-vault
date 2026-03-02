@@ -35,15 +35,15 @@ const inputSchema = z.object({
 const COMPOSITION_RULES = [
   'SQUARE 1:1 aspect ratio composition',
   'The watch must be PERFECTLY CENTERED in the frame, both horizontally and vertically',
-  'CRITICAL SIZE RULE: Regardless of the actual case diameter of the watch, ALL watches must appear the SAME visual size in the image - the watch case (excluding strap) must fill exactly 60% of the image width and 50% of the image height. This is a normalized catalog view where a 44mm Panerai and a 40mm IWC must look the same size in the frame',
-  'STRAIGHT-ON front-facing view looking directly at the dial face - absolutely NO side angles',
-  'Maximum 3-5 degree tilt for minimal depth perception - the full dial must be completely visible and readable',
-  'The watch must be UPRIGHT with 12 o\'clock at the top',
+  'CRITICAL SIZE RULE: Regardless of the actual case diameter, ALL watches must appear the SAME visual size — the case (excluding strap) fills exactly 60% of image width and 50% of image height',
+  'STRAIGHT-ON front-facing view looking directly at the dial face — absolutely NO side angles, NO wrist shots',
+  'Maximum 3-5 degree tilt for minimal depth perception — the full dial must be completely visible and readable',
+  'The watch must be UPRIGHT with 12 o\'clock at the top, hands set to 10:10 position',
   'Show a small portion of the bracelet/strap extending from both lugs (about 1-2 links or 2cm of strap)',
   'DARK background: smooth gradient from charcoal (#2a2a2a) at edges to near-black (#111111) at center',
   'Professional studio lighting: soft diffused main light from upper-left, subtle fill light from right',
-  'Sharp focus on entire dial face - every index, hand, and subdial must be crisp',
-  'No reflections on crystal, no glare spots',
+  'Sharp focus on entire dial face — every index, hand, and subdial must be crisp and legible',
+  'No reflections on crystal, no glare spots, no watermarks, no text overlays',
   'Ultra high resolution, photorealistic, luxury catalog quality',
 ].join('. ');
 
@@ -55,16 +55,23 @@ function buildReferencePrompt(
   const canonicalModel = canonicalizeModelForPrompt(brand, model);
 
   const specificCues = [
-    opts.dialColor ? `Dial color/finish MUST match exactly: ${opts.dialColor}` : '',
-    opts.type ? `Complication/category cues: ${opts.type}` : '',
-    opts.caseSize ? `Case size target: ${opts.caseSize}` : '',
-    opts.movement ? `Movement cue: ${opts.movement}` : '',
-    opts.bezelType ? `Bezel cue: ${opts.bezelType}` : '',
-    opts.strapType ? `Bracelet/strap cue: ${opts.strapType}` : '',
-    opts.specialEditionHint ? `Edition/reference cue: ${opts.specialEditionHint}` : '',
+    opts.dialColor ? `CRITICAL — Dial color/finish MUST be exactly: ${opts.dialColor}. This is non-negotiable` : '',
+    opts.type ? `Watch type/complication: ${opts.type}` : '',
+    opts.caseSize ? `Case diameter: ${opts.caseSize}` : '',
+    opts.movement ? `Movement type: ${opts.movement}` : '',
+    opts.bezelType ? `Bezel style: ${opts.bezelType}` : '',
+    opts.strapType ? `Bracelet/strap: ${opts.strapType}` : '',
+    opts.specialEditionHint ? `Special edition/reference: ${opts.specialEditionHint}` : '',
   ].filter(Boolean).join('. ');
 
-  return `IMPORTANT: Use the reference image ONLY to identify design details (dial layout, hand style, bezel markings, bracelet pattern, crown shape). Do NOT copy the framing, zoom level, angle, or proportions from the reference photo. Never output a generic or placeholder-style watch; it must be recognizably the exact ${brand} ${canonicalModel} reference with accurate dial layout, bezel markings, hand set, indices, crown, and bracelet/strap architecture. Instead, generate a completely new studio product shot following these STRICT composition rules. This is a ${brand} ${canonicalModel}. ${specificCues}. CRITICAL OVERRIDE - IGNORE THE REFERENCE IMAGE'S FRAMING: ${COMPOSITION_RULES}`;
+  return [
+    `REFERENCE IMAGE INSTRUCTIONS: Study the reference image carefully to extract EXACT design DNA — dial layout, indices style, hand shapes, subdial positions, bezel markings, crown design, bracelet/strap pattern, case shape, and any text printed on the dial (brand name, model name, depth rating).`,
+    `Do NOT copy the reference image's framing, angle, zoom, lighting, or background. Generate a COMPLETELY NEW studio product shot.`,
+    `WATCH IDENTITY: This is a ${brand} ${canonicalModel}. The generated image MUST be unmistakably recognizable as this specific model.`,
+    `KEY ACCURACY REQUIREMENTS: The dial must show the correct brand logo/name placement, correct number and style of subdials (if any), correct hand shapes specific to this model, correct bezel insert markings (if applicable), and correct bracelet/strap design.`,
+    specificCues,
+    `COMPOSITION: ${COMPOSITION_RULES}`,
+  ].filter(Boolean).join('. ');
 }
 
 function buildPureGenerationPrompt(
@@ -75,15 +82,18 @@ function buildPureGenerationPrompt(
   const canonicalModel = canonicalizeModelForPrompt(brand, model);
 
   const details = [
-    `Create an ACCURATE photorealistic product photograph of the ${brand} ${canonicalModel} wristwatch`,
-    opts.dialColor ? `Dial color/finish MUST be: ${opts.dialColor}` : 'Dial color must match the real production model',
-    opts.type ? `Complication/category: ${opts.type}` : '',
-    opts.caseSize ? `Case diameter cue: ${opts.caseSize}` : '',
-    opts.movement ? `Movement cue: ${opts.movement}` : '',
-    opts.bezelType ? `Bezel cue: ${opts.bezelType}` : '',
-    opts.strapType ? `Bracelet/strap cue: ${opts.strapType}` : '',
-    opts.specialEditionHint ? `Edition/reference cue: ${opts.specialEditionHint}` : '',
-    `Render the exact real-world reference/edition when identifiable; avoid generic lookalikes`,
+    `Create a HIGHLY ACCURATE photorealistic product photograph of the ${brand} ${canonicalModel} wristwatch`,
+    `ACCURACY IS PARAMOUNT: The image must be unmistakably recognizable as the ${brand} ${canonicalModel} — not a generic watch or a different model from the same brand`,
+    `DIAL DETAILS: Reproduce the correct brand logo position, model name text on dial (if the real watch has it), correct number/layout of subdials, correct index style (applied, printed, Arabic, Roman, baton, dot), correct hand design specific to this model`,
+    opts.dialColor ? `CRITICAL — Dial color/finish MUST be exactly: ${opts.dialColor}. This is non-negotiable` : 'Dial color must precisely match the real production model',
+    opts.type ? `Watch type/complication: ${opts.type}` : '',
+    opts.caseSize ? `Case diameter: ${opts.caseSize}` : '',
+    opts.movement ? `Movement type: ${opts.movement}` : '',
+    opts.bezelType ? `Bezel style: ${opts.bezelType} — reproduce exact markings, scale, and insert color` : '',
+    opts.strapType ? `Bracelet/strap: ${opts.strapType} — match link shape, clasp style, and finishing` : '',
+    opts.specialEditionHint ? `Special edition/reference: ${opts.specialEditionHint}` : '',
+    `CASE & CROWN: Match the correct case shape, lug design, crown shape and guards (if applicable) for this specific model`,
+    `Render the exact real-world reference/edition; absolutely NO generic lookalikes or amalgamations of different models`,
     COMPOSITION_RULES,
   ].filter(Boolean);
   return details.join('. ');
