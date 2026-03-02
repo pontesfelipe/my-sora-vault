@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Tag } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, Calendar, DollarSign, Eye, EyeOff, Trash2, Info, Pencil } from "lucide-react";
 import { PinchZoomImage } from "@/components/PinchZoomImage";
@@ -80,6 +81,7 @@ const WatchDetail = () => {
   const [watch, setWatch] = useState<Watch | null>(null);
   const [watchSpecs, setWatchSpecs] = useState<WatchSpecs | null>(null);
   const [wearEntries, setWearEntries] = useState<WearEntry[]>([]);
+  const [entryTags, setEntryTags] = useState<Record<string, { id: string; name: string; category: string | null }[]>>({});
   const [loading, setLoading] = useState(true);
   const [showCost, setShowCost] = useState(isAdmin);
   const [editingEntry, setEditingEntry] = useState<WearEntry | null>(null);
@@ -142,7 +144,27 @@ const WatchDetail = () => {
 
     if (watchResult.data) setWatch(watchResult.data);
     if (specsResult.data) setWatchSpecs(specsResult.data);
-    if (wearResult.data) setWearEntries(wearResult.data);
+    if (wearResult.data) {
+      setWearEntries(wearResult.data);
+      // Fetch tags for all wear entries
+      const entryIds = wearResult.data.map((e: WearEntry) => e.id);
+      if (entryIds.length > 0) {
+        const { data: tagLinks } = await supabase
+          .from("wear_entry_tags")
+          .select("wear_entry_id, tag_id, tags(id, name, category)")
+          .in("wear_entry_id", entryIds);
+        if (tagLinks) {
+          const tagsMap: Record<string, { id: string; name: string; category: string | null }[]> = {};
+          tagLinks.forEach((link: any) => {
+            if (!tagsMap[link.wear_entry_id]) tagsMap[link.wear_entry_id] = [];
+            if (link.tags) tagsMap[link.wear_entry_id].push(link.tags);
+          });
+          setEntryTags(tagsMap);
+        }
+      } else {
+        setEntryTags({});
+      }
+    }
     setLoading(false);
   };
 
@@ -637,10 +659,20 @@ const WatchDetail = () => {
                         <p className="text-sm text-muted-foreground">
                           {entry.days} {entry.days === 1 ? 'day' : 'days'}
                         </p>
-                        {entry.notes && (
-                          <p className="text-sm text-muted-foreground mt-1">{entry.notes}</p>
-                        )}
-                      </div>
+                         {entry.notes && (
+                           <p className="text-sm text-muted-foreground mt-1">{entry.notes}</p>
+                         )}
+                         {entryTags[entry.id] && entryTags[entry.id].length > 0 && (
+                           <div className="flex flex-wrap gap-1 mt-1.5">
+                             {entryTags[entry.id].map((tag) => (
+                               <Badge key={tag.id} variant="secondary" className="text-[10px] px-1.5 py-0 gap-1">
+                                 <Tag className="h-2.5 w-2.5" />
+                                 {tag.name}
+                               </Badge>
+                             ))}
+                           </div>
+                         )}
+                       </div>
 
                       <div className="flex gap-2">
                         <Button 
