@@ -3,7 +3,8 @@ import { PageTransition } from "@/components/PageTransition";
 import { useNavigate } from "react-router-dom";
 import {
   Watch, Settings, Heart, List, Plus, Search, Users, ChevronRight,
-  Grid3X3, BookHeart, Bot, ShoppingBag, ArrowUpDown, ScrollText
+  Grid3X3, BookHeart, Bot, ShoppingBag, ArrowUpDown, ScrollText,
+  Sparkles, Trash2
 } from "lucide-react";
 import { CreateListDialog } from "@/components/CreateListDialog";
 import { ListDetailView } from "@/components/ListDetailView";
@@ -11,7 +12,7 @@ import { useTrustLevel } from "@/hooks/useTrustLevel";
 import { TrustLevelBadge } from "@/components/TrustLevelBadge";
 import { WatchCaseGrid } from "@/components/WatchCaseGrid";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -19,25 +20,33 @@ import { useWatchData } from "@/hooks/useWatchData";
 import { useWishlistData } from "@/hooks/useWishlistData";
 import { useCollection } from "@/contexts/CollectionContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { useAllowedUserCheck } from "@/hooks/useAllowedUserCheck";
 import { UserAvatar } from "@/components/UserAvatar";
 import { AddWatchDialog } from "@/components/AddWatchDialog";
 import { CollectionSwitcher } from "@/components/CollectionSwitcher";
 import { WishlistTable } from "@/components/WishlistTable";
 import { AddWishlistDialog } from "@/components/AddWishlistDialog";
+import { TastePreferences } from "@/components/TastePreferences";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
 
 const Profile = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const { selectedCollectionId, currentCollection, currentCollectionType, currentCollectionConfig } = useCollection();
   const { watches, wearEntries, loading, refetch } = useWatchData(selectedCollectionId);
   const { wishlist, loading: wishlistLoading, refetch: refetchWishlist } = useWishlistData();
   const { data: trustData, config: trustConfig } = useTrustLevel();
+  const { isAllowed } = useAllowedUserCheck();
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("collection");
   const [searchQuery, setSearchQuery] = useState("");
   const [profileData, setProfileData] = useState<any>(null);
+  const [wishlistDialogOpen, setWishlistDialogOpen] = useState(false);
+  const [isGeneratingSuggestions, setIsGeneratingSuggestions] = useState(false);
+  const [remainingWishlistUsage, setRemainingWishlistUsage] = useState<number | null>(null);
 
   // Load profile data
   useEffect(() => {
@@ -70,6 +79,114 @@ const Profile = () => {
       .eq("friend_id", user.id)
       .then(({ count }) => setFollowerCount(count || 0));
   }, [user]);
+
+  // Check wishlist usage limits
+  useEffect(() => {
+    if (isAllowed && user) {
+      checkWishlistUsageLimit();
+    }
+  }, [isAllowed, user]);
+
+  const checkWishlistUsageLimit = async () => {
+    if (!user) return;
+    try {
+      const { data, error } = await supabase.rpc('get_ai_feature_usage', {
+        _user_id: user.id,
+        _feature_name: 'wishlist'
+      });
+      if (error) throw error;
+      if (data && data.length > 0) {
+        setRemainingWishlistUsage(Number(data[0].remaining_count));
+      }
+    } catch (error) {
+      console.error("Error checking wishlist usage limit:", error);
+    }
+  };
+
+  const handleGenerateSuggestions = async (tasteDescription: string, focusOnGaps?: boolean) => {
+    if (!user) return;
+    setIsGeneratingSuggestions(true);
+    try {
+      const { data: canUse, error: canUseError } = await supabase.rpc('can_use_ai_feature', {
+        _user_id: user.id,
+        _feature_name: 'wishlist'
+      });
+      if (canUseError) throw canUseError;
+      if (!canUse) {
+        toast({
+          title: "Monthly Limit Reached",
+          description: "You've used all AI wishlist suggestions this month. Resets next month.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke("suggest-watches", {
+        body: { tasteDescription, focusOnGaps },
+      });
+      if (error) throw error;
+
+      // Clear existing AI suggestions first
+      await (supabase.from('wishlist' as any) as any)
+        .delete()
+        .eq('user_id', user.id)
+        .eq('is_ai_suggested', true);
+
+      // Add new suggestions
+      if (data?.suggestions?.length > 0) {
+        const suggestionsToInsert = data.suggestions.map((s: any, index: number) => ({
+          brand: s.brand,
+          model: s.model,
+          dial_colors: s.dial_colors || 'Various',
+          rank: index + 1,
+          notes: s.notes || s.reason,
+          is_ai_suggested: true,
+          user_id: user.id,
+        }));
+        await (supabase.from('wishlist' as any) as any).insert(suggestionsToInsert);
+      }
+
+      // Record usage
+      await supabase.from("ai_feature_usage").insert([{
+        user_id: user.id,
+        feature_name: 'wishlist'
+      }]);
+
+      await checkWishlistUsageLimit();
+      refetchWishlist();
+
+      toast({
+        title: "Suggestions Generated",
+        description: `Added ${data?.suggestions?.length || 0} AI-powered suggestions`,
+      });
+    } catch (error: any) {
+      console.error("Error generating suggestions:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to generate suggestions",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingSuggestions(false);
+    }
+  };
+
+  const handleClearAISuggestions = async () => {
+    if (!user) return;
+    try {
+      await (supabase.from('wishlist' as any) as any)
+        .delete()
+        .eq('user_id', user.id)
+        .eq('is_ai_suggested', true);
+      refetchWishlist();
+      toast({
+        title: "Cleared",
+        description: "AI suggestions have been removed",
+      });
+    } catch (error) {
+      console.error("Error clearing AI suggestions:", error);
+    }
+  };
 
   // Recent logs
   const recentLogs = useMemo(() => {
@@ -279,8 +396,88 @@ const Profile = () => {
         </TabsContent>
 
         {/* Wishlist Tab */}
-        <TabsContent value="wishlist" className="mt-4 space-y-3">
-          <WishlistTable items={wishlist} onDelete={refetchWishlist} />
+        <TabsContent value="wishlist" className="mt-4 space-y-4">
+          <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-base font-semibold text-textMain">My Wishlist</h2>
+              <p className="text-xs text-textMuted">Track {currentCollectionConfig.pluralLabel.toLowerCase()} you'd love to add</p>
+            </div>
+            <Button size="sm" onClick={() => setWishlistDialogOpen(true)} className="gap-1.5">
+              <Plus className="w-3.5 h-3.5" />
+              Add
+            </Button>
+          </div>
+
+          {/* User Wishlist */}
+          <Card>
+            <CardHeader className="pb-2 px-4 pt-4">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <Heart className="w-4 h-4 text-primary" />
+                My Items
+              </CardTitle>
+              <CardDescription className="text-xs">
+                {wishlist.filter(item => !item.is_ai_suggested).length} {wishlist.filter(item => !item.is_ai_suggested).length === 1 ? 'item' : 'items'}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="px-4 pb-4">
+              <WishlistTable 
+                items={wishlist.filter(item => !item.is_ai_suggested)} 
+                onDelete={refetchWishlist} 
+                showAISuggested={false}
+              />
+            </CardContent>
+          </Card>
+
+          {/* AI Suggestions - Only show if user is allowed */}
+          {isAllowed && (
+            <div className="space-y-4">
+              <TastePreferences 
+                onSuggest={handleGenerateSuggestions}
+                isGenerating={isGeneratingSuggestions}
+                remainingUsage={remainingWishlistUsage}
+              />
+
+              {wishlist.filter(item => item.is_ai_suggested).length > 0 && (
+                <Card>
+                  <CardHeader className="pb-2 px-4 pt-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle className="text-sm flex items-center gap-2">
+                          <Sparkles className="w-4 h-4 text-accent" />
+                          AI Suggestions
+                        </CardTitle>
+                        <CardDescription className="text-xs">
+                          Personalized recommendations based on your taste
+                        </CardDescription>
+                      </div>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={handleClearAISuggestions}
+                        className="text-textMuted hover:text-destructive h-8 text-xs"
+                      >
+                        <Trash2 className="w-3.5 h-3.5 mr-1" />
+                        Clear
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="px-4 pb-4">
+                    <WishlistTable 
+                      items={wishlist.filter(item => item.is_ai_suggested)} 
+                      onDelete={refetchWishlist}
+                      showAISuggested={true}
+                    />
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          )}
+
+          <AddWishlistDialog 
+            open={wishlistDialogOpen}
+            onOpenChange={setWishlistDialogOpen}
+            onSuccess={refetchWishlist}
+          />
         </TabsContent>
 
         {/* Lists Tab */}
