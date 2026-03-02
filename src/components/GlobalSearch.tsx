@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Search, X, Watch, User, Hash, Plus, Clock } from "lucide-react";
+import { Search, X, Watch, User, Hash, Plus, Clock, Tag } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -10,7 +10,7 @@ import { useCollection } from "@/contexts/CollectionContext";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface SearchResult {
-  type: "watch" | "user" | "topic";
+  type: "watch" | "user" | "tag";
   id: string;
   title: string;
   subtitle?: string;
@@ -92,6 +92,29 @@ export function GlobalSearch() {
         // ignore search errors
       }
 
+      // Search tags
+      try {
+        const { data: tags } = await supabase
+          .from("tags")
+          .select("id, name, category, usage_count")
+          .ilike("name", `%${q}%`)
+          .order("usage_count", { ascending: false })
+          .limit(5);
+
+        if (tags) {
+          tags.forEach((t: any) => {
+            searchResults.push({
+              type: "tag",
+              id: t.id,
+              title: t.name,
+              subtitle: t.category ? `${t.category} · ${t.usage_count || 0} uses` : `${t.usage_count || 0} uses`,
+            });
+          });
+        }
+      } catch (e) {
+        // ignore search errors
+      }
+
       setResults(searchResults.slice(0, 10));
       setLoading(false);
     }, 300);
@@ -103,8 +126,9 @@ export function GlobalSearch() {
     if (result.type === "watch") {
       navigate(`/watch/${result.id}`);
     } else if (result.type === "user") {
-      // Could navigate to user profile in future
       navigate(`/feed`);
+    } else if (result.type === "tag") {
+      navigate(`/log`);
     }
     setIsOpen(false);
     setQuery("");
@@ -184,6 +208,8 @@ export function GlobalSearch() {
                         ) : (
                           <Watch className="h-4 w-4 text-accent" />
                         )
+                      ) : result.type === "tag" ? (
+                        <Tag className="h-4 w-4 text-accent" />
                       ) : (
                         <User className="h-4 w-4 text-accent" />
                       )}
