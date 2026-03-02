@@ -67,7 +67,6 @@ const Home = () => {
             watches={watches}
             wearEntries={wearEntries}
             onWatchTap={handleWatchCardTap}
-            onNavigateToWatch={(id) => navigate(`/watch/${id}`)}
           />
         </section>
 
