@@ -46,12 +46,28 @@ function isKnownBrand(brand: string): boolean {
   return KNOWN_BRANDS.has(brand.trim().toLowerCase());
 }
 
+function shouldReuseExistingImage(opts: {
+  brand: string;
+  referenceImageBase64?: string;
+  referenceImageUrl?: string;
+  customPrompt?: string;
+  specialEditionHint?: string;
+}): boolean {
+  // Reuse only for well-known brands and only when no custom/reference context exists.
+  // This prevents propagating low-quality legacy images for microbrands (e.g. Trafford).
+  if (!isKnownBrand(opts.brand)) return false;
+  if (opts.referenceImageBase64 || opts.referenceImageUrl) return false;
+  if (opts.customPrompt || opts.specialEditionHint) return false;
+  return true;
+}
+
 const COMPOSITION_RULES = [
   'SQUARE 1:1 aspect ratio composition',
   'The watch must be PERFECTLY CENTERED in the frame, both horizontally and vertically',
   'CRITICAL SIZE RULE: Regardless of the actual case diameter, ALL watches must appear the SAME visual size — the case (excluding strap) fills exactly 60% of image width and 50% of image height',
   'STRAIGHT-ON front-facing view looking directly at the dial face — absolutely NO side angles, NO wrist shots',
   'Maximum 3-5 degree tilt for minimal depth perception — the full dial must be completely visible and readable',
+  'ORIENTATION LOCK: 12 o\'clock marker must be at the top; watch must be upright and NEVER sideways or rotated 90°',
   'The watch must be UPRIGHT with 12 o\'clock at the top, hands set to 10:10 position',
   'Show a small portion of the bracelet/strap extending from both lugs (about 1-2 links or 2cm of strap)',
   'DARK background: smooth gradient from charcoal (#2a2a2a) at edges to near-black (#111111) at center',
@@ -300,50 +316,62 @@ serve(async (req) => {
     const supabaseClient = createClient(supabaseUrl, supabaseServiceKey);
 
     // ─── CHECK FOR EXISTING IMAGE FROM ANOTHER USER'S COLLECTION ───
-    // If another user already has this exact watch (brand + model + dial_color) with an AI image,
-    // reuse it instead of spending resources regenerating.
-    const normalizedBrand = brand.trim().toLowerCase();
-    const normalizedModel = model.trim().toLowerCase();
-    const normalizedDialColor = (dialColor || '').trim().toLowerCase();
+    // Reuse is intentionally restricted to avoid recycling bad legacy outputs
+    // for microbrands or custom/reference-driven requests.
+    const allowImageReuse = shouldReuseExistingImage({
+      brand,
+      referenceImageBase64,
+      referenceImageUrl,
+      customPrompt,
+      specialEditionHint,
+    });
 
-    const { data: existingMatches } = await supabaseClient
-      .from('watches')
-      .select('id, ai_image_url, brand, model, dial_color')
-      .not('ai_image_url', 'is', null)
-      .eq('status', 'active')
-      .limit(50);
+    if (allowImageReuse) {
+      const normalizedBrand = brand.trim().toLowerCase();
+      const normalizedModel = model.trim().toLowerCase();
+      const normalizedDialColor = (dialColor || '').trim().toLowerCase();
 
-    if (existingMatches && existingMatches.length > 0) {
-      const match = existingMatches.find((w: any) => {
-        const wb = (w.brand || '').trim().toLowerCase();
-        const wm = (w.model || '').trim().toLowerCase();
-        const wd = (w.dial_color || '').trim().toLowerCase();
-        // Exact match on brand + model + dial color (or both have no dial color)
-        return wb === normalizedBrand && wm === normalizedModel &&
-          (wd === normalizedDialColor || (!wd && !normalizedDialColor));
-      });
+      const { data: existingMatches } = await supabaseClient
+        .from('watches')
+        .select('id, ai_image_url, brand, model, dial_color')
+        .not('ai_image_url', 'is', null)
+        .eq('status', 'active')
+        .limit(50);
 
-      if (match && match.ai_image_url) {
-        // Skip watchId check — only reuse from a DIFFERENT watch record
-        if (!watchId || match.id !== watchId) {
-          console.log(`Reusing existing AI image from watch ${match.id} for ${brand} ${model}`);
+      if (existingMatches && existingMatches.length > 0) {
+        const match = existingMatches.find((w: any) => {
+          const wb = (w.brand || '').trim().toLowerCase();
+          const wm = (w.model || '').trim().toLowerCase();
+          const wd = (w.dial_color || '').trim().toLowerCase();
+          // Exact match on brand + model + dial color (or both have no dial color)
+          return wb === normalizedBrand && wm === normalizedModel &&
+            (wd === normalizedDialColor || (!wd && !normalizedDialColor));
+        });
 
-          // Update the current watch record with the existing image
-          if (watchId) {
-            await supabaseClient.from('watches').update({ ai_image_url: match.ai_image_url }).eq('id', watchId);
+        if (match && match.ai_image_url) {
+          // Skip watchId check — only reuse from a DIFFERENT watch record
+          if (!watchId || match.id !== watchId) {
+            console.log(`Reusing existing AI image from watch ${match.id} for ${brand} ${model}`);
+
+            // Update the current watch record with the existing image
+            if (watchId) {
+              await supabaseClient.from('watches').update({ ai_image_url: match.ai_image_url }).eq('id', watchId);
+            }
+
+            return new Response(
+              JSON.stringify({
+                success: true,
+                imageUrl: match.ai_image_url,
+                generationMethod: 'reused-existing',
+                message: `Reused existing AI image from another collection`,
+              }),
+              { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
           }
-
-          return new Response(
-            JSON.stringify({
-              success: true,
-              imageUrl: match.ai_image_url,
-              generationMethod: 'reused-existing',
-              message: `Reused existing AI image from another collection`,
-            }),
-            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-          );
         }
       }
+    } else {
+      console.log(`Skipping image reuse for ${brand} ${model} to force fresh generation`);
     }
 
     // Resolve reference image with quality priority:
