@@ -15,11 +15,11 @@ import { AccessLogsTab } from "@/components/admin/AccessLogsTab";
 import { UsageMetricsTab } from "@/components/admin/UsageMetricsTab";
 import { CollectionsTab } from "@/components/admin/CollectionsTab";
 import { FeedbackTab } from "@/components/admin/FeedbackTab";
-import { FeatureMatrixTab } from "@/components/admin/FeatureMatrixTab";
+
 import { ExportWearLogsDialog } from "@/components/admin/ExportWearLogsDialog";
 import { ExportWatchInventoryDialog } from "@/components/admin/ExportWatchInventoryDialog";
 import { ExportAllDataDialog } from "@/components/admin/ExportAllDataDialog";
-import { Shield, Users, UserCog, FileCheck, Calendar, RefreshCw, Moon, Sun, BookOpen, FileText, Activity, BarChart3, FolderOpen, MessageSquarePlus, ToggleRight } from "lucide-react";
+import { Shield, Users, UserCog, FileCheck, Calendar, Moon, Sun, BookOpen, FileText, Activity, BarChart3, FolderOpen, MessageSquarePlus } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -29,24 +29,7 @@ export default function Admin() {
   const { user, isAdmin, loading } = useAuth();
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
-  const [isUpdatingPrices, setIsUpdatingPrices] = useState(false);
   const goToWearLogs = () => navigate("/admin/wear-logs");
-
-  const handleUpdateMarketPrices = async () => {
-    setIsUpdatingPrices(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('update-all-watch-prices');
-      
-      if (error) throw error;
-      
-      toast.success(data.message || 'Market prices updated successfully');
-    } catch (error) {
-      console.error('Error updating market prices:', error);
-      toast.error('Failed to update market prices');
-    } finally {
-      setIsUpdatingPrices(false);
-    }
-  };
 
 
   useEffect(() => {
@@ -84,10 +67,6 @@ export default function Admin() {
             <ExportAllDataDialog />
             <ExportWearLogsDialog />
             <ExportWatchInventoryDialog />
-            <Button onClick={handleUpdateMarketPrices} variant="outline" disabled={isUpdatingPrices}>
-              <RefreshCw className={`w-4 h-4 mr-2 ${isUpdatingPrices ? 'animate-spin' : ''}`} />
-              {isUpdatingPrices ? 'Updating...' : 'Update Market Prices'}
-            </Button>
             <Button onClick={goToWearLogs} variant="outline">
               <Calendar className="w-4 h-4 mr-2" />
               Wear Logs
@@ -97,7 +76,7 @@ export default function Admin() {
         </div>
 
         <Tabs defaultValue="requests" className="w-full">
-          <TabsList className="grid w-full max-w-7xl grid-cols-11">
+          <TabsList className="grid w-full max-w-7xl grid-cols-10">
             <TabsTrigger value="requests" className="flex items-center gap-1 text-xs">
               <UserCog className="h-3 w-3" />
               Requests
@@ -113,10 +92,6 @@ export default function Admin() {
             <TabsTrigger value="collections" className="flex items-center gap-1 text-xs">
               <FolderOpen className="h-3 w-3" />
               Collections
-            </TabsTrigger>
-            <TabsTrigger value="features" className="flex items-center gap-1 text-xs">
-              <ToggleRight className="h-3 w-3" />
-              Features
             </TabsTrigger>
             <TabsTrigger value="feedback" className="flex items-center gap-1 text-xs">
               <MessageSquarePlus className="h-3 w-3" />
@@ -190,9 +165,6 @@ export default function Admin() {
             <CollectionsTab />
           </TabsContent>
 
-          <TabsContent value="features" className="space-y-4">
-            <FeatureMatrixTab />
-          </TabsContent>
 
           <TabsContent value="feedback" className="space-y-4">
             <Card>
