@@ -97,7 +97,12 @@ const Log = () => {
     normalizeForCompare(value)
       .split(/[\s/-]+/)
       .map((token) => token.replace(/^\.+|\.+$/g, ""))
-      .filter((token) => token.length >= 3 && !modelStopWords.has(token));
+      .filter((token) => {
+        if (modelStopWords.has(token)) return false;
+        // Keep numeric tokens ≥2 chars (e.g. "57", "300") as they distinguish model variants
+        if (/^\d+$/.test(token)) return token.length >= 2;
+        return token.length >= 3;
+      });
 
   const extractReferenceTokens = (value: string): string[] =>
     (normalizeForCompare(value).match(/[a-z0-9]{2,}(?:[.-][a-z0-9]{2,}){1,}/g) ?? []).filter((token) => /\d/.test(token));
