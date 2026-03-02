@@ -1,8 +1,18 @@
 import { useMemo, useState } from "react";
-import { Calendar } from "@/components/ui/calendar";
 import { Card } from "@/components/ui/card";
-import { Watch, ChevronRight } from "lucide-react";
-import { format, parseISO, startOfMonth, endOfMonth, isWithinInterval } from "date-fns";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Watch, ChevronRight, CalendarIcon } from "lucide-react";
+import {
+  format,
+  parseISO,
+  startOfWeek,
+  endOfWeek,
+  isWithinInterval,
+  addDays,
+  isSameWeek,
+} from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -10,182 +20,283 @@ interface WearCalendarProps {
   watches: any[];
   wearEntries: any[];
   onWatchTap?: (watch: any) => void;
-  onNavigateToWatch?: (watchId: string) => void;
 }
 
-export const WearCalendar = ({ watches, wearEntries, onWatchTap, onNavigateToWatch }: WearCalendarProps) => {
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
-  const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
+export const WearCalendar = ({ watches, wearEntries, onWatchTap }: WearCalendarProps) => {
+  const [selectedWeekDate, setSelectedWeekDate] = useState<Date>(new Date());
+  const [selectedDay, setSelectedDay] = useState<string | null>(null);
+  const [calendarOpen, setCalendarOpen] = useState(false);
 
-  // Build a set of dates that have wear entries
-  const wornDatesMap = useMemo(() => {
-    const map: Record<string, string[]> = {}; // date string -> watch_ids
-    wearEntries.forEach((entry: any) => {
-      const dateKey = entry.wear_date;
-      if (!map[dateKey]) map[dateKey] = [];
-      if (!map[dateKey].includes(entry.watch_id)) {
-        map[dateKey].push(entry.watch_id);
-      }
-    });
-    return map;
-  }, [wearEntries]);
+  const isCurrentWeek = isSameWeek(selectedWeekDate, new Date(), { weekStartsOn: 1 });
 
-  // Get watches worn on selected date
-  const selectedDateWatches = useMemo(() => {
-    if (!selectedDate) return [];
-    const dateKey = format(selectedDate, "yyyy-MM-dd");
-    const watchIds = wornDatesMap[dateKey] || [];
-    return watchIds
-      .map((id) => watches.find((w) => w.id === id))
-      .filter(Boolean);
-  }, [selectedDate, wornDatesMap, watches]);
+  // Calculate week data based on selectedWeekDate
+  const weekData = useMemo(() => {
+    const weekStart = startOfWeek(selectedWeekDate, { weekStartsOn: 1 });
+    const weekEnd = endOfWeek(selectedWeekDate, { weekStartsOn: 1 });
 
-  // Dates with entries for calendar highlighting
-  const datesWithEntries = useMemo(() => {
-    return new Set(Object.keys(wornDatesMap));
-  }, [wornDatesMap]);
-
-  // Stats for selected month
-  const monthStats = useMemo(() => {
-    const monthStart = startOfMonth(currentMonth);
-    const monthEnd = endOfMonth(currentMonth);
-    let totalDays = 0;
-    const watchCounts: Record<string, number> = {};
-
-    wearEntries.forEach((entry: any) => {
+    const weekEntries = wearEntries.filter((entry: any) => {
       try {
         const entryDate = parseISO(entry.wear_date);
-        if (isWithinInterval(entryDate, { start: monthStart, end: monthEnd })) {
-          totalDays += entry.days;
-          watchCounts[entry.watch_id] = (watchCounts[entry.watch_id] || 0) + entry.days;
-        }
-      } catch {}
+        return isWithinInterval(entryDate, { start: weekStart, end: weekEnd });
+      } catch {
+        return false;
+      }
     });
 
-    return { totalDays, uniqueWatches: Object.keys(watchCounts).length };
-  }, [currentMonth, wearEntries]);
+    const watchCounts: Record<string, number> = {};
+    weekEntries.forEach((entry: any) => {
+      watchCounts[entry.watch_id] = (watchCounts[entry.watch_id] || 0) + entry.days;
+    });
+
+    const sorted = Object.entries(watchCounts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([watchId, count]) => {
+        const watch = watches.find((w: any) => w.id === watchId);
+        return { watch, count };
+      })
+      .filter((item) => item.watch);
+
+    const daysOfWeek = Array.from({ length: 7 }, (_, i) => {
+      const date = addDays(weekStart, i);
+      const dateKey = format(date, "yyyy-MM-dd");
+      const dayEntries = weekEntries.filter((e: any) => e.wear_date === dateKey);
+      const dayWatchIds = [...new Set(dayEntries.map((e: any) => e.watch_id))];
+      return {
+        label: format(date, "EEE"),
+        date: format(date, "d"),
+        dateKey,
+        hasEntry: dayEntries.length > 0,
+        isToday: dateKey === format(new Date(), "yyyy-MM-dd"),
+        watchIds: dayWatchIds,
+      };
+    });
+
+    return {
+      totalDays: weekEntries.reduce((s: number, e: any) => s + e.days, 0),
+      watches: sorted,
+      daysOfWeek,
+      weekStart,
+      weekEnd,
+    };
+  }, [watches, wearEntries, selectedWeekDate]);
+
+  // Watches for selected day
+  const selectedDayWatches = useMemo(() => {
+    if (!selectedDay) return [];
+    const day = weekData.daysOfWeek.find((d) => d.dateKey === selectedDay);
+    if (!day) return [];
+    return day.watchIds
+      .map((id: string) => watches.find((w: any) => w.id === id))
+      .filter(Boolean);
+  }, [selectedDay, weekData, watches]);
+
+  // Dates that have wear entries (for calendar dots)
+  const datesWithEntries = useMemo(() => {
+    const set = new Set<string>();
+    wearEntries.forEach((e: any) => set.add(e.wear_date));
+    return set;
+  }, [wearEntries]);
+
+  const handleDatePick = (date: Date | undefined) => {
+    if (date) {
+      setSelectedWeekDate(date);
+      setSelectedDay(format(date, "yyyy-MM-dd"));
+    }
+    setCalendarOpen(false);
+  };
+
+  const handleDayTap = (dateKey: string) => {
+    setSelectedDay((prev) => (prev === dateKey ? null : dateKey));
+  };
 
   return (
     <div className="space-y-3">
-      {/* Calendar */}
-      <Card className="border-borderSubtle bg-surface shadow-card overflow-hidden">
-        <Calendar
-          mode="single"
-          selected={selectedDate}
-          onSelect={setSelectedDate}
-          month={currentMonth}
-          onMonthChange={setCurrentMonth}
-          className="p-3 pointer-events-auto"
-          modifiers={{
-            worn: (date) => datesWithEntries.has(format(date, "yyyy-MM-dd")),
-          }}
-          modifiersClassNames={{
-            worn: "worn-day",
-          }}
-          classNames={{
-            day: cn(
-              "h-9 w-9 p-0 font-normal aria-selected:opacity-100 rounded-full",
-              "hover:bg-surfaceMuted transition-colors relative"
-            ),
-            day_selected:
-              "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
-            day_today: "ring-2 ring-accent ring-offset-1 ring-offset-background",
-          }}
-          components={{
-            DayContent: ({ date }) => {
-              const dateKey = format(date, "yyyy-MM-dd");
-              const hasEntry = datesWithEntries.has(dateKey);
-              return (
-                <div className="relative flex items-center justify-center w-full h-full">
-                  <span>{date.getDate()}</span>
-                  {hasEntry && (
-                    <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 h-1 w-1 rounded-full bg-accent" />
-                  )}
-                </div>
-              );
-            },
-          }}
-        />
-
-        {/* Month stats bar */}
-        <div className="flex items-center justify-between px-4 py-2.5 border-t border-borderSubtle bg-surfaceMuted/50">
-          <span className="text-xs text-textMuted">
-            {format(currentMonth, "MMMM yyyy")}
-          </span>
-          <div className="flex gap-3">
-            <span className="text-xs text-textMuted">
-              <strong className="text-textMain">{monthStats.totalDays}</strong> day{monthStats.totalDays !== 1 ? "s" : ""} logged
-            </span>
-            <span className="text-xs text-textMuted">
-              <strong className="text-textMain">{monthStats.uniqueWatches}</strong> watch{monthStats.uniqueWatches !== 1 ? "es" : ""}
-            </span>
-          </div>
+      {/* Header: title + date picker */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-textMuted">
+            {isCurrentWeek ? "Your Week" : format(weekData.weekStart, "MMM d") + " – " + format(weekData.weekEnd, "MMM d")}
+          </h2>
+          {!isCurrentWeek && (
+            <button
+              onClick={() => {
+                setSelectedWeekDate(new Date());
+                setSelectedDay(null);
+              }}
+              className="text-[10px] text-accent font-medium px-1.5 py-0.5 rounded bg-accent/10 hover:bg-accent/20 transition-colors"
+            >
+              Today
+            </button>
+          )}
         </div>
-      </Card>
+
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-textMuted">
+            {weekData.totalDays} day{weekData.totalDays !== 1 ? "s" : ""}
+          </span>
+          <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7 text-textMuted hover:text-textMain"
+              >
+                <CalendarIcon className="h-4 w-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="end">
+              <Calendar
+                mode="single"
+                selected={selectedWeekDate}
+                onSelect={handleDatePick}
+                className="p-3 pointer-events-auto"
+                components={{
+                  DayContent: ({ date }: { date: Date }) => {
+                    const dateKey = format(date, "yyyy-MM-dd");
+                    const hasEntry = datesWithEntries.has(dateKey);
+                    return (
+                      <div className="relative flex items-center justify-center w-full h-full">
+                        <span>{date.getDate()}</span>
+                        {hasEntry && (
+                          <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-1 w-1 rounded-full bg-accent" />
+                        )}
+                      </div>
+                    );
+                  },
+                }}
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+      </div>
+
+      {/* Week strip */}
+      <div className="flex justify-between">
+        {weekData.daysOfWeek.map((day, i) => (
+          <button
+            key={i}
+            onClick={() => handleDayTap(day.dateKey)}
+            className="flex flex-col items-center gap-1 group"
+          >
+            <span className="text-[10px] text-textMuted font-medium">{day.label}</span>
+            <div
+              className={cn(
+                "h-8 w-8 rounded-full flex items-center justify-center text-xs font-medium transition-all",
+                day.isToday && "ring-2 ring-accent ring-offset-2 ring-offset-background",
+                day.hasEntry
+                  ? "bg-accent text-accent-foreground"
+                  : "bg-surfaceMuted text-textMuted",
+                selectedDay === day.dateKey && "ring-2 ring-primary ring-offset-1 ring-offset-background scale-110"
+              )}
+            >
+              {day.date}
+            </div>
+          </button>
+        ))}
+      </div>
 
       {/* Selected day detail */}
       <AnimatePresence mode="wait">
-        {selectedDate && (
+        {selectedDay && (
           <motion.div
-            key={format(selectedDate, "yyyy-MM-dd")}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
+            key={selectedDay}
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
+            className="overflow-hidden"
           >
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-textMuted">
-                {format(selectedDate, "EEEE, MMM d")}
-              </h3>
-              <span className="text-xs text-textMuted">
-                {selectedDateWatches.length} worn
-              </span>
-            </div>
-
-            {selectedDateWatches.length > 0 ? (
-              <div className="space-y-2">
-                {selectedDateWatches.map((watch: any, i: number) => (
-                  <motion.div
-                    key={watch.id}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.05 }}
-                  >
-                    <Card
-                      className="flex items-center gap-3 p-3 cursor-pointer hover:bg-surfaceMuted active:scale-[0.98] transition-all border-borderSubtle"
-                      onClick={() => onWatchTap?.(watch)}
-                    >
-                      <div className="h-10 w-10 rounded-xl bg-surfaceMuted overflow-hidden shrink-0">
-                        {watch.ai_image_url ? (
-                          <img
-                            src={watch.ai_image_url}
-                            alt={`${watch.brand} ${watch.model}`}
-                            className="h-full w-full object-cover"
-                          />
-                        ) : (
-                          <div className="h-full w-full flex items-center justify-center">
-                            <Watch className="h-4 w-4 text-textMuted" />
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-textMain truncate">
-                          {watch.brand} {watch.model}
-                        </p>
-                      </div>
-                      <ChevronRight className="h-4 w-4 text-textMuted shrink-0" />
-                    </Card>
-                  </motion.div>
-                ))}
+            <div className="pt-1 space-y-2">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-medium text-textMuted">
+                  {format(parseISO(selectedDay), "EEEE, MMM d")}
+                </p>
+                <span className="text-[10px] text-textMuted">
+                  {selectedDayWatches.length} worn
+                </span>
               </div>
-            ) : (
-              <Card className="p-4 text-center border-dashed border-borderSubtle">
-                <p className="text-xs text-textMuted">No wrist check logged</p>
-              </Card>
-            )}
+              {selectedDayWatches.length > 0 ? (
+                selectedDayWatches.map((watch: any) => (
+                  <Card
+                    key={watch.id}
+                    className="flex items-center gap-3 p-2.5 cursor-pointer hover:bg-surfaceMuted active:scale-[0.98] transition-all border-borderSubtle"
+                    onClick={() => onWatchTap?.(watch)}
+                  >
+                    <div className="h-9 w-9 rounded-lg bg-surfaceMuted overflow-hidden shrink-0">
+                      {watch.ai_image_url ? (
+                        <img
+                          src={watch.ai_image_url}
+                          alt={`${watch.brand} ${watch.model}`}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="h-full w-full flex items-center justify-center">
+                          <Watch className="h-4 w-4 text-textMuted" />
+                        </div>
+                      )}
+                    </div>
+                    <p className="text-sm font-medium text-textMain truncate flex-1">
+                      {watch.brand} {watch.model}
+                    </p>
+                    <ChevronRight className="h-3.5 w-3.5 text-textMuted shrink-0" />
+                  </Card>
+                ))
+              ) : (
+                <p className="text-xs text-textMuted text-center py-2">No wrist check this day</p>
+              )}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Week summary watches (when no day selected) */}
+      {!selectedDay && weekData.watches.length > 0 && (
+        <div className="space-y-2">
+          {weekData.watches.slice(0, 3).map(({ watch, count }, i) => (
+            <motion.div
+              key={watch!.id}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: i * 0.1 }}
+            >
+              <Card
+                className="flex items-center gap-3 p-3 cursor-pointer hover:bg-surfaceMuted active:scale-[0.98] transition-all border-borderSubtle"
+                onClick={() => onWatchTap?.(watch)}
+              >
+                <div className="h-12 w-12 rounded-xl bg-surfaceMuted overflow-hidden shrink-0">
+                  {watch!.ai_image_url ? (
+                    <img
+                      src={watch!.ai_image_url}
+                      alt={`${watch!.brand} ${watch!.model}`}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="h-full w-full flex items-center justify-center">
+                      <Watch className="h-5 w-5 text-textMuted" />
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-textMain truncate">
+                    {watch!.brand} {watch!.model}
+                  </p>
+                  <p className="text-xs text-textMuted">
+                    {count} day{count !== 1 ? "s" : ""} this week
+                  </p>
+                </div>
+                <ChevronRight className="h-4 w-4 text-textMuted shrink-0" />
+              </Card>
+            </motion.div>
+          ))}
+        </div>
+      )}
+
+      {!selectedDay && weekData.watches.length === 0 && (
+        <Card className="p-6 text-center border-dashed border-borderSubtle">
+          <Watch className="h-8 w-8 text-textMuted mx-auto mb-2" />
+          <p className="text-sm text-textMuted">No entries this week</p>
+        </Card>
+      )}
     </div>
   );
 };
