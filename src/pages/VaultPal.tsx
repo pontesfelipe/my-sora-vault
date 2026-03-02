@@ -67,7 +67,6 @@ const VaultPal = () => {
   // Voice input hook
   const { isListening, isSupported: isVoiceSupported, interimText, toggleListening } = useVoiceInput({
     onTranscript: (transcript) => {
-      // Append transcript to input or send directly
       setInput((prev) => {
         const newInput = prev ? `${prev} ${transcript}` : transcript;
         return newInput;
@@ -103,7 +102,6 @@ const VaultPal = () => {
     
     setIsRefreshingInsights(true);
     try {
-      // Fetch current watches
       const { data: watches, error: watchesError } = await supabase
         .from("watches")
         .select("*")
@@ -118,7 +116,6 @@ const VaultPal = () => {
         return;
       }
 
-      // Call the analyze-collection edge function
       const { data, error } = await supabase.functions.invoke("analyze-collection", {
         body: { watches },
       });
@@ -126,7 +123,6 @@ const VaultPal = () => {
       if (error) throw error;
 
       if (data?.insights) {
-        // Save to database
         await supabase
           .from("collection_insights")
           .upsert({
@@ -161,7 +157,6 @@ const VaultPal = () => {
           filter: `user_id=eq.${user.id}`,
         },
         (payload) => {
-          // Debounce: wait 2 seconds after change before refreshing
           const timeoutId = setTimeout(() => {
             refreshInsights();
           }, 2000);
@@ -221,8 +216,10 @@ const VaultPal = () => {
     `Which ${itemLabel} have I not worn recently?`,
   ];
 
+  // On mobile: use dvh for proper viewport height minus bottom nav (~4.5rem) and top header (~3.5rem)
+  // On desktop: standard calc
   return (
-    <div className="flex h-[calc(100vh-4rem)] max-h-[calc(100vh-4rem)]">
+    <div className={`flex ${isMobile ? 'h-[calc(100dvh-4rem)] pb-safe' : 'h-[calc(100vh-4rem)] max-h-[calc(100vh-4rem)]'}`}>
       {/* Conversation History Sidebar - Desktop */}
       {!isMobile && (
         <div className="w-64 shrink-0 border-r border-borderSubtle bg-surfaceMuted flex flex-col">
@@ -288,31 +285,41 @@ const VaultPal = () => {
       )}
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Header with Collection Insights */}
-        <div className="shrink-0 border-b border-borderSubtle bg-surface px-4 py-4">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-            <div className="flex items-center gap-3">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        {/* Header - Compact on mobile */}
+        <div className={`shrink-0 border-b border-borderSubtle bg-surface ${isMobile ? 'px-3 py-2' : 'px-4 py-4'}`}>
+          <div className={`flex items-center justify-between gap-2 ${isMobile ? '' : 'mb-4'}`}>
+            <div className="flex items-center gap-2 min-w-0">
               {isMobile && (
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => setShowHistory(!showHistory)}
-                  className="shrink-0"
+                  className="shrink-0 h-9 w-9"
                   aria-label="Chat history"
                 >
-                  <MessageSquare className="w-5 h-5" />
+                  <MessageSquare className="w-4 h-4" />
                 </Button>
               )}
-              <div className="p-2.5 rounded-xl bg-accent/10">
-                <Bot className="w-6 h-6 text-accent" />
+              <div className={`shrink-0 ${isMobile ? 'p-1.5' : 'p-2.5'} rounded-xl bg-accent/10`}>
+                <Bot className={`${isMobile ? 'w-4 h-4' : 'w-6 h-6'} text-accent`} />
               </div>
-              <div>
-                <h1 className="text-lg font-semibold text-textMain">My Vault Assistant</h1>
-                <p className="text-xs text-textMuted">Your personal collection expert</p>
+              <div className="min-w-0">
+                <h1 className={`${isMobile ? 'text-sm' : 'text-lg'} font-semibold text-textMain truncate`}>My Vault Assistant</h1>
+                {!isMobile && <p className="text-xs text-textMuted">Your personal collection expert</p>}
               </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 shrink-0">
+              {isMobile && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={startNewChat}
+                  className="h-9 w-9"
+                >
+                  <Plus className="w-4 h-4" />
+                </Button>
+              )}
               <CollectionSwitcher />
               {!isMobile && currentConversationId && (
                 <Button
@@ -328,9 +335,9 @@ const VaultPal = () => {
             </div>
           </div>
 
-          {/* Collection Insights Header */}
-          {collectionInsights && (
-            <Card className="bg-accentSubtle/30 border-accent/20">
+          {/* Collection Insights Header - Collapsed by default on mobile */}
+          {collectionInsights && !isMobile && (
+            <Card className="bg-accentSubtle/30 border-accent/20 mt-3">
               <CardContent className="py-3 px-4">
                 <div className="flex items-start gap-3">
                   <Sparkles className="w-4 h-4 text-accent mt-0.5 shrink-0" />
@@ -381,13 +388,14 @@ const VaultPal = () => {
           )}
         </div>
 
-        {/* Mobile History Dropdown */}
+        {/* Mobile History Overlay - Full screen with proper positioning */}
         {isMobile && showHistory && (
-          <div className="absolute inset-x-0 top-[180px] bottom-0 z-50 bg-background/95 backdrop-blur-sm">
-            <div className="p-4 border-b border-borderSubtle space-y-3">
+          <div className="absolute inset-0 z-50 bg-background flex flex-col">
+            <div className="p-3 border-b border-borderSubtle space-y-2">
               <div className="flex items-center justify-between">
-                <h3 className="font-medium">Chat History</h3>
-                <Button variant="ghost" size="sm" onClick={() => setShowHistory(false)}>
+                <h3 className="font-medium text-sm">Chat History</h3>
+                <Button variant="ghost" size="sm" className="h-8 text-xs" onClick={() => setShowHistory(false)}>
+                  <X className="w-4 h-4 mr-1" />
                   Close
                 </Button>
               </div>
@@ -397,7 +405,7 @@ const VaultPal = () => {
                   placeholder="Search chats..."
                   value={searchQuery}
                   onChange={(e) => searchConversations(e.target.value)}
-                  className="pl-8 pr-8 h-9"
+                  className="pl-8 pr-8 h-9 text-sm"
                 />
                 {searchQuery && (
                   <Button
@@ -411,8 +419,8 @@ const VaultPal = () => {
                 )}
               </div>
             </div>
-            <ScrollArea className="h-[calc(100%-120px)]">
-              <div className="p-2 space-y-1">
+            <ScrollArea className="flex-1">
+              <div className="p-2 space-y-1 pb-20">
                 <Button
                   onClick={() => {
                     startNewChat();
@@ -459,26 +467,59 @@ const VaultPal = () => {
         )}
 
         {/* Chat Messages Area */}
-        <ScrollArea className="flex-1 px-4" ref={scrollRef}>
-          <div className="py-4 space-y-4 max-w-3xl mx-auto">
+        <ScrollArea className={`flex-1 ${isMobile ? 'px-3' : 'px-4'}`} ref={scrollRef}>
+          <div className={`${isMobile ? 'py-3 space-y-3' : 'py-4 space-y-4'} max-w-3xl mx-auto`}>
             {messages.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 text-center">
-                <div className="p-4 rounded-2xl bg-accent/10 mb-4">
-                  <Bot className="w-10 h-10 text-accent" />
+              <div className={`flex flex-col items-center justify-center ${isMobile ? 'py-6' : 'py-12'} text-center`}>
+                <div className={`${isMobile ? 'p-3' : 'p-4'} rounded-2xl bg-accent/10 mb-3`}>
+                  <Bot className={`${isMobile ? 'w-7 h-7' : 'w-10 h-10'} text-accent`} />
                 </div>
-                <h2 className="text-lg font-medium text-textMain mb-2">
+                <h2 className={`${isMobile ? 'text-base' : 'text-lg'} font-medium text-textMain mb-1.5`}>
                   Welcome to My Vault Assistant
                 </h2>
-                <p className="text-sm text-textMuted mb-6 max-w-md">
-                  I'm your personal collection expert. I know everything about your {itemLabel.toLowerCase()}, 
-                  wear patterns, trips, events, and preferences. Ask me anything!
+                <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-textMuted mb-4 max-w-md px-2`}>
+                  I know everything about your {itemLabel.toLowerCase()}, 
+                  wear patterns, and preferences. Ask me anything!
                 </p>
-                <div className="flex gap-2.5 overflow-x-auto scrollbar-hide pb-2 w-full px-4 snap-x snap-mandatory touch-pan-y">
+
+                {/* Mobile insights pill if available */}
+                {isMobile && collectionInsights && (
+                  <button
+                    onClick={() => setInsightsExpanded(!insightsExpanded)}
+                    className="w-full mb-4 px-3 py-2 rounded-xl bg-accentSubtle/30 border border-accent/20 text-left"
+                  >
+                    <div className="flex items-center gap-2 mb-1">
+                      <Sparkles className="w-3 h-3 text-accent shrink-0" />
+                      <span className="text-xs font-medium text-accent">Collection Insights</span>
+                      <div className="ml-auto flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-5 w-5 text-accent"
+                          onClick={(e) => { e.stopPropagation(); refreshInsights(); }}
+                          disabled={isRefreshingInsights}
+                        >
+                          {isRefreshingInsights ? (
+                            <Loader2 className="w-3 h-3 animate-spin" />
+                          ) : (
+                            <RefreshCw className="w-3 h-3" />
+                          )}
+                        </Button>
+                        {insightsExpanded ? <ChevronUp className="w-3 h-3 text-accent" /> : <ChevronDown className="w-3 h-3 text-accent" />}
+                      </div>
+                    </div>
+                    <p className={`text-xs text-textMuted leading-relaxed ${insightsExpanded ? '' : 'line-clamp-2'}`}>
+                      {collectionInsights}
+                    </p>
+                  </button>
+                )}
+
+                <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2 w-full px-2 snap-x snap-mandatory touch-pan-y">
                   {suggestedQuestions.map((question, idx) => (
                     <button
                       key={idx}
                       onClick={() => sendMessage(question)}
-                      className="text-xs whitespace-nowrap shrink-0 snap-start py-2.5 px-5 rounded-full bg-accent/10 text-accent font-medium border border-accent/20 hover:bg-accent/20 active:scale-95 transition-all"
+                      className={`${isMobile ? 'text-[11px] py-2 px-3.5' : 'text-xs py-2.5 px-5'} whitespace-nowrap shrink-0 snap-start rounded-full bg-accent/10 text-accent font-medium border border-accent/20 hover:bg-accent/20 active:scale-95 transition-all`}
                     >
                       {question}
                     </button>
@@ -487,18 +528,18 @@ const VaultPal = () => {
               </div>
             ) : (
               messages.map((message, idx) => (
-                <MessageBubble key={idx} message={message} />
+                <MessageBubble key={idx} message={message} isMobile={isMobile} />
               ))
             )}
             
             {isLoading && messages[messages.length - 1]?.role === "user" && (
-              <div className="flex items-start gap-3">
-                <div className="p-2 rounded-lg bg-accent/10 shrink-0">
-                  <Bot className="w-4 h-4 text-accent" />
+              <div className="flex items-start gap-2">
+                <div className="p-1.5 rounded-lg bg-accent/10 shrink-0">
+                  <Bot className="w-3.5 h-3.5 text-accent" />
                 </div>
                 <div className="flex items-center gap-2 text-textMuted">
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span className="text-sm">Thinking...</span>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <span className="text-xs">Thinking...</span>
                 </div>
               </div>
             )}
@@ -506,45 +547,44 @@ const VaultPal = () => {
         </ScrollArea>
 
         {/* Input Area */}
-        <div className="shrink-0 border-t border-borderSubtle bg-surface px-4 py-3">
+        <div className={`shrink-0 border-t border-borderSubtle bg-surface ${isMobile ? 'px-3 py-2' : 'px-4 py-3'}`}>
           <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
             {/* Voice input indicator */}
             {isListening && (
-              <div className="flex items-center justify-center gap-2 mb-2 py-2 px-3 bg-accent/10 rounded-lg">
+              <div className="flex items-center justify-center gap-2 mb-2 py-1.5 px-3 bg-accent/10 rounded-lg">
                 <div className="flex gap-1">
-                  <span className="w-1 h-4 bg-accent rounded-full animate-pulse" style={{ animationDelay: "0ms" }} />
-                  <span className="w-1 h-4 bg-accent rounded-full animate-pulse" style={{ animationDelay: "150ms" }} />
-                  <span className="w-1 h-4 bg-accent rounded-full animate-pulse" style={{ animationDelay: "300ms" }} />
+                  <span className="w-1 h-3 bg-accent rounded-full animate-pulse" style={{ animationDelay: "0ms" }} />
+                  <span className="w-1 h-3 bg-accent rounded-full animate-pulse" style={{ animationDelay: "150ms" }} />
+                  <span className="w-1 h-3 bg-accent rounded-full animate-pulse" style={{ animationDelay: "300ms" }} />
                 </div>
-                <span className="text-sm text-accent font-medium">
+                <span className="text-xs text-accent font-medium">
                   {interimText || "Listening..."}
                 </span>
               </div>
             )}
-            <div className="flex gap-2">
+            <div className="flex gap-1.5">
               <Textarea
                 ref={textareaRef}
                 value={input}
                 onChange={(e) => {
                   setInput(e.target.value);
-                  // Auto-resize textarea
                   const ta = e.target;
                   ta.style.height = 'auto';
-                  ta.style.height = Math.min(ta.scrollHeight, 120) + 'px';
+                  ta.style.height = Math.min(ta.scrollHeight, isMobile ? 80 : 120) + 'px';
                 }}
                 onKeyDown={handleKeyDown}
                 placeholder={isListening ? "Speak now..." : `Ask about your ${itemLabel.toLowerCase()}...`}
-                className="min-h-[44px] max-h-[120px] resize-none overflow-hidden"
+                className={`${isMobile ? 'min-h-[40px] max-h-[80px] text-sm' : 'min-h-[44px] max-h-[120px]'} resize-none overflow-hidden`}
                 rows={1}
                 disabled={isLoading}
-                style={{ height: '44px' }}
+                style={{ height: isMobile ? '40px' : '44px' }}
               />
               {isVoiceSupported && (
                 <Button
                   type="button"
                   variant={isListening ? "default" : "outline"}
                   size="icon"
-                  className={`shrink-0 h-[44px] w-[44px] transition-colors ${
+                  className={`shrink-0 ${isMobile ? 'h-10 w-10' : 'h-[44px] w-[44px]'} transition-colors ${
                     isListening ? "bg-accent hover:bg-accent/90 text-accent-foreground" : ""
                   }`}
                   onClick={toggleListening}
@@ -562,7 +602,7 @@ const VaultPal = () => {
                 type="submit"
                 disabled={!input.trim() || isLoading}
                 size="icon"
-                className="shrink-0 h-[44px] w-[44px]"
+                className={`shrink-0 ${isMobile ? 'h-10 w-10' : 'h-[44px] w-[44px]'}`}
               >
                 {isLoading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -571,11 +611,13 @@ const VaultPal = () => {
                 )}
               </Button>
             </div>
-            <p className="text-xs text-textMuted mt-2 text-center">
-              {isVoiceSupported 
-                ? "Press Enter to send, Shift+Enter for new line, or tap mic for voice" 
-                : "Press Enter to send, Shift+Enter for new line"}
-            </p>
+            {!isMobile && (
+              <p className="text-xs text-textMuted mt-2 text-center">
+                {isVoiceSupported 
+                  ? "Press Enter to send, Shift+Enter for new line, or tap mic for voice" 
+                  : "Press Enter to send, Shift+Enter for new line"}
+              </p>
+            )}
           </form>
         </div>
       </div>
@@ -631,38 +673,36 @@ const VaultPal = () => {
 };
 
 
-const MessageBubble = ({ message }: { message: ChatMessage }) => {
+const MessageBubble = ({ message, isMobile = false }: { message: ChatMessage; isMobile?: boolean }) => {
   const isUser = message.role === "user";
   const [isExpanded, setIsExpanded] = useState(false);
   
-  // Determine if message is long (more than 300 characters or 4 lines)
   const lines = message.content.split("\n");
   const isLongMessage = message.content.length > 300 || lines.length > 4;
   
-  // Show truncated content when collapsed
   const displayContent = isExpanded || !isLongMessage 
     ? message.content 
     : message.content.slice(0, 250) + "...";
 
   return (
-    <div className={`flex items-start gap-3 ${isUser ? "flex-row-reverse" : ""}`}>
-      <div className={`p-2 rounded-lg shrink-0 ${isUser ? "bg-primary/10" : "bg-accent/10"}`}>
+    <div className={`flex items-start gap-2 ${isUser ? "flex-row-reverse" : ""}`}>
+      <div className={`${isMobile ? 'p-1.5' : 'p-2'} rounded-lg shrink-0 ${isUser ? "bg-primary/10" : "bg-accent/10"}`}>
         {isUser ? (
-          <User className="w-4 h-4 text-primary" />
+          <User className={`${isMobile ? 'w-3.5 h-3.5' : 'w-4 h-4'} text-primary`} />
         ) : (
-          <Bot className="w-4 h-4 text-accent" />
+          <Bot className={`${isMobile ? 'w-3.5 h-3.5' : 'w-4 h-4'} text-accent`} />
         )}
       </div>
       <div
-        className={`flex-1 rounded-xl px-4 py-3 ${
+        className={`flex-1 rounded-xl ${isMobile ? 'px-3 py-2' : 'px-4 py-3'} ${
           isUser
-            ? "bg-primary text-primary-foreground ml-12"
-            : "bg-muted text-textMain mr-12"
+            ? `bg-primary text-primary-foreground ${isMobile ? 'ml-6' : 'ml-12'}`
+            : `bg-muted text-textMain ${isMobile ? 'mr-6' : 'mr-12'}`
         }`}
       >
-        <div className="text-sm whitespace-pre-wrap break-words leading-relaxed">
+        <div className={`${isMobile ? 'text-[13px]' : 'text-sm'} whitespace-pre-wrap break-words leading-relaxed`}>
           {displayContent.split("\n").map((line, i) => (
-            <p key={i} className={i > 0 ? "mt-2" : ""}>
+            <p key={i} className={i > 0 ? "mt-1.5" : ""}>
               {line}
             </p>
           ))}
@@ -670,7 +710,7 @@ const MessageBubble = ({ message }: { message: ChatMessage }) => {
         {isLongMessage && (
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className={`flex items-center gap-1 mt-2 text-xs font-medium transition-colors ${
+            className={`flex items-center gap-1 mt-1.5 text-xs font-medium transition-colors ${
               isUser 
                 ? "text-primary-foreground/80 hover:text-primary-foreground" 
                 : "text-accent hover:text-accent/80"
@@ -678,13 +718,13 @@ const MessageBubble = ({ message }: { message: ChatMessage }) => {
           >
             {isExpanded ? (
               <>
-                <ChevronUp className="w-3.5 h-3.5" />
-                Show less
+                <ChevronUp className="w-3 h-3" />
+                Less
               </>
             ) : (
               <>
-                <ChevronDown className="w-3.5 h-3.5" />
-                Show more
+                <ChevronDown className="w-3 h-3" />
+                More
               </>
             )}
           </button>
