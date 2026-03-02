@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { ResponsiveDialog } from "@/components/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar, MapPin, Flag, Droplets, Dumbbell } from "lucide-react";
+import { Calendar, MapPin, Flag, Droplets, Dumbbell, Camera, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
@@ -31,8 +31,30 @@ export const AddWearDialog = ({ watchId, onSuccess }: { watchId: string; onSucce
   const [tripNotes, setTripNotes] = useState("");
   const [eventLocation, setEventLocation] = useState("");
   const [sportLocation, setSportLocation] = useState("");
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const { user } = useAuth();
+
+  const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) {
+      toast({ title: "File too large", description: "Max 10MB", variant: "destructive" });
+      return;
+    }
+    setPhotoFile(file);
+    const reader = new FileReader();
+    reader.onload = () => setPhotoPreview(reader.result as string);
+    reader.readAsDataURL(file);
+  };
+
+  const clearPhoto = () => {
+    setPhotoFile(null);
+    setPhotoPreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -217,6 +239,22 @@ export const AddWearDialog = ({ watchId, onSuccess }: { watchId: string; onSucce
         }
       }
 
+      // Upload photo if provided
+      let photoUrl: string | null = null;
+      if (photoFile && user) {
+        const fileExt = photoFile.name.split(".").pop();
+        const fileName = `${user.id}/${watchId}/${Date.now()}.${fileExt}`;
+        const { error: uploadError } = await supabase.storage
+          .from("post-images")
+          .upload(fileName, photoFile);
+        if (!uploadError) {
+          const { data: urlData } = supabase.storage
+            .from("post-images")
+            .getPublicUrl(fileName);
+          photoUrl = urlData.publicUrl;
+        }
+      }
+
       let error;
       if (existing) {
         // Update existing entry
@@ -229,6 +267,7 @@ export const AddWearDialog = ({ watchId, onSuccess }: { watchId: string; onSucce
             event_id: eventId,
             water_usage_id: waterUsageId,
             sport_id: sportId,
+            ...(photoUrl ? { photo_url: photoUrl } : {}),
           } as any)
           .eq("id", existing.id);
         error = result.error;
@@ -243,6 +282,7 @@ export const AddWearDialog = ({ watchId, onSuccess }: { watchId: string; onSucce
           event_id: eventId,
           water_usage_id: waterUsageId,
           sport_id: sportId,
+          photo_url: photoUrl,
           user_id: user?.id,
         } as any);
         error = result.error;
@@ -261,6 +301,7 @@ export const AddWearDialog = ({ watchId, onSuccess }: { watchId: string; onSucce
       setIsWaterActivity(false);
       setIsSport(false);
       setSportLocation("");
+      clearPhoto();
       onSuccess();
       (e.target as HTMLFormElement).reset();
     } catch (error) {
@@ -347,6 +388,41 @@ export const AddWearDialog = ({ watchId, onSuccess }: { watchId: string; onSucce
               className="bg-background border-border resize-none"
               rows={3}
             />
+          </div>
+
+          {/* Wrist Shot Photo */}
+          <div className="space-y-2">
+            <Label>Wrist Shot (Optional)</Label>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={handlePhotoSelect}
+              className="hidden"
+            />
+            {photoPreview ? (
+              <div className="relative inline-block">
+                <img src={photoPreview} alt="Preview" className="h-24 w-24 rounded-xl object-cover border border-border" />
+                <button
+                  type="button"
+                  onClick={clearPhoto}
+                  className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </div>
+            ) : (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="gap-2"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <Camera className="w-4 h-4" />
+                Add Photo
+              </Button>
+            )}
           </div>
 
           <div className="space-y-4 pt-2 border-t border-border">

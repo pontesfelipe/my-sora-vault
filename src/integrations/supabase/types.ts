@@ -1738,6 +1738,7 @@ export type Database = {
           event_id: string | null
           id: string
           notes: string | null
+          photo_url: string | null
           sport_id: string | null
           trip_id: string | null
           updated_at: string
@@ -1752,6 +1753,7 @@ export type Database = {
           event_id?: string | null
           id?: string
           notes?: string | null
+          photo_url?: string | null
           sport_id?: string | null
           trip_id?: string | null
           updated_at?: string
@@ -1766,6 +1768,7 @@ export type Database = {
           event_id?: string | null
           id?: string
           notes?: string | null
+          photo_url?: string | null
           sport_id?: string | null
           trip_id?: string | null
           updated_at?: string

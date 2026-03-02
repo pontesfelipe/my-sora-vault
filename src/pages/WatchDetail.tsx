@@ -5,8 +5,9 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Calendar, DollarSign, Eye, EyeOff, Trash2, Info, Pencil, Flame, Clock } from "lucide-react";
-import { differenceInDays, parseISO } from "date-fns";
+import { ArrowLeft, Calendar, DollarSign, Eye, EyeOff, Trash2, Info, Pencil, Flame, Clock, Share2, Image } from "lucide-react";
+import { differenceInDays, parseISO, format } from "date-fns";
+import { WearHeatmap } from "@/components/WearHeatmap";
 import { PinchZoomImage } from "@/components/PinchZoomImage";
 import watchHero from "@/assets/watch-hero.jpg";
 import { AddWearDialog } from "@/components/AddWearDialog";
@@ -56,6 +57,7 @@ interface WearEntry {
   wear_date: string;
   days: number;
   notes: string | null;
+  photo_url: string | null;
 }
 
 interface WatchSpecs {
@@ -210,6 +212,34 @@ const WatchDetail = () => {
         setIsDeletingWatch(false);
       }
     });
+  };
+
+  const handleShareStats = async () => {
+    if (!watch) return;
+    const text = [
+      `${watch.brand} ${watch.model}`,
+      `Total Days Worn: ${totalDays}`,
+      wearStreakInfo.streak > 0 ? `Current Streak: ${wearStreakInfo.streak} days` : null,
+      wearStreakInfo.lastWornDaysAgo !== null
+        ? wearStreakInfo.lastWornDaysAgo === 0
+          ? "Last Worn: Today"
+          : `Last Worn: ${wearStreakInfo.lastWornDaysAgo} days ago`
+        : null,
+      `Wear Entries: ${wearEntries.length}`,
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: `${watch.brand} ${watch.model} Stats`, text });
+      } catch {
+        /* user cancelled */
+      }
+    } else {
+      await navigator.clipboard.writeText(text);
+      toast({ title: "Copied!", description: "Stats copied to clipboard" });
+    }
   };
 
   if (loading) {
@@ -641,6 +671,20 @@ const WatchDetail = () => {
                 )}
               </div>
 
+              {/* Wear Heatmap */}
+              <Card className="border-border bg-card p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl font-semibold text-foreground">Wear Activity</h2>
+                  <Button variant="outline" size="sm" className="gap-2" onClick={handleShareStats}>
+                    <Share2 className="w-3.5 h-3.5" />
+                    Share
+                  </Button>
+                </div>
+                <div className="relative overflow-x-auto">
+                  <WearHeatmap wearEntries={wearEntries} />
+                </div>
+              </Card>
+
               {/* Monthly Breakdown */}
               <Card className="border-border bg-card p-6">
                 <h2 className="text-xl font-semibold text-foreground mb-4">Monthly Breakdown</h2>
@@ -680,7 +724,15 @@ const WatchDetail = () => {
                       key={entry.id}
                       className="flex items-center justify-between p-4 bg-muted rounded-lg hover:bg-muted/70 transition-colors"
                     >
-                      <div className="flex-1 cursor-pointer" onClick={() => handleEditEntry(entry)}>
+                      <div className="flex items-start gap-3 flex-1 cursor-pointer" onClick={() => handleEditEntry(entry)}>
+                        {entry.photo_url && (
+                          <img
+                            src={entry.photo_url}
+                            alt="Wrist shot"
+                            className="h-14 w-14 rounded-lg object-cover shrink-0"
+                          />
+                        )}
+                        <div className="min-w-0">
                         <p className="font-medium text-foreground">
                           {parseLocalDate(entry.wear_date).toLocaleDateString('en-US', {
                             month: 'short',
@@ -692,8 +744,9 @@ const WatchDetail = () => {
                           {entry.days} {entry.days === 1 ? 'day' : 'days'}
                         </p>
                         {entry.notes && (
-                          <p className="text-sm text-muted-foreground mt-1">{entry.notes}</p>
+                          <p className="text-sm text-muted-foreground mt-1 truncate">{entry.notes}</p>
                         )}
+                        </div>
                       </div>
 
                       <div className="flex gap-2">

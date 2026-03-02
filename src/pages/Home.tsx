@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, Watch, ChevronRight, Clock, Camera, AlertCircle, Target } from "lucide-react";
+import { Plus, Watch, ChevronRight, Clock, Camera, AlertCircle, Target, TrendingUp, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
@@ -105,6 +105,14 @@ const Home = () => {
     return { current: uniqueWatchIds.size, goal };
   }, [watches, wearEntries]);
 
+  // Collection value dashboard stats
+  const collectionStats = useMemo(() => {
+    const totalValue = watches.reduce((sum, w) => sum + (w.cost || 0), 0);
+    const totalDaysWorn = wearEntries.reduce((sum, e) => sum + e.days, 0);
+    const avgCostPerDay = totalDaysWorn > 0 ? totalValue / totalDaysWorn : 0;
+    return { totalValue, totalDaysWorn, watchCount: watches.length, avgCostPerDay };
+  }, [watches, wearEntries]);
+
   const handleWatchCardTap = (watch: any) => {
     setQuickLogWatch(watch);
     setQuickLogOpen(true);
@@ -130,6 +138,34 @@ const Home = () => {
             {format(new Date(), "EEEE, MMMM d")}
           </p>
         </div>
+
+        {/* Collection Value Dashboard */}
+        {watches.length > 0 && (
+          <section>
+            <div className="grid grid-cols-2 gap-3">
+              <Card className="p-3 border-borderSubtle">
+                <div className="flex items-center gap-2 mb-1">
+                  <DollarSign className="h-3.5 w-3.5 text-accent" />
+                  <span className="text-[10px] text-textMuted uppercase tracking-wider font-semibold">Collection</span>
+                </div>
+                <p className="text-lg font-bold text-textMain">${collectionStats.totalValue.toLocaleString()}</p>
+                <p className="text-[10px] text-textMuted">{collectionStats.watchCount} pieces</p>
+              </Card>
+              <Card className="p-3 border-borderSubtle">
+                <div className="flex items-center gap-2 mb-1">
+                  <TrendingUp className="h-3.5 w-3.5 text-accent" />
+                  <span className="text-[10px] text-textMuted uppercase tracking-wider font-semibold">Avg Cost/Day</span>
+                </div>
+                <p className="text-lg font-bold text-textMain">
+                  {collectionStats.avgCostPerDay > 0
+                    ? `$${collectionStats.avgCostPerDay.toFixed(0)}`
+                    : "---"}
+                </p>
+                <p className="text-[10px] text-textMuted">{collectionStats.totalDaysWorn} total days</p>
+              </Card>
+            </div>
+          </section>
+        )}
 
         {/* Quick Log CTA */}
         <motion.div whileTap={{ scale: 0.98 }}>
