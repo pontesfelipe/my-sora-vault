@@ -10,8 +10,8 @@ const corsHeaders = {
 
 const inputSchema = z.object({
   watchId: z.string().uuid().optional(),
-  brand: z.string().min(1).max(100).regex(/^[a-zA-Z0-9\s\-\.&']+$/, 'Invalid brand format'),
-  model: z.string().min(1).max(200).regex(/^[a-zA-Z0-9\s\-\.\/&'(),:]+$/, 'Invalid model format'),
+  brand: z.string().trim().min(1).max(100),
+  model: z.string().trim().min(1).max(200),
   dialColor: z.string().max(50).optional(),
   type: z.string().max(50).optional(),
   caseSize: z.string().max(20).optional(),
