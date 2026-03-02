@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Card } from "@/components/ui/card";
-import { Watch, ChevronLeft, ChevronRight } from "lucide-react";
-import { format, parseISO, startOfMonth, endOfMonth, isWithinInterval, startOfWeek, endOfWeek } from "date-fns";
+import { Watch, ChevronRight } from "lucide-react";
+import { format, parseISO, startOfMonth, endOfMonth, isWithinInterval } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
