@@ -365,13 +365,13 @@ const WatchDetail = () => {
           {/* Wear streak / last worn badges */}
           <div className="flex items-center justify-center gap-3 mb-6 flex-wrap">
             {wearStreakInfo.streak > 0 && (
-              <Badge variant="default" className="gap-1.5 text-sm py-1 px-3">
+              <Badge variant="default" className="gap-1.5 text-sm py-2 px-3">
                 <Flame className="w-3.5 h-3.5" />
                 {wearStreakInfo.streak}-day streak
               </Badge>
             )}
             {wearStreakInfo.lastWornDaysAgo !== null && (
-              <Badge variant="secondary" className="gap-1.5 text-sm py-1 px-3">
+              <Badge variant="secondary" className="gap-1.5 text-sm py-2 px-3">
                 <Clock className="w-3.5 h-3.5" />
                 {wearStreakInfo.lastWornDaysAgo === 0
                   ? "Worn today"
@@ -381,7 +381,7 @@ const WatchDetail = () => {
               </Badge>
             )}
             {wearEntries.length === 0 && (
-              <Badge variant="outline" className="gap-1.5 text-sm py-1 px-3 text-muted-foreground">
+              <Badge variant="outline" className="gap-1.5 text-sm py-2 px-3 text-muted-foreground">
                 <Clock className="w-3.5 h-3.5" />
                 Never worn
               </Badge>
