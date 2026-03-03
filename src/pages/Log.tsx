@@ -169,7 +169,12 @@ const Log = () => {
     const normalizedModel = normalizeForCompare(model).replace(/[^a-z0-9]/g, "");
     if (!normalizedBrand || !normalizedModel) return null;
 
-    const identifiedTokens = extractModelTokens(model);
+    // Strip brand name from model tokens to avoid false mismatches
+    // (e.g. DB has "Breitling Navitimer..." but AI returns just "Navitimer...")
+    const brandTokens = new Set(normalizeForCompare(brand).split(/\s+/).filter(t => t.length >= 3));
+    const stripBrand = (tokens: string[]) => tokens.filter(t => !brandTokens.has(t));
+
+    const identifiedTokens = stripBrand(extractModelTokens(model));
     const identifiedRefs = extractReferenceTokens(model);
     const identifiedPrimaryToken = identifiedTokens.find(
       (token) => /[a-z]/.test(token) && !/^\d/.test(token) && token !== "ref"
@@ -189,8 +194,10 @@ const Log = () => {
     let best: { watch: any; score: number } | null = null;
 
     for (const candidate of brandMatches) {
+      const candidateBrandTokens = new Set(normalizeForCompare(candidate.brand).split(/\s+/).filter(t => t.length >= 3));
+      const stripCandidateBrand = (tokens: string[]) => tokens.filter(t => !candidateBrandTokens.has(t));
       const candidateModelNormalized = normalizeForCompare(candidate.model).replace(/[^a-z0-9]/g, "");
-      const candidateTokens = extractModelTokens(candidate.model);
+      const candidateTokens = stripCandidateBrand(extractModelTokens(candidate.model));
       const candidateRefs = extractReferenceTokens(candidate.model);
       const candidatePrimaryToken = candidateTokens.find(
         (token) => /[a-z]/.test(token) && !/^\d/.test(token) && token !== "ref"
