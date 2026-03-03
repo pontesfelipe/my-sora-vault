@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Edit } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
@@ -46,6 +47,8 @@ interface Watch {
   rarity?: string;
   historical_significance?: string;
   available_for_trade?: boolean;
+  complications?: string[];
+  case_shape?: string;
 }
 
 export const EditWatchDialog = ({ watch, onSuccess }: { watch: Watch; onSuccess: () => void }) => {
@@ -77,6 +80,8 @@ export const EditWatchDialog = ({ watch, onSuccess }: { watch: Watch; onSuccess:
     rarity: (watch.rarity || "common") as "common" | "uncommon" | "rare" | "very_rare" | "grail",
     historicalSignificance: (watch.historical_significance || "regular") as "regular" | "notable" | "historically_significant",
     availableForTrade: watch.available_for_trade || false,
+    complications: watch.complications || [],
+    caseShape: watch.case_shape || "",
   });
   const { toast } = useToast();
 
@@ -110,6 +115,8 @@ export const EditWatchDialog = ({ watch, onSuccess }: { watch: Watch; onSuccess:
       rarity: (watch.rarity || "common") as any,
       historicalSignificance: (watch.historical_significance || "regular") as any,
       availableForTrade: watch.available_for_trade || false,
+      complications: watch.complications || [],
+      caseShape: watch.case_shape || "",
     });
 
     const loadSpecs = async () => {
@@ -224,6 +231,8 @@ export const EditWatchDialog = ({ watch, onSuccess }: { watch: Watch; onSuccess:
           rarity: data.rarity || 'common',
           historical_significance: data.historicalSignificance || 'regular',
           available_for_trade: formValues.availableForTrade,
+          complications: formValues.complications,
+          case_shape: formValues.caseShape || null,
         })
         .eq("id", watch.id);
 
@@ -359,6 +368,52 @@ export const EditWatchDialog = ({ watch, onSuccess }: { watch: Watch; onSuccess:
             <p className="text-xs text-muted-foreground">
               Select one or more watch types
             </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Functions / Complications</Label>
+            <div className="flex flex-wrap gap-2">
+              {["GMT", "Chronograph", "Date", "Day-Date", "Moonphase", "Annual Calendar", "Perpetual Calendar", "Tourbillon", "Power Reserve", "Flyback", "Tachymeter", "Small Seconds", "World Time", "Alarm", "Minute Repeater"].map((comp) => (
+                <Badge
+                  key={comp}
+                  variant={formValues.complications.includes(comp) ? "default" : "outline"}
+                  className="cursor-pointer select-none"
+                  onClick={() => {
+                    setFormValues((prev) => ({
+                      ...prev,
+                      complications: prev.complications.includes(comp)
+                        ? prev.complications.filter((c) => c !== comp)
+                        : [...prev.complications, comp],
+                    }));
+                  }}
+                >
+                  {comp}
+                </Badge>
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground">Tap to toggle complications</p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="caseShape">Case Shape</Label>
+            <Select
+              value={formValues.caseShape || ""}
+              onValueChange={(value) => setFormValues({ ...formValues, caseShape: value })}
+            >
+              <SelectTrigger className="bg-background border-border">
+                <SelectValue placeholder="Select case shape" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Round">Round</SelectItem>
+                <SelectItem value="Tonneau">Tonneau</SelectItem>
+                <SelectItem value="Rectangular">Rectangular</SelectItem>
+                <SelectItem value="Square">Square</SelectItem>
+                <SelectItem value="Cushion">Cushion</SelectItem>
+                <SelectItem value="Octagonal">Octagonal</SelectItem>
+                <SelectItem value="Oval">Oval</SelectItem>
+                <SelectItem value="Barrel">Barrel</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">

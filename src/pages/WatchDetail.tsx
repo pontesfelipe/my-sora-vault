@@ -48,6 +48,8 @@ interface Watch {
   metadata_analysis_reasoning?: string;
   available_for_trade?: boolean;
   ai_image_url?: string;
+  complications?: string[];
+  case_shape?: string;
 }
 
 interface WearEntry {
@@ -357,6 +359,24 @@ const WatchDetail = () => {
                     <p className="text-sm text-muted-foreground mb-1">Type</p>
                     <p className="text-lg font-medium text-foreground">{watch.type}</p>
                   </div>
+                  {watch.complications && watch.complications.length > 0 && (
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Functions / Complications</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {watch.complications.map((c) => (
+                          <Badge key={c} variant="secondary" className="text-sm">
+                            {c}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {watch.case_shape && (
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Case Shape</p>
+                      <p className="text-lg font-medium text-foreground">{watch.case_shape}</p>
+                    </div>
+                  )}
                   {watchSpecs && (
                     <>
                       <div>
