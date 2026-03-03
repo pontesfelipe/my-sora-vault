@@ -15,11 +15,12 @@ import { AccessLogsTab } from "@/components/admin/AccessLogsTab";
 import { UsageMetricsTab } from "@/components/admin/UsageMetricsTab";
 import { CollectionsTab } from "@/components/admin/CollectionsTab";
 import { FeedbackTab } from "@/components/admin/FeedbackTab";
+import { ChangeControlLogTab } from "@/components/admin/ChangeControlLogTab";
 
 import { ExportWearLogsDialog } from "@/components/admin/ExportWearLogsDialog";
 import { ExportWatchInventoryDialog } from "@/components/admin/ExportWatchInventoryDialog";
 import { ExportAllDataDialog } from "@/components/admin/ExportAllDataDialog";
-import { Shield, Users, UserCog, FileCheck, Calendar, Moon, Sun, BookOpen, FileText, Activity, BarChart3, FolderOpen, MessageSquarePlus } from "lucide-react";
+import { Shield, Users, UserCog, FileCheck, Calendar, Moon, Sun, BookOpen, FileText, Activity, BarChart3, FolderOpen, MessageSquarePlus, ClipboardList } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -76,7 +77,7 @@ export default function Admin() {
         </div>
 
         <Tabs defaultValue="requests" className="w-full">
-          <TabsList className="grid w-full max-w-7xl grid-cols-10">
+          <TabsList className="grid w-full max-w-7xl grid-cols-11">
             <TabsTrigger value="requests" className="flex items-center gap-1 text-xs">
               <UserCog className="h-3 w-3" />
               Requests
@@ -116,6 +117,10 @@ export default function Admin() {
             <TabsTrigger value="metrics" className="flex items-center gap-1 text-xs">
               <BarChart3 className="h-3 w-3" />
               Metrics
+            </TabsTrigger>
+            <TabsTrigger value="changelog" className="flex items-center gap-1 text-xs">
+              <ClipboardList className="h-3 w-3" />
+              Changes
             </TabsTrigger>
           </TabsList>
 
@@ -198,6 +203,10 @@ export default function Admin() {
 
           <TabsContent value="metrics" className="space-y-4">
             <UsageMetricsTab />
+          </TabsContent>
+
+          <TabsContent value="changelog" className="space-y-4">
+            <ChangeControlLogTab />
           </TabsContent>
         </Tabs>
 
