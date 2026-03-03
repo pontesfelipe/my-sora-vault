@@ -45,6 +45,35 @@ const WATCH_REFERENCES: Record<string, {
   "CA-53W": { brand: "Casio", model: "Databank", dialColor: "Black", type: "Digital", cost: 30 },
 };
 
+// Extract complications from type, model, and other fields
+const extractComplications = (type: string, movement?: string): string[] => {
+  const complications: string[] = [];
+  const combined = `${type} ${movement || ""}`.toLowerCase();
+  const checks: [string, string[]][] = [
+    ["GMT", ["gmt", "world time", "dual time"]],
+    ["Chronograph", ["chronograph", "chrono"]],
+    ["Date", ["date", "day-date", "day date"]],
+    ["Day-Date", ["day-date", "day date"]],
+    ["Moonphase", ["moonphase", "moon phase", "moon"]],
+    ["Annual Calendar", ["annual calendar"]],
+    ["Perpetual Calendar", ["perpetual calendar"]],
+    ["Tourbillon", ["tourbillon"]],
+    ["Power Reserve", ["power reserve"]],
+    ["Flyback", ["flyback"]],
+    ["Tachymeter", ["tachymeter"]],
+    ["Small Seconds", ["small seconds", "sub seconds"]],
+    ["Alarm", ["alarm"]],
+    ["Minute Repeater", ["minute repeater"]],
+    ["World Time", ["world time", "worldtime"]],
+  ];
+  for (const [name, keywords] of checks) {
+    if (keywords.some((kw) => combined.includes(kw))) {
+      complications.push(name);
+    }
+  }
+  return complications;
+};
+
 const watchSchema = z.object({
   brand: z.string().trim().min(1, "Brand is required").max(100),
   model: z.string().trim().min(1, "Model is required").max(200),
@@ -75,6 +104,8 @@ interface AddWatchDialogProps {
     type?: string;
     case_size?: string;
     movement?: string;
+    complications?: string[];
+    case_shape?: string;
   };
 }
 
@@ -315,6 +346,8 @@ export const AddWatchDialog = ({ onSuccess, externalOpen, onExternalOpenChange, 
         rarity: data.rarity || 'common',
         historical_significance: data.historicalSignificance || 'regular',
         available_for_trade: formValues.availableForTrade,
+        complications: prefill?.complications?.length ? prefill.complications : extractComplications(data.type, formValues.movement),
+        case_shape: prefill?.case_shape || null,
       }).select().single();
 
       if (error) throw error;

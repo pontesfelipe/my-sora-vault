@@ -154,12 +154,16 @@ const Log = () => {
     identifiedType?: string,
     identifiedDialColor?: string,
     identifiedCaseSize?: string,
-    identifiedMovement?: string
+    identifiedMovement?: string,
+    identifiedComplications?: string[],
+    identifiedCaseShape?: string
   ) => {
     const identifiedTypeFamily = mapTypeToFamily(identifiedType);
     const identifiedColorFamily = extractColorFamily(identifiedDialColor);
     const identifiedMovementFamily = mapMovementFamily(identifiedMovement);
     const identifiedCaseMm = extractCaseSizeMm(identifiedCaseSize);
+    const normalizedIdentifiedComplications = (identifiedComplications || []).map(c => c.toLowerCase());
+
 
     const normalizedBrand = normalizeForCompare(brand).replace(/\s+/g, "");
     const normalizedModel = normalizeForCompare(model).replace(/[^a-z0-9]/g, "");
@@ -196,6 +200,7 @@ const Log = () => {
       const candidateColorFamily = extractColorFamily(candidate.dial_color);
       const candidateMovementFamily = mapMovementFamily(candidate.movement);
       const candidateCaseMm = extractCaseSizeMm(candidate.case_size);
+      const candidateComplications = ((candidate as any).complications || []).map((c: string) => c.toLowerCase());
 
       const hasExactModel = candidateModelNormalized === normalizedModel;
       const hasReferenceMatch =
@@ -209,7 +214,12 @@ const Log = () => {
       ) {
         continue;
       }
-      if (identifiedTypeFamily && candidateTypeFamily && identifiedTypeFamily !== candidateTypeFamily) {
+      // Relaxed type family check: if complications overlap, don't block on type family mismatch
+      // e.g. a Breitling GMT Chronograph might be typed as "Chronograph" but has GMT complication
+      const hasComplicationOverlap = normalizedIdentifiedComplications.length > 0 && candidateComplications.length > 0 &&
+        normalizedIdentifiedComplications.some((c: string) => candidateComplications.includes(c));
+      
+      if (identifiedTypeFamily && candidateTypeFamily && identifiedTypeFamily !== candidateTypeFamily && !hasComplicationOverlap) {
         continue;
       }
       if (identifiedColorFamily && candidateColorFamily && identifiedColorFamily !== candidateColorFamily) {
@@ -231,11 +241,15 @@ const Log = () => {
         sharedTokenCount /
         Math.max(identifiedTokens.length || 1, candidateTokens.length || 1);
 
+      // Count complication matches
+      const complicationMatches = normalizedIdentifiedComplications.filter((c: string) => candidateComplications.includes(c)).length;
+
       const matchedSignals = [
         identifiedTypeFamily && candidateTypeFamily && identifiedTypeFamily === candidateTypeFamily,
         identifiedColorFamily && candidateColorFamily && identifiedColorFamily === candidateColorFamily,
         identifiedMovementFamily && candidateMovementFamily && identifiedMovementFamily === candidateMovementFamily,
         identifiedCaseMm !== null && candidateCaseMm !== null && Math.abs(identifiedCaseMm - candidateCaseMm) <= 1,
+        complicationMatches >= 2,
       ].filter(Boolean).length;
 
       // Only auto-select with very strong evidence
@@ -251,7 +265,8 @@ const Log = () => {
         (hasReferenceMatch ? 10 : 0) +
         sharedTokenCount +
         coverage +
-        matchedSignals;
+        matchedSignals +
+        complicationMatches * 2;
 
       if (!best || score > best.score) {
         best = { watch: candidate, score };
@@ -313,7 +328,7 @@ const Log = () => {
         setIdentifiedWatch(data);
 
         // Auto-match to collection
-        const match = findBestMatch(data.brand, data.model, data.type, data.dial_color, data.case_size, data.movement);
+        const match = findBestMatch(data.brand, data.model, data.type, data.dial_color, data.case_size, data.movement, data.complications, data.case_shape);
         if (match) {
           setSelectedWatchId(match.id);
           setIdentifiedWatch(null);
