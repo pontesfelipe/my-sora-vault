@@ -204,7 +204,7 @@ export function GlobalSearch() {
                     <div className="h-8 w-8 rounded-lg bg-accentSubtle flex items-center justify-center shrink-0">
                       {result.type === "watch" ? (
                         result.imageUrl ? (
-                          <img src={result.imageUrl} alt="" className="h-8 w-8 rounded-lg object-cover" />
+                          <img src={result.imageUrl} alt={result.title} className="h-8 w-8 rounded-lg object-cover" />
                         ) : (
                           <Watch className="h-4 w-4 text-accent" />
                         )
