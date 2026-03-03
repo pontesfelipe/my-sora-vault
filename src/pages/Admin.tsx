@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { useTheme } from "@/contexts/ThemeContext";
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AllowedUsersTable } from "@/components/admin/AllowedUsersTable";
@@ -20,7 +20,7 @@ import { ChangeControlLogTab } from "@/components/admin/ChangeControlLogTab";
 import { ExportWearLogsDialog } from "@/components/admin/ExportWearLogsDialog";
 import { ExportWatchInventoryDialog } from "@/components/admin/ExportWatchInventoryDialog";
 import { ExportAllDataDialog } from "@/components/admin/ExportAllDataDialog";
-import { Shield, Users, UserCog, FileCheck, Calendar, Moon, Sun, BookOpen, FileText, Activity, BarChart3, FolderOpen, MessageSquarePlus, ClipboardList } from "lucide-react";
+import { Shield, Users, UserCog, FileCheck, Calendar, BookOpen, FileText, Activity, BarChart3, FolderOpen, MessageSquarePlus, ClipboardList } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -28,7 +28,7 @@ import { toast } from "sonner";
 
 export default function Admin() {
   const { user, isAdmin, loading } = useAuth();
-  const { theme, setTheme } = useTheme();
+  
   const navigate = useNavigate();
   const goToWearLogs = () => navigate("/admin/wear-logs");
 
@@ -231,35 +231,6 @@ export default function Admin() {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>UI Theme</CardTitle>
-              <CardDescription>Switch between light and dark mode</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <div className="font-medium">Current Theme</div>
-                  <div className="text-sm text-muted-foreground capitalize">{theme} mode</div>
-                </div>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-                  className="h-10 w-10"
-                >
-                  {theme === "light" ? (
-                    <Moon className="h-5 w-5" />
-                  ) : (
-                    <Sun className="h-5 w-5" />
-                  )}
-                </Button>
-              </div>
-              <div className="text-xs text-muted-foreground">
-                Your theme preference is saved and will persist across sessions.
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </div>
     </AppLayout>

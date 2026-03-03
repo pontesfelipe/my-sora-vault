@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2, Trash2, KeyRound, Eye, EyeOff } from "lucide-react";
+import { Loader2, Trash2, KeyRound, Eye, EyeOff, Moon, Sun } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,9 +26,11 @@ import { SessionManagementCard } from "@/components/SessionManagementCard";
 import { LoginHistoryCard } from "@/components/LoginHistoryCard";
 import { AccountLinkingCard } from "@/components/AccountLinkingCard";
 import { DefaultCollectionCard } from "@/components/DefaultCollectionCard";
+import { useTheme } from "@/contexts/ThemeContext";
 
 const Settings = () => {
   const { user, signOut } = useAuth();
+  const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -208,6 +210,29 @@ const Settings = () => {
           <ProfileSettingsCard />
 
           <DefaultCollectionCard />
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Appearance</CardTitle>
+              <CardDescription>Switch between light and dark mode</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <div className="font-medium">Theme</div>
+                  <div className="text-sm text-muted-foreground capitalize">{theme} mode</div>
+                </div>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+                  className="h-10 w-10"
+                >
+                  {theme === "light" ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
 
           <AccountLinkingCard />
 
