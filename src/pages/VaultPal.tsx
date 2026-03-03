@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { Send, Trash2, Bot, Sparkles, Loader2, User, Plus, MessageSquare, Pencil, Search, X, ChevronDown, ChevronUp, RefreshCw, Mic, MicOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -62,6 +63,8 @@ const VaultPal = () => {
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const [showScrollPill, setShowScrollPill] = useState(false);
   const isMobile = useIsMobile();
 
   // Voice input hook
@@ -176,6 +179,18 @@ const VaultPal = () => {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages]);
+
+  // IntersectionObserver for scroll-to-latest pill
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setShowScrollPill(!entry.isIntersecting),
+      { threshold: 0.1 }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [messages.length]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -543,8 +558,29 @@ const VaultPal = () => {
                 </div>
               </div>
             )}
+            <div ref={sentinelRef} className="h-1" />
           </div>
         </ScrollArea>
+
+        {/* Scroll-to-latest pill */}
+        <AnimatePresence>
+          {showScrollPill && messages.length > 0 && (
+            <motion.button
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              onClick={() => {
+                if (scrollRef.current) {
+                  scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+                }
+              }}
+              className="absolute bottom-20 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent text-white text-xs font-medium shadow-luxury"
+            >
+              <ChevronDown className="w-3.5 h-3.5" />
+              New messages
+            </motion.button>
+          )}
+        </AnimatePresence>
 
         {/* Input Area */}
         <div className={`shrink-0 border-t border-borderSubtle bg-surface ${isMobile ? 'px-3 py-2' : 'px-4 py-3'}`}>
