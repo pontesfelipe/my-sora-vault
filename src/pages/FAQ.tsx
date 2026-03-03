@@ -6,55 +6,71 @@ import { HelpCircle } from "lucide-react";
 const faqItems = [
   {
     question: "What is Luxury Vault?",
-    answer: "Luxury Vault is a comprehensive watch collection management platform designed to help enthusiasts track, organize, and analyze their luxury timepieces. It provides tools for logging usage history, managing trips and events, tracking activities, and gaining insights into your collection."
+    answer: "Luxury Vault is a comprehensive collection management platform for luxury enthusiasts. It supports multiple collection types — watches, sneakers, and purses — giving you tools to track, organize, analyze, and share your prized items all in one place."
   },
   {
-    question: "What can I track about my watches?",
-    answer: "Luxury Vault supports detailed watch specifications including movement type, case material, case size, water resistance, power reserve, lug-to-lug measurements, warranty tracking, rarity, and historical significance."
+    question: "What collection types are supported?",
+    answer: "Luxury Vault currently supports three collection types: Watches (with specs like movement, case material, water resistance, and power reserve), Sneakers (with specs like colorway, shoe size, SKU, condition, and collaboration details), and Purses (with specs like material, hardware color, closure type, and authenticity verification). Each type has its own tailored tracking fields."
   },
   {
-    question: "How do I add a watch to my collection?",
-    answer: "Navigate to the Collection page and click the 'Add Item' button. Fill in the details about your watch including brand, model, and specifications. You can also upload photos and additional documentation like warranty cards or authenticity certificates."
+    question: "How do I create a collection?",
+    answer: "After signing in, you'll be prompted to create your first collection. Choose a name and select a type (watches, sneakers, or purses). You can create multiple collections of different types and switch between them using the collection switcher."
+  },
+  {
+    question: "How do I add an item to my collection?",
+    answer: "Navigate to the Collection page and click the 'Add Item' button. Fill in the details such as brand, model, and type-specific specifications. You can also upload photos and documentation like warranty cards or authenticity certificates."
+  },
+  {
+    question: "What is the Wear Tracking feature?",
+    answer: "Wear Tracking lets you log when you use an item from your collection. You can associate entries with trips, events, sports activities, or water usage. Over time, you'll see usage patterns through calendars, charts, and monthly grids."
+  },
+  {
+    question: "What are Trips and Events?",
+    answer: "Trips and Events let you document special occasions and associate them with the items you wore. Track locations, dates, duration, and which pieces accompanied you — building a timeline of memories with your collection."
   },
   {
     question: "What is the Wishlist feature?",
-    answer: "The Wishlist allows you to keep track of watches you're interested in acquiring. You can add items with their brand, model, and preferred specifications. The system can also match your wishlist with other users who have those watches available for trade."
+    answer: "The Wishlist lets you track items you're interested in acquiring. Add brand, model, and preferred specs. The system can also match your wishlist with other users who have those items available for trade."
   },
   {
-    question: "How does the Trade Matching work?",
-    answer: "When you mark a watch as 'Open to Trade', the system automatically matches it with other users' wishlists. If there's a match, both parties receive a notification and can connect to discuss a potential exchange."
+    question: "How does Trade Matching work?",
+    answer: "When you mark an item as 'Open to Trade', the system automatically matches it with other users' wishlists. If there's a match, both parties receive a notification and can connect through messaging to discuss a potential exchange."
   },
   {
     question: "What is Water Usage tracking?",
-    answer: "Water Usage tracking allows you to log activities where you've used your watch in water (swimming, diving, etc.). This is useful to monitor water exposure and track water resistance over time."
+    answer: "Water Usage tracking lets you log activities where you've used a watch in water (swimming, diving, snorkeling, etc.). This helps monitor water exposure relative to your watch's water resistance rating."
   },
   {
-    question: "How do I log a wear entry?",
-    answer: "You can log entries from multiple places: the Home page, the Watch Detail page, or the Collection page. Simply select the watch and date, and optionally associate it with a trip, event, or water activity."
-  },
-  {
-    question: "What are Collection Insights?",
-    answer: "Collection Insights provides AI-powered analysis of your collection, including taste preferences, usage patterns, and suggestions for watches that might complement your collection."
+    question: "What are Collection Insights and AI features?",
+    answer: "Luxury Vault offers several AI-powered features: Collection Insights analyzes your taste profile and usage patterns, Sentiment Analysis evaluates your feelings about each item, Watch Metadata Analysis enriches specs automatically, and the Vault Pal chatbot assistant answers questions about your collection."
   },
   {
     question: "Can I share my collection with others?",
-    answer: "Yes! You can add friends through the Messages feature and share watch details with them. You can also grant other users viewer or editor access to your collection."
+    answer: "Yes! You can add friends through the social features and share item details via messaging. You can also grant other users viewer or editor access to your collections. The Forum lets you post and discuss with the community."
   },
   {
-    question: "How do I track warranties and authenticity?",
-    answer: "When adding or editing a watch, you can set warranty dates and upload photos of warranty cards or authenticity certificates. The system will track warranty status and notify you before warranties expire."
+    question: "What is the Trust Level system?",
+    answer: "Trust Levels (Observer, Collector, Verified Collector, Trusted Trader) reflect a user's standing in the community. Higher trust levels are assigned by admins based on activity and completed trades, helping users gauge reliability for trade opportunities."
   },
   {
-    question: "What data is stored about my watches?",
-    answer: "Luxury Vault stores comprehensive information including brand, model, specifications, purchase details, photos, documentation, usage history, and personal notes. All data is securely stored and only accessible to you and users you grant access to."
+    question: "How do warranties and authenticity work?",
+    answer: "When adding or editing an item, you can set warranty dates and upload warranty card or authenticity certificate photos. The system tracks warranty status and sends notifications before warranties expire."
+  },
+  {
+    question: "What Personal Notes and Lists can I create?",
+    answer: "Personal Notes let you keep private observations about your items. Lists allow you to organize items into custom groupings beyond your main collection — for example, 'Daily Rotation', 'Grails', or 'For Sale'."
   },
   {
     question: "Is my data secure?",
-    answer: "Yes, we take security seriously. All data is encrypted in transit and at rest. We use row-level security policies to ensure you can only access your own data. Authentication is handled securely through industry-standard protocols."
+    answer: "Yes. All data is encrypted in transit and at rest. Row-level security policies ensure you can only access your own data. Two-factor authentication (MFA) and login history tracking are available for additional account protection."
   },
   {
     question: "How can I export my data?",
-    answer: "Administrators can export usage logs and other data through the Admin panel. Individual users can view all their data through the various pages and reports in the application."
+    answer: "Administrators can export watch inventory, wear logs, and full data exports through the Admin panel. The platform also supports importing data via spreadsheet upload."
+  },
+  {
+    question: "How do I submit feedback or report issues?",
+    answer: "Use the 'Submit Feedback' option available in the app to send bug reports, feature requests, or general feedback directly to the admin team. You can track the status of your submissions as well."
   }
 ];
 

@@ -1,6 +1,6 @@
 import { AppLayout } from "@/components/AppLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Watch, Heart, Shield, Sparkles, Users, Globe, TrendingUp, BarChart3 } from "lucide-react";
+import { Watch, Heart, Shield, Sparkles, Users, Globe, TrendingUp, BarChart3, ShoppingBag, Footprints } from "lucide-react";
 import watchHero from "@/assets/watch-hero.jpg";
 
 export default function About() {
@@ -19,16 +19,61 @@ export default function About() {
               <div>
                 <h1 className="text-4xl font-bold tracking-tight">Luxury Vault</h1>
                 <p className="text-muted-foreground text-lg">
-                  Your Personal Watch Collection Studio
+                  Your Personal Luxury Collection Studio
                 </p>
               </div>
             </div>
             
             <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl">
-              The premier platform for watch enthusiasts who demand excellence in managing their luxury timepiece collection. 
-              Track, analyze, and curate your watches with unprecedented precision.
+              The premier platform for luxury enthusiasts who demand excellence in managing their collections. 
+              Track, analyze, and curate your watches, sneakers, and purses with unprecedented precision.
             </p>
           </div>
+        </div>
+
+        {/* Collection Types */}
+        <div className="grid gap-4 sm:grid-cols-3">
+          <Card className="group overflow-hidden border-0 shadow-card hover:shadow-xl transition-all duration-500">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10">
+                  <Watch className="h-5 w-5 text-accent" />
+                </div>
+                <h3 className="font-semibold text-lg">Watches</h3>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Track movements, case materials, water resistance, market values, wear history, and warranty details for your timepieces.
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="group overflow-hidden border-0 shadow-card hover:shadow-xl transition-all duration-500">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10">
+                  <Footprints className="h-5 w-5 text-accent" />
+                </div>
+                <h3 className="font-semibold text-lg">Sneakers</h3>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Catalog colorways, SKUs, collaborations, condition, shoe sizes, and limited edition status for your sneaker collection.
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="group overflow-hidden border-0 shadow-card hover:shadow-xl transition-all duration-500">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10">
+                  <ShoppingBag className="h-5 w-5 text-accent" />
+                </div>
+                <h3 className="font-semibold text-lg">Purses</h3>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Track materials, hardware colors, authenticity verification, serial numbers, and accessories for your luxury bags.
+              </p>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Watch Showcase */}
@@ -36,17 +81,14 @@ export default function About() {
           <div className="relative h-64 overflow-hidden">
             <img 
               src={watchHero} 
-              alt="Luxury watches" 
+              alt="Luxury collection showcase" 
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-card via-card/50 to-transparent" />
             <div className="absolute bottom-4 left-4 right-4">
-              <div className="flex items-center gap-2">
-                <Watch className="h-6 w-6 text-accent" />
-                <h3 className="text-xl font-bold">Watches</h3>
-              </div>
+              <h3 className="text-xl font-bold">Built for Collectors</h3>
               <p className="text-sm text-muted-foreground mt-2">
-                Track movement types, case materials, water resistance, market values, wear history, and warranty details.
+                Whether it's a vintage timepiece, a rare sneaker drop, or a designer handbag — Luxury Vault gives each item the attention it deserves.
               </p>
             </div>
           </div>
@@ -56,7 +98,7 @@ export default function About() {
         <Card className="border-0 shadow-card">
           <CardHeader>
             <CardTitle className="text-2xl">Platform Features</CardTitle>
-            <CardDescription>Everything you need to manage your watch collection</CardDescription>
+            <CardDescription>Everything you need to manage your luxury collections</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -67,7 +109,7 @@ export default function About() {
                 <div>
                   <h3 className="font-semibold mb-1">Analytics Dashboard</h3>
                   <p className="text-sm text-muted-foreground">
-                    Comprehensive statistics and insights about your collection usage.
+                    Collection statistics, spending analytics, purchase timelines, and depreciation tracking.
                   </p>
                 </div>
               </div>
@@ -79,7 +121,7 @@ export default function About() {
                 <div>
                   <h3 className="font-semibold mb-1">Wear Tracking</h3>
                   <p className="text-sm text-muted-foreground">
-                    Log usage history and discover patterns in your wearing habits.
+                    Log usage with calendars, monthly grids, and associate wears with trips, events, and sports.
                   </p>
                 </div>
               </div>
@@ -89,9 +131,9 @@ export default function About() {
                   <Sparkles className="h-6 w-6 text-accent" />
                 </div>
                 <div>
-                  <h3 className="font-semibold mb-1">AI Insights</h3>
+                  <h3 className="font-semibold mb-1">AI-Powered Insights</h3>
                   <p className="text-sm text-muted-foreground">
-                    Get personalized recommendations and collection analysis.
+                    Collection analysis, taste profiling, sentiment analysis, gap suggestions, and the Vault Pal chatbot.
                   </p>
                 </div>
               </div>
@@ -101,9 +143,9 @@ export default function About() {
                   <Users className="h-6 w-6 text-accent" />
                 </div>
                 <div>
-                  <h3 className="font-semibold mb-1">Community</h3>
+                  <h3 className="font-semibold mb-1">Community & Trading</h3>
                   <p className="text-sm text-muted-foreground">
-                    Connect with collectors and explore trade opportunities.
+                    Friends, messaging, forums, trade matching, trust levels, and wishlist sharing.
                   </p>
                 </div>
               </div>
@@ -113,9 +155,9 @@ export default function About() {
                   <Globe className="h-6 w-6 text-accent" />
                 </div>
                 <div>
-                  <h3 className="font-semibold mb-1">Trip & Events</h3>
+                  <h3 className="font-semibold mb-1">Trips & Events</h3>
                   <p className="text-sm text-muted-foreground">
-                    Associate watches with special moments and memories.
+                    Document occasions and associate your collection items with travel and special moments.
                   </p>
                 </div>
               </div>
@@ -127,7 +169,7 @@ export default function About() {
                 <div>
                   <h3 className="font-semibold mb-1">Secure & Private</h3>
                   <p className="text-sm text-muted-foreground">
-                    Enterprise-grade encryption protects your data.
+                    Row-level security, two-factor authentication, login history, and encrypted data storage.
                   </p>
                 </div>
               </div>
@@ -138,18 +180,16 @@ export default function About() {
         {/* Stats Section */}
         <div className="grid gap-4 sm:grid-cols-3">
           <div className="text-center p-6 rounded-xl bg-gradient-to-br from-accent/10 to-accent/5">
-            <div className="text-4xl font-bold text-accent mb-2">∞</div>
-            <div className="text-sm text-muted-foreground">Watches Per Collection</div>
+            <div className="text-4xl font-bold text-accent mb-2">3</div>
+            <div className="text-sm text-muted-foreground">Collection Types</div>
           </div>
           <div className="text-center p-6 rounded-xl bg-gradient-to-br from-accent/10 to-accent/5">
             <div className="text-4xl font-bold text-accent mb-2">AI</div>
             <div className="text-sm text-muted-foreground">Powered Insights</div>
           </div>
           <div className="text-center p-6 rounded-xl bg-gradient-to-br from-accent/10 to-accent/5">
-            <div className="text-4xl font-bold text-accent mb-2">
-              <Watch className="h-10 w-10 mx-auto text-accent" />
-            </div>
-            <div className="text-sm text-muted-foreground">Built for Watch Lovers</div>
+            <div className="text-4xl font-bold text-accent mb-2">∞</div>
+            <div className="text-sm text-muted-foreground">Items Per Collection</div>
           </div>
         </div>
 
@@ -160,10 +200,10 @@ export default function About() {
           </CardHeader>
           <CardContent className="space-y-2">
             <p className="text-muted-foreground">
-              For support or feedback, please reach out through the Messages feature or contact an administrator.
+              For support or feedback, use the Submit Feedback feature in the app or reach out through messaging. You can also connect with the community through the Forum.
             </p>
             <p className="text-sm text-muted-foreground">
-              © 2024 Luxury Vault. All rights reserved.
+              © 2025 Luxury Vault. All rights reserved. Version 1.0
             </p>
           </CardContent>
         </Card>
