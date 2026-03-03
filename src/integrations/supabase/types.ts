@@ -1613,9 +1613,11 @@ export type Database = {
           available_for_trade: boolean
           average_resale_price: number | null
           brand: string
+          case_shape: string | null
           case_size: string | null
           caseback_material: string | null
           collection_id: string | null
+          complications: string[] | null
           cost: number
           created_at: string
           dial_color: string
@@ -1651,9 +1653,11 @@ export type Database = {
           available_for_trade?: boolean
           average_resale_price?: number | null
           brand: string
+          case_shape?: string | null
           case_size?: string | null
           caseback_material?: string | null
           collection_id?: string | null
+          complications?: string[] | null
           cost?: number
           created_at?: string
           dial_color: string
@@ -1689,9 +1693,11 @@ export type Database = {
           available_for_trade?: boolean
           average_resale_price?: number | null
           brand?: string
+          case_shape?: string | null
           case_size?: string | null
           caseback_material?: string | null
           collection_id?: string | null
+          complications?: string[] | null
           cost?: number
           created_at?: string
           dial_color?: string

@@ -144,6 +144,15 @@ serve(async (req) => {
                     type: 'string',
                     description: 'Strap/bracelet type (e.g., Metal Bracelet, Leather, NATO, Rubber)'
                   },
+                  case_shape: {
+                    type: 'string',
+                    description: 'Case shape (e.g., Round, Tonneau, Rectangular, Cushion, Square, Octagonal)'
+                  },
+                  complications: {
+                    type: 'array',
+                    items: { type: 'string' },
+                    description: 'List of ALL watch complications/functions visible or known for this model. Include every applicable one from: GMT, Chronograph, Date, Day-Date, Annual Calendar, Perpetual Calendar, Moonphase, Power Reserve, Minute Repeater, Tourbillon, World Time, Flyback, Tachymeter, Alarm, Small Seconds, Split-Seconds. Be thorough.'
+                  },
                   confidence: {
                     type: 'string',
                     enum: ['high', 'medium', 'low'],
@@ -154,7 +163,7 @@ serve(async (req) => {
                     description: 'Additional observations, distinguishing features, or uncertainties about the identification'
                   }
                 },
-                required: ['brand', 'model', 'dial_color', 'type', 'confidence'],
+                required: ['brand', 'model', 'dial_color', 'type', 'confidence', 'complications'],
                 additionalProperties: false
               }
             }
