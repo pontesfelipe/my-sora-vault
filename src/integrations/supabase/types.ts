@@ -98,6 +98,54 @@ export type Database = {
         }
         Relationships: []
       }
+      change_control_log: {
+        Row: {
+          affected_components: string[] | null
+          author: string | null
+          category: string
+          created_at: string
+          created_by: string
+          description: string
+          id: string
+          is_breaking_change: boolean
+          rollback_notes: string | null
+          status: string
+          title: string
+          updated_at: string
+          version: string | null
+        }
+        Insert: {
+          affected_components?: string[] | null
+          author?: string | null
+          category?: string
+          created_at?: string
+          created_by: string
+          description: string
+          id?: string
+          is_breaking_change?: boolean
+          rollback_notes?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          version?: string | null
+        }
+        Update: {
+          affected_components?: string[] | null
+          author?: string | null
+          category?: string
+          created_at?: string
+          created_by?: string
+          description?: string
+          id?: string
+          is_breaking_change?: boolean
+          rollback_notes?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          version?: string | null
+        }
+        Relationships: []
+      }
       collection_feature_toggles: {
         Row: {
           collection_type: string
