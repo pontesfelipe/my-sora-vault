@@ -1,4 +1,4 @@
-import { useState, lazy, Suspense } from "react";
+import { useState, lazy, Suspense, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -12,6 +12,7 @@ import { AppLayout } from "@/components/AppLayout";
 import { SplashScreen } from "@/components/SplashScreen";
 import { OfflineBanner } from "@/components/OfflineBanner";
 import { AnimatePresence, motion } from "framer-motion";
+import { initNativeApp, configureBackButton } from "@/utils/nativeApp";
 
 // Lazy-loaded pages for code splitting
 const Home = lazy(() => import("./pages/Home"));
@@ -135,6 +136,14 @@ function AnimatedRoutes() {
 
 function AppContent() {
   const [showSplash, setShowSplash] = useState(true);
+
+  useEffect(() => {
+    initNativeApp();
+    configureBackButton(() => {
+      // On Android back at root — minimize app
+      // The App plugin handles this natively when canGoBack is false
+    });
+  }, []);
 
   return (
     <>
