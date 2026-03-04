@@ -616,6 +616,13 @@ const Log = () => {
                       <Plus className="h-4 w-4 mr-1" />
                       Add to Collection
                     </Button>
+                    <Button size="sm" variant="outline" onClick={handleNotMyWatch} disabled={isIdentifying}>
+                      {isIdentifying ? (
+                        <><Loader2 className="h-4 w-4 mr-1 animate-spin" />Retrying...</>
+                      ) : (
+                        <><X className="h-4 w-4 mr-1" />Not My Watch</>
+                      )}
+                    </Button>
                     <Button size="sm" variant="ghost" onClick={() => setIdentifiedWatch(null)}>
                       Dismiss
                     </Button>
