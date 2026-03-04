@@ -151,9 +151,7 @@ function AppContent() {
       <OfflineBanner />
       <Toaster />
       <Sonner />
-      <BrowserRouter>
-        <AnimatedRoutes />
-      </BrowserRouter>
+      <AnimatedRoutes />
     </>
   );
 }
@@ -161,15 +159,17 @@ function AppContent() {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider>
-      <AuthProvider>
-        <PasscodeProvider>
-          <CollectionProvider>
-            <TooltipProvider>
-              <AppContent />
-            </TooltipProvider>
-          </CollectionProvider>
-        </PasscodeProvider>
-      </AuthProvider>
+      <BrowserRouter>
+        <AuthProvider>
+          <PasscodeProvider>
+            <CollectionProvider>
+              <TooltipProvider>
+                <AppContent />
+              </TooltipProvider>
+            </CollectionProvider>
+          </PasscodeProvider>
+        </AuthProvider>
+      </BrowserRouter>
     </ThemeProvider>
   </QueryClientProvider>
 );
