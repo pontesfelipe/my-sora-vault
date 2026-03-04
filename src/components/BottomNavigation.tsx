@@ -1,21 +1,23 @@
 import { Home, Clock, Users, User, Menu } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { triggerHaptic } from "@/utils/haptics";
 import { useSocialNotifications } from "@/hooks/useSocialNotifications";
 import { Badge } from "@/components/ui/badge";
 import { MobileMenuDrawer } from "@/components/MobileMenuDrawer";
 
-const navItems = [
-  { title: "Home", url: "/", icon: Home },
-  { title: "Log", url: "/log", icon: Clock },
-  { title: "Feed", url: "/feed", icon: Users },
-  { title: "Profile", url: "/profile", icon: User },
-];
-
 export function BottomNavigation() {
   const location = useLocation();
+  const { t } = useTranslation();
   const { totalCount } = useSocialNotifications();
+
+  const navItems = [
+    { title: t("nav.home"), url: "/", icon: Home },
+    { title: t("nav.log"), url: "/log", icon: Clock },
+    { title: t("nav.feed"), url: "/feed", icon: Users },
+    { title: t("nav.profile"), url: "/profile", icon: User },
+  ];
 
   const handleNavClick = () => {
     triggerHaptic('selection');
@@ -31,7 +33,7 @@ export function BottomNavigation() {
           const showBadge = item.url === "/feed" && totalCount > 0;
           return (
             <NavLink
-              key={item.title}
+              key={item.url}
               to={item.url}
               onClick={handleNavClick}
               className={`flex flex-col items-center justify-center flex-1 h-full py-2 transition-colors touch-target ${
@@ -54,7 +56,6 @@ export function BottomNavigation() {
           );
         })}
         
-        {/* More button */}
         <MobileMenuDrawer>
           <button
             onClick={() => triggerHaptic('selection')}
@@ -62,7 +63,7 @@ export function BottomNavigation() {
             aria-label="More options"
           >
             <Menu className="h-6 w-6 mb-1" />
-            <span className="text-[10px] font-medium">More</span>
+            <span className="text-[10px] font-medium">{t("nav.more")}</span>
           </button>
         </MobileMenuDrawer>
       </div>

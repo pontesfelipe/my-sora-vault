@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Settings, HelpCircle, Info, Shield, Lightbulb, LogOut, Bot } from "lucide-react";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import {
   Drawer,
   DrawerContent,
@@ -24,16 +25,17 @@ export function MobileMenuDrawer({ children }: MobileMenuDrawerProps) {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
   const { user, isAdmin, signOut } = useAuth();
   const { selectedCollectionId } = useCollection();
   const { watches } = useWatchData(selectedCollectionId);
 
   const menuItems = [
-    { title: "Vault Assistant", url: "/vault-pal", icon: Bot },
-    { title: "Settings", url: "/settings", icon: Settings },
-    { title: "FAQ", url: "/faq", icon: HelpCircle },
-    { title: "About", url: "/about", icon: Info },
-    ...(isAdmin ? [{ title: "Admin", url: "/admin", icon: Shield }] : []),
+    { title: t("nav.vaultAssistant"), url: "/vault-pal", icon: Bot },
+    { title: t("nav.settings"), url: "/settings", icon: Settings },
+    { title: t("nav.faq"), url: "/faq", icon: HelpCircle },
+    { title: t("nav.about"), url: "/about", icon: Info },
+    ...(isAdmin ? [{ title: t("nav.admin"), url: "/admin", icon: Shield }] : []),
   ];
 
   const handleNavigation = (url: string) => {
@@ -55,10 +57,9 @@ export function MobileMenuDrawer({ children }: MobileMenuDrawerProps) {
       </DrawerTrigger>
       <DrawerContent className="pb-safe">
         <DrawerHeader className="text-left pb-2">
-          <DrawerTitle className="text-lg font-semibold text-textMain">More</DrawerTitle>
+          <DrawerTitle className="text-lg font-semibold text-textMain">{t("nav.more")}</DrawerTitle>
         </DrawerHeader>
 
-        {/* Mini watch showcase */}
         {watches.length > 0 && (
           <div className="px-4 pb-4">
             <div className="relative rounded-2xl p-3 bg-gradient-to-b from-[hsl(var(--watch-case-frame-start))] to-[hsl(var(--watch-case-frame-end))] shadow-[0_4px_20px_-4px_hsl(var(--watch-case-shadow))]">
@@ -92,7 +93,7 @@ export function MobileMenuDrawer({ children }: MobileMenuDrawerProps) {
             const isActive = location.pathname === item.url;
             return (
               <motion.button
-                key={item.title}
+                key={item.url}
                 initial={{ opacity: 0, x: -16 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.04, duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
@@ -111,11 +112,9 @@ export function MobileMenuDrawer({ children }: MobileMenuDrawerProps) {
 
           {user && (
             <SubmitFeedbackDialog>
-              <button
-                className="w-full flex items-center gap-3 rounded-xl px-4 py-3 text-base transition-colors touch-target text-textMuted hover:bg-surfaceMuted hover:text-textMain active:bg-surfaceMuted"
-              >
+              <button className="w-full flex items-center gap-3 rounded-xl px-4 py-3 text-base transition-colors touch-target text-textMuted hover:bg-surfaceMuted hover:text-textMain active:bg-surfaceMuted">
                 <Lightbulb className="h-5 w-5" />
-                <span>Send Feedback</span>
+                <span>{t("nav.sendFeedback")}</span>
               </button>
             </SubmitFeedbackDialog>
           )}
@@ -128,7 +127,7 @@ export function MobileMenuDrawer({ children }: MobileMenuDrawerProps) {
                 className="w-full flex items-center gap-3 rounded-xl px-4 py-3 text-base transition-colors touch-target text-destructive hover:bg-destructive/10 active:bg-destructive/10"
               >
                 <LogOut className="h-5 w-5" />
-                <span>Sign Out</span>
+                <span>{t("nav.signOut")}</span>
               </button>
             </div>
           )}
