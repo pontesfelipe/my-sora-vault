@@ -54,7 +54,8 @@ serve(async (req) => {
       );
     }
     
-    const normalizedImage = normalizeImageForGateway(parseResult.data.image);
+    const { image, excluded_suggestions } = parseResult.data;
+    const normalizedImage = normalizeImageForGateway(image);
     if (!(normalizedImage.startsWith('data:image/') || normalizedImage.startsWith('http://') || normalizedImage.startsWith('https://'))) {
       return new Response(
         JSON.stringify({ error: 'Invalid image format. Please upload a valid image.' }),
