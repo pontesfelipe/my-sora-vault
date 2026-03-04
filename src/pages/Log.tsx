@@ -67,6 +67,7 @@ const Log = () => {
   const [watchSearch, setWatchSearch] = useState("");
   const [showAddWatch, setShowAddWatch] = useState(false);
   const [addWatchPrefill, setAddWatchPrefill] = useState<any>(null);
+  const [rejectedSuggestions, setRejectedSuggestions] = useState<Array<{ brand: string; model: string }>>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const uploadInputRef = useRef<HTMLInputElement>(null);
 
@@ -283,46 +284,36 @@ const Log = () => {
     return best?.watch ?? null;
   };
 
-  const handlePhotoCapture = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setPhotoFile(file);
-    setSelectedWatchId("");
+  const identifyFromImage = async (base64: string, exclusions: Array<{ brand: string; model: string }>) => {
+    setIsIdentifying(true);
     setIdentifiedWatch(null);
     setIdentificationError(null);
-
-    const reader = new FileReader();
-    reader.onload = (ev) => setPhotoPreview(ev.target?.result as string);
-    reader.readAsDataURL(file);
-
-    // Try AI identification
-    setIsIdentifying(true);
     try {
-      const base64 = await fileToBase64(file);
       let data: any = null;
       let lastError: string | null = null;
 
-      // Attempt 1: full-quality image
-      const res1 = await supabase.functions.invoke("identify-watch-from-photo", {
-        body: { image: base64 },
-      });
+      const body: any = { image: base64 };
+      if (exclusions.length > 0) {
+        body.excluded_suggestions = exclusions;
+      }
+
+      const res1 = await supabase.functions.invoke("identify-watch-from-photo", { body });
 
       if (res1.error || res1.data?.error) {
         lastError = res1.data?.error || res1.error?.message || "Identification failed";
         console.warn("Attempt 1 failed, retrying with compressed image…", lastError);
 
-        // Attempt 2: compressed image (~60% quality, max 1200px)
-        const compressed = await compressImage(file, 1200, 0.6);
-        const res2 = await supabase.functions.invoke("identify-watch-from-photo", {
-          body: { image: compressed },
-        });
-
-        if (res2.error || res2.data?.error) {
-          lastError = res2.data?.error || res2.error?.message || "Identification failed";
-        } else if (res2.data) {
-          data = res2.data;
-          lastError = null;
+        if (photoFile) {
+          const compressed = await compressImage(photoFile, 1200, 0.6);
+          const compressedBody: any = { image: compressed };
+          if (exclusions.length > 0) compressedBody.excluded_suggestions = exclusions;
+          const res2 = await supabase.functions.invoke("identify-watch-from-photo", { body: compressedBody });
+          if (res2.error || res2.data?.error) {
+            lastError = res2.data?.error || res2.error?.message || "Identification failed";
+          } else if (res2.data) {
+            data = res2.data;
+            lastError = null;
+          }
         }
       } else if (res1.data) {
         data = res1.data;
@@ -333,8 +324,6 @@ const Log = () => {
         toast.error(lastError || "Could not identify watch. You can add it manually.");
       } else {
         setIdentifiedWatch(data);
-
-        // Auto-match to collection
         const match = findBestMatch(data.brand, data.model, data.type, data.dial_color, data.case_size, data.movement, data.complications, data.case_shape);
         if (match) {
           setSelectedWatchId(match.id);
@@ -351,6 +340,66 @@ const Log = () => {
       setIdentificationError("Could not identify this watch automatically.");
       toast.error("Could not identify watch. You can add it manually.");
     } finally {
+      setIsIdentifying(false);
+    }
+  };
+
+  const handleNotMyWatch = async () => {
+    if (!identifiedWatch || !photoPreview || !user) return;
+    const rejection = { brand: identifiedWatch.brand || "", model: identifiedWatch.model || "" };
+    const updatedRejections = [...rejectedSuggestions, rejection];
+    setRejectedSuggestions(updatedRejections);
+
+    // Persist rejection
+    supabase.from("watch_id_rejections").insert({
+      user_id: user.id,
+      rejected_brand: rejection.brand,
+      rejected_model: rejection.model,
+    }).then(() => {});
+
+    toast.info("Got it — trying again with a different identification...");
+    await identifyFromImage(photoPreview, updatedRejections);
+  };
+
+  const handlePhotoCapture = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setPhotoFile(file);
+    setSelectedWatchId("");
+    setIdentifiedWatch(null);
+    setIdentificationError(null);
+    setRejectedSuggestions([]);
+
+    const reader = new FileReader();
+    reader.onload = (ev) => setPhotoPreview(ev.target?.result as string);
+    reader.readAsDataURL(file);
+
+    setIsIdentifying(true);
+    try {
+      const base64 = await fileToBase64(file);
+
+      // Load user's past rejections to avoid repeating old mistakes
+      let pastRejections: Array<{ brand: string; model: string }> = [];
+      if (user) {
+        const { data: pastData } = await supabase
+          .from("watch_id_rejections")
+          .select("rejected_brand, rejected_model")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(20);
+        if (pastData) {
+          pastRejections = pastData.map(r => ({ brand: r.rejected_brand, model: r.rejected_model }));
+          setRejectedSuggestions(pastRejections);
+        }
+      }
+
+      setIsIdentifying(false); // identifyFromImage sets it again
+      await identifyFromImage(base64, pastRejections);
+    } catch (err) {
+      console.error("AI identification failed:", err);
+      setIdentificationError("Could not identify this watch automatically.");
+      toast.error("Could not identify watch. You can add it manually.");
       setIsIdentifying(false);
     }
   };
@@ -566,6 +615,13 @@ const Log = () => {
                     }}>
                       <Plus className="h-4 w-4 mr-1" />
                       Add to Collection
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={handleNotMyWatch} disabled={isIdentifying}>
+                      {isIdentifying ? (
+                        <><Loader2 className="h-4 w-4 mr-1 animate-spin" />Retrying...</>
+                      ) : (
+                        <><X className="h-4 w-4 mr-1" />Not My Watch</>
+                      )}
                     </Button>
                     <Button size="sm" variant="ghost" onClick={() => setIdentifiedWatch(null)}>
                       Dismiss

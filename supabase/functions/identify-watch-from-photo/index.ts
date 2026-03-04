@@ -11,6 +11,10 @@ const corsHeaders = {
 // Input validation schema - limit image payload to ~10MB
 const inputSchema = z.object({
   image: z.string().min(1).max(15000000, 'Image too large (max 10MB)'),
+  excluded_suggestions: z.array(z.object({
+    brand: z.string(),
+    model: z.string(),
+  })).optional().default([]),
 });
 
 const isLikelyBase64 = (value: string) => {
@@ -50,7 +54,8 @@ serve(async (req) => {
       );
     }
     
-    const normalizedImage = normalizeImageForGateway(parseResult.data.image);
+    const { image, excluded_suggestions } = parseResult.data;
+    const normalizedImage = normalizeImageForGateway(image);
     if (!(normalizedImage.startsWith('data:image/') || normalizedImage.startsWith('http://') || normalizedImage.startsWith('https://'))) {
       return new Response(
         JSON.stringify({ error: 'Invalid image format. Please upload a valid image.' }),
@@ -81,14 +86,14 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are a world-class watch identification expert with encyclopedic knowledge of every watch brand, reference number, and edition ever produced — from mainstream luxury (Rolex, Omega, Breitling, etc.) to microbrands and vintage pieces. You must identify not just the general model line but the EXACT reference/edition. Pay close attention to: dial color and texture, bezel type and markings (GMT, tachymeter, dive scale), bracelet/strap type and material, subdial layout, hand style, crown guards, case shape, lume plot pattern, date window position, and any text/logos on the dial. Distinguish between standard editions, limited editions, special editions, anniversary models, and regional variants. Always provide the most specific reference number you can determine.'
+            content: 'You are a world-class watch identification expert with encyclopedic knowledge of every watch brand, reference number, and edition ever produced — from mainstream luxury (Rolex, Omega, Breitling, etc.) to microbrands and vintage pieces. You must identify not just the general model line but the EXACT reference/edition. Pay close attention to: dial color and texture, bezel type and markings (GMT, tachymeter, dive scale), bracelet/strap type and material, subdial layout, hand style, crown guards, case shape, lume plot pattern, date window position, and any text/logos on the dial. Distinguish between standard editions, limited editions, special editions, anniversary models, and regional variants. Always provide the most specific reference number you can determine. IMPORTANT: If you are given a list of previously rejected identifications, do NOT repeat any of those — look more carefully at distinguishing features and suggest a DIFFERENT identification.'
           },
           {
             role: 'user',
             content: [
               {
                 type: 'text',
-                text: 'Identify this watch with maximum specificity. I need the EXACT edition and reference number, not just the model line. Analyze: 1) Dial color and finish (sunburst, matte, lacquer, fumé, etc.) 2) Bezel type (ceramic, aluminum, fixed, rotating, GMT, tachymeter, countdown) 3) Bracelet/strap (oyster, jubilee, president, NATO, leather, rubber, mesh, specific endlink style) 4) Complications visible (GMT, chronograph, moonphase, date, day-date, annual calendar) 5) Case details (material, polished vs brushed, crown guards, case shape) 6) Any special edition markers (engravings, unique colorways, anniversary text, collaboration branding). For example: not just "Rolex Submariner" but "Rolex Submariner Date 126610LN with black ceramic bezel and Oyster bracelet". Not just "Omega Speedmaster" but "Omega Speedmaster Professional Moonwatch 310.30.42.50.01.001 hesalite crystal".'
+                text: `Identify this watch with maximum specificity. I need the EXACT edition and reference number, not just the model line. Analyze: 1) Dial color and finish (sunburst, matte, lacquer, fumé, etc.) 2) Bezel type (ceramic, aluminum, fixed, rotating, GMT, tachymeter, countdown) 3) Bracelet/strap (oyster, jubilee, president, NATO, leather, rubber, mesh, specific endlink style) 4) Complications visible (GMT, chronograph, moonphase, date, day-date, annual calendar) 5) Case details (material, polished vs brushed, crown guards, case shape) 6) Any special edition markers (engravings, unique colorways, anniversary text, collaboration branding). For example: not just "Rolex Submariner" but "Rolex Submariner Date 126610LN with black ceramic bezel and Oyster bracelet". Not just "Omega Speedmaster" but "Omega Speedmaster Professional Moonwatch 310.30.42.50.01.001 hesalite crystal".${excluded_suggestions.length > 0 ? `\n\nIMPORTANT: The user has REJECTED the following previous identifications as WRONG. Do NOT suggest any of these again. Look more carefully at distinguishing details and provide a DIFFERENT identification:\n${excluded_suggestions.map((s: any, i: number) => `${i + 1}. ${s.brand} ${s.model}`).join('\n')}` : ''}`
               },
               {
                 type: 'image_url',

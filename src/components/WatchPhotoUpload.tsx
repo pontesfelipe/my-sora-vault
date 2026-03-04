@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Camera, Upload, Loader2, AlertCircle } from "lucide-react";
+import { Camera, Upload, Loader2, AlertCircle, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
 interface WatchInfo {
@@ -28,69 +29,94 @@ interface WatchPhotoUploadProps {
 }
 
 export const WatchPhotoUpload = ({ onIdentified, onPhotoUploaded, onContinueToForm }: WatchPhotoUploadProps) => {
+  const { user } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
   const [identifiedWatch, setIdentifiedWatch] = useState<WatchInfo | null>(null);
+  const [rejectedSuggestions, setRejectedSuggestions] = useState<Array<{ brand: string; model: string }>>([]);
 
-  const processImage = async (file: File) => {
+  const identifyFromImage = async (base64Image: string, exclusions: Array<{ brand: string; model: string }>) => {
+    setIsProcessing(true);
     try {
-      setIsProcessing(true);
+      const body: any = { image: base64Image };
+      if (exclusions.length > 0) body.excluded_suggestions = exclusions;
+
+      const { data, error } = await supabase.functions.invoke('identify-watch-from-photo', { body });
+
+      if (error) throw error;
+
+      setIdentifiedWatch(data);
+      toast.success(`Watch identified with ${data.confidence} confidence!`, {
+        description: `${data.brand} ${data.model}`
+      });
+      onIdentified(data);
+    } catch (error: any) {
+      console.error('Error identifying watch:', error);
+      if (error.message?.includes('Rate limit')) {
+        toast.error('Rate limit exceeded. Please try again later.');
+      } else if (error.message?.includes('quota')) {
+        toast.error('AI usage quota exceeded. Please add credits.');
+      } else {
+        toast.error('Failed to identify watch from photo');
+      }
+      setPreview(null);
       setIdentifiedWatch(null);
-      
-      // Convert to base64
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      
-      reader.onload = async () => {
-        const base64Image = reader.result as string;
-        setPreview(base64Image);
-        
-        // Pass the photo to parent for AI image generation
-        onPhotoUploaded?.(base64Image);
-
-        try {
-          const { data, error } = await supabase.functions.invoke('identify-watch-from-photo', {
-            body: { image: base64Image }
-          });
-
-          if (error) throw error;
-
-          setIdentifiedWatch(data);
-          
-          const confidenceColor = 
-            data.confidence === 'high' ? 'text-green-500' : 
-            data.confidence === 'medium' ? 'text-yellow-500' : 
-            'text-orange-500';
-          
-          toast.success(`Watch identified with ${data.confidence} confidence!`, {
-            description: `${data.brand} ${data.model}`
-          });
-
-          onIdentified(data);
-        } catch (error: any) {
-          console.error('Error identifying watch:', error);
-          if (error.message?.includes('Rate limit')) {
-            toast.error('Rate limit exceeded. Please try again later.');
-          } else if (error.message?.includes('quota')) {
-            toast.error('AI usage quota exceeded. Please add credits.');
-          } else {
-            toast.error('Failed to identify watch from photo');
-          }
-          setPreview(null);
-        } finally {
-          setIsProcessing(false);
-        }
-      };
-
-      reader.onerror = () => {
-        toast.error('Failed to read image file');
-        setIsProcessing(false);
-      };
-    } catch (error) {
-      console.error('Error processing image:', error);
-      toast.error('Failed to process image');
+    } finally {
       setIsProcessing(false);
     }
+  };
+
+  const processImage = async (file: File) => {
+    setIdentifiedWatch(null);
+    setRejectedSuggestions([]);
+
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+
+    reader.onload = async () => {
+      const base64Image = reader.result as string;
+      setPreview(base64Image);
+      onPhotoUploaded?.(base64Image);
+
+      // Load past rejections
+      let pastRejections: Array<{ brand: string; model: string }> = [];
+      if (user) {
+        const { data: pastData } = await supabase
+          .from("watch_id_rejections")
+          .select("rejected_brand, rejected_model")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(20);
+        if (pastData) {
+          pastRejections = pastData.map(r => ({ brand: r.rejected_brand, model: r.rejected_model }));
+          setRejectedSuggestions(pastRejections);
+        }
+      }
+
+      await identifyFromImage(base64Image, pastRejections);
+    };
+
+    reader.onerror = () => {
+      toast.error('Failed to read image file');
+    };
+  };
+
+  const handleNotMyWatch = async () => {
+    if (!identifiedWatch || !preview || !user) return;
+    const rejection = { brand: identifiedWatch.brand || "", model: identifiedWatch.model || "" };
+    const updatedRejections = [...rejectedSuggestions, rejection];
+    setRejectedSuggestions(updatedRejections);
+
+    // Persist rejection
+    supabase.from("watch_id_rejections").insert({
+      user_id: user.id,
+      rejected_brand: rejection.brand,
+      rejected_model: rejection.model,
+    }).then(() => {});
+
+    toast.info("Got it — trying again with a different identification...");
+    setIdentifiedWatch(null);
+    await identifyFromImage(preview, updatedRejections);
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -154,16 +180,23 @@ export const WatchPhotoUpload = ({ onIdentified, onPhotoUploaded, onContinueToFo
                   {identifiedWatch.notes && (
                     <p className="text-sm text-muted-foreground">{identifiedWatch.notes}</p>
                   )}
+                  {rejectedSuggestions.length > 0 && (
+                    <p className="text-xs text-muted-foreground">
+                      Previously rejected: {rejectedSuggestions.map(r => `${r.brand} ${r.model}`).join(", ")}
+                    </p>
+                  )}
                   <div className="flex gap-2 pt-2">
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      onClick={() => {
-                        setPreview(null);
-                        setIdentifiedWatch(null);
-                      }}
+                      onClick={handleNotMyWatch}
+                      disabled={isProcessing}
                     >
-                      Cancel
+                      {isProcessing ? (
+                        <><Loader2 className="w-4 h-4 mr-1 animate-spin" />Retrying...</>
+                      ) : (
+                        <><X className="w-4 h-4 mr-1" />Not My Watch</>
+                      )}
                     </Button>
                     <Button 
                       size="sm" 
@@ -176,6 +209,13 @@ export const WatchPhotoUpload = ({ onIdentified, onPhotoUploaded, onContinueToFo
                   </div>
                 </AlertDescription>
               </Alert>
+            )}
+
+            {isProcessing && !identifiedWatch && (
+              <div className="flex items-center justify-center py-4 gap-2 text-muted-foreground">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span className="text-sm">Analyzing...</span>
+              </div>
             )}
           </div>
         )}
@@ -190,17 +230,8 @@ export const WatchPhotoUpload = ({ onIdentified, onPhotoUploaded, onContinueToFo
                 disabled={isProcessing}
                 onClick={() => document.getElementById('watch-photo-input')?.click()}
               >
-                {isProcessing ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Analyzing...
-                  </>
-                ) : (
-                  <>
-                    <Upload className="w-4 h-4 mr-2" />
-                    Upload Photo
-                  </>
-                )}
+                <Upload className="w-4 h-4 mr-2" />
+                Upload Photo
               </Button>
               <Button
                 type="button"
