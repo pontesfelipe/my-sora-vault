@@ -67,6 +67,7 @@ const Log = () => {
   const [watchSearch, setWatchSearch] = useState("");
   const [showAddWatch, setShowAddWatch] = useState(false);
   const [addWatchPrefill, setAddWatchPrefill] = useState<any>(null);
+  const [rejectedSuggestions, setRejectedSuggestions] = useState<Array<{ brand: string; model: string }>>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const uploadInputRef = useRef<HTMLInputElement>(null);
 
