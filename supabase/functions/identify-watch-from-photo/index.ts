@@ -11,6 +11,10 @@ const corsHeaders = {
 // Input validation schema - limit image payload to ~10MB
 const inputSchema = z.object({
   image: z.string().min(1).max(15000000, 'Image too large (max 10MB)'),
+  excluded_suggestions: z.array(z.object({
+    brand: z.string(),
+    model: z.string(),
+  })).optional().default([]),
 });
 
 const isLikelyBase64 = (value: string) => {
