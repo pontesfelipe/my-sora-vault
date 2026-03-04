@@ -1545,6 +1545,33 @@ export type Database = {
           },
         ]
       }
+      watch_id_rejections: {
+        Row: {
+          created_at: string
+          id: string
+          image_context: string | null
+          rejected_brand: string
+          rejected_model: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_context?: string | null
+          rejected_brand: string
+          rejected_model: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_context?: string | null
+          rejected_brand?: string
+          rejected_model?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       watch_specs: {
         Row: {
           band: string | null
