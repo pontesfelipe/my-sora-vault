@@ -119,11 +119,12 @@ export function DocumentationTab() {
                 <h3 className="text-lg font-semibold mb-3">Backend Functions</h3>
                 <div className="grid gap-2 text-sm">
                   {[
+                    { name: "admin-reset-password", desc: "Admin password reset" },
+                    { name: "admin-user-providers", desc: "User auth providers" },
                     { name: "analyze-collection", desc: "AI analysis of collection" },
                     { name: "analyze-sentiment", desc: "Sentiment analysis for notes" },
                     { name: "analyze-taste-profile", desc: "AI taste profile analysis" },
                     { name: "analyze-watch-metadata", desc: "Extract watch metadata" },
-                    { name: "check-user-access", desc: "Verify user permissions" },
                     { name: "delete-user", desc: "Complete user deletion" },
                     { name: "extract-warranty-info", desc: "OCR warranty cards" },
                     { name: "fetch-watch-price", desc: "Get market prices" },
@@ -132,7 +133,6 @@ export function DocumentationTab() {
                     { name: "import-spreadsheet-data", desc: "Bulk data import" },
                     { name: "search-watch-info", desc: "Search watch database" },
                     { name: "suggest-watches", desc: "AI watch suggestions" },
-                    { name: "update-all-watch-prices", desc: "Batch price update" },
                     { name: "vault-pal-chat", desc: "AI assistant chatbot" },
                   ].map((fn) => (
                     <div key={fn.name} className="flex justify-between p-2 border rounded">
