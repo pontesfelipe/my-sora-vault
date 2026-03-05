@@ -58,12 +58,12 @@ const Settings = () => {
         body: { userId: user.id, selfDelete: true }
       });
       if (error) throw error;
-      toast.success("Account deleted successfully");
+      toast.success(t("settings.accountDeleted"));
       await signOut();
       navigate("/auth");
     } catch (error: any) {
       console.error("Error deleting account:", error);
-      toast.error(error.message || "Failed to delete account");
+      toast.error(error.message || t("settings.failedDeleteAccount"));
     } finally {
       setDeleting(false);
       setShowDeleteConfirm(false);
@@ -73,24 +73,24 @@ const Settings = () => {
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newPassword !== confirmPassword) {
-      toast.error("New passwords do not match");
+      toast.error(t("settings.passwordsDoNotMatch"));
       return;
     }
     if (newPassword.length < 6) {
-      toast.error("Password must be at least 6 characters");
+      toast.error(t("settings.passwordTooShort"));
       return;
     }
     setChangingPassword(true);
     try {
       const { error } = await supabase.auth.updateUser({ password: newPassword });
       if (error) throw error;
-      toast.success("Password changed successfully");
+      toast.success(t("settings.passwordChanged"));
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
     } catch (error: any) {
       console.error("Error changing password:", error);
-      toast.error(error.message || "Failed to change password");
+      toast.error(error.message || t("settings.failedChangePassword"));
     } finally {
       setChangingPassword(false);
     }

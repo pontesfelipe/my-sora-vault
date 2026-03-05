@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -27,6 +28,7 @@ interface PreferencesData {
 }
 
 export function ProfileSettingsCard() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -50,10 +52,8 @@ export function ProfileSettingsCard() {
   useEffect(() => {
     const fetchProfile = async () => {
       if (!user) return;
-
       setLoading(true);
       try {
-        // Fetch profile
         const { data: profileData } = await supabase
           .from("profiles")
           .select("full_name, username, country, state, city, avatar_url, avatar_color")
@@ -72,7 +72,6 @@ export function ProfileSettingsCard() {
           });
         }
 
-        // Fetch preferences
         const { data: prefsData } = await supabase
           .from("user_preferences")
           .select("trade_match_scope")
@@ -90,32 +89,23 @@ export function ProfileSettingsCard() {
         setLoading(false);
       }
     };
-
     fetchProfile();
   }, [user]);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file || !user) return;
-
-    // Validate file type
     if (!file.type.startsWith("image/")) {
-      toast.error("Please upload an image file");
+      toast.error(t("settings.uploadImageFile"));
       return;
     }
-
-    // Validate file size (max 5MB for cropping, final will be smaller)
     if (file.size > 5 * 1024 * 1024) {
-      toast.error("Image must be less than 5MB");
+      toast.error(t("settings.imageTooLarge"));
       return;
     }
-
-    // Create object URL for cropping
     const imageUrl = URL.createObjectURL(file);
     setImageToCrop(imageUrl);
     setCropDialogOpen(true);
-    
-    // Reset file input
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -123,44 +113,27 @@ export function ProfileSettingsCard() {
 
   const handleCroppedAvatar = async (croppedBlob: Blob) => {
     if (!user) return;
-
     setUploadingAvatar(true);
     try {
       const filePath = `${user.id}/avatar.jpg`;
-
-      // Upload to storage
       const { error: uploadError } = await supabase.storage
         .from("avatars")
-        .upload(filePath, croppedBlob, { 
-          upsert: true,
-          contentType: "image/jpeg"
-        });
-
+        .upload(filePath, croppedBlob, { upsert: true, contentType: "image/jpeg" });
       if (uploadError) throw uploadError;
-
-      // Get public URL with cache-busting
-      const { data: { publicUrl } } = supabase.storage
-        .from("avatars")
-        .getPublicUrl(filePath);
-
+      const { data: { publicUrl } } = supabase.storage.from("avatars").getPublicUrl(filePath);
       const avatarUrlWithTimestamp = `${publicUrl}?t=${Date.now()}`;
-
-      // Update profile with new avatar URL
       const { error: updateError } = await supabase
         .from("profiles")
         .update({ avatar_url: avatarUrlWithTimestamp })
         .eq("id", user.id);
-
       if (updateError) throw updateError;
-
       setProfile({ ...profile, avatar_url: avatarUrlWithTimestamp });
-      toast.success("Avatar uploaded successfully");
+      toast.success(t("settings.avatarUploaded"));
     } catch (error) {
       console.error("Error uploading avatar:", error);
-      toast.error("Failed to upload avatar");
+      toast.error(t("settings.failedUploadAvatar"));
     } finally {
       setUploadingAvatar(false);
-      // Clean up object URL
       if (imageToCrop) {
         URL.revokeObjectURL(imageToCrop);
         setImageToCrop(null);
@@ -170,30 +143,21 @@ export function ProfileSettingsCard() {
 
   const handleRemoveAvatar = async () => {
     if (!user) return;
-
     try {
-      // Update profile to remove avatar URL
-      const { error } = await supabase
-        .from("profiles")
-        .update({ avatar_url: null })
-        .eq("id", user.id);
-
+      const { error } = await supabase.from("profiles").update({ avatar_url: null }).eq("id", user.id);
       if (error) throw error;
-
       setProfile({ ...profile, avatar_url: null });
-      toast.success("Avatar removed");
+      toast.success(t("settings.avatarRemoved"));
     } catch (error) {
       console.error("Error removing avatar:", error);
-      toast.error("Failed to remove avatar");
+      toast.error(t("settings.failedRemoveAvatar"));
     }
   };
 
   const handleSave = async () => {
     if (!user) return;
-
     setSaving(true);
     try {
-      // Update profile
       const { error: profileError } = await supabase
         .from("profiles")
         .update({
@@ -205,26 +169,20 @@ export function ProfileSettingsCard() {
           avatar_color: profile.avatar_color,
         })
         .eq("id", user.id);
-
       if (profileError) throw profileError;
 
-      // Upsert preferences
       const { error: prefsError } = await supabase
         .from("user_preferences")
-        .upsert({
-          user_id: user.id,
-          trade_match_scope: preferences.trade_match_scope,
-        }, { onConflict: "user_id" });
-
+        .upsert({ user_id: user.id, trade_match_scope: preferences.trade_match_scope }, { onConflict: "user_id" });
       if (prefsError) throw prefsError;
 
-      toast.success("Profile updated successfully");
+      toast.success(t("settings.profileUpdated"));
     } catch (error: any) {
       console.error("Error saving profile:", error);
       if (error.code === "23505") {
-        toast.error("Username is already taken");
+        toast.error(t("settings.usernameTaken"));
       } else {
-        toast.error("Failed to save profile");
+        toast.error(t("settings.failedSaveProfile"));
       }
     } finally {
       setSaving(false);
@@ -243,240 +201,122 @@ export function ProfileSettingsCard() {
 
   return (
     <div className="space-y-6">
-      {/* Avatar Settings Card */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Palette className="h-5 w-5" />
-            Avatar
+            {t("settings.avatar")}
           </CardTitle>
-          <CardDescription>
-            Customize your avatar with a photo or choose a color for your initials.
-          </CardDescription>
+          <CardDescription>{t("settings.avatarDesc")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Avatar Preview */}
           <div className="flex items-center gap-4">
-            <UserAvatar
-              username={profile.username}
-              fullName={profile.full_name}
-              avatarUrl={profile.avatar_url}
-              avatarColor={profile.avatar_color}
-              size="lg"
-              className="h-16 w-16 text-xl"
-            />
+            <UserAvatar username={profile.username} fullName={profile.full_name} avatarUrl={profile.avatar_url} avatarColor={profile.avatar_color} size="lg" className="h-16 w-16 text-xl" />
             <div className="space-y-2">
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleFileSelect}
-                className="hidden"
-              />
+              <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileSelect} className="hidden" />
               <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={uploadingAvatar}
-                >
-                  {uploadingAvatar ? (
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  ) : (
-                    <Upload className="h-4 w-4 mr-2" />
-                  )}
-                  Upload Photo
+                <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} disabled={uploadingAvatar}>
+                  {uploadingAvatar ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Upload className="h-4 w-4 mr-2" />}
+                  {t("settings.uploadPhoto")}
                 </Button>
                 {profile.avatar_url && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleRemoveAvatar}
-                  >
+                  <Button variant="ghost" size="sm" onClick={handleRemoveAvatar}>
                     <X className="h-4 w-4 mr-2" />
-                    Remove
+                    {t("settings.remove")}
                   </Button>
                 )}
               </div>
-              <p className="text-xs text-muted-foreground">
-                JPG, PNG or GIF. Max 2MB.
-              </p>
+              <p className="text-xs text-muted-foreground">{t("settings.avatarFileHint")}</p>
             </div>
           </div>
 
-          {/* Color Picker */}
           <div className="space-y-2">
-            <Label>Avatar Color (for initials)</Label>
-            <p className="text-xs text-muted-foreground mb-2">
-              This color shows when you don't have a photo, or as a fallback.
-            </p>
+            <Label>{t("settings.avatarColor")}</Label>
+            <p className="text-xs text-muted-foreground mb-2">{t("settings.avatarColorDesc")}</p>
             <div className="flex flex-wrap gap-2">
               {AVATAR_COLORS.map((color) => (
-                <button
-                  key={color.value}
-                  type="button"
-                  onClick={() => setProfile({ ...profile, avatar_color: color.value })}
-                  className={cn(
-                    "w-8 h-8 rounded-full transition-all",
-                    color.value,
-                    profile.avatar_color === color.value
-                      ? "ring-2 ring-offset-2 ring-primary"
-                      : "hover:scale-110"
-                  )}
-                  title={color.name}
-                />
+                <button key={color.value} type="button" onClick={() => setProfile({ ...profile, avatar_color: color.value })} className={cn("w-8 h-8 rounded-full transition-all", color.value, profile.avatar_color === color.value ? "ring-2 ring-offset-2 ring-primary" : "hover:scale-110")} title={color.name} />
               ))}
-              <button
-                type="button"
-                onClick={() => setProfile({ ...profile, avatar_color: null })}
-                className={cn(
-                  "w-8 h-8 rounded-full border-2 border-dashed border-muted-foreground/50 flex items-center justify-center text-xs text-muted-foreground transition-all",
-                  profile.avatar_color === null
-                    ? "ring-2 ring-offset-2 ring-primary"
-                    : "hover:scale-110"
-                )}
-                title="Auto (based on username)"
-              >
-                A
-              </button>
+              <button type="button" onClick={() => setProfile({ ...profile, avatar_color: null })} className={cn("w-8 h-8 rounded-full border-2 border-dashed border-muted-foreground/50 flex items-center justify-center text-xs text-muted-foreground transition-all", profile.avatar_color === null ? "ring-2 ring-offset-2 ring-primary" : "hover:scale-110")} title={t("settings.autoColor")}>A</button>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Profile Information Card */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <User className="h-5 w-5" />
-            Profile Information
+            {t("settings.profileInfo")}
           </CardTitle>
-          <CardDescription>
-            Your username is displayed in chats and forums to protect your privacy. You can change it anytime.
-          </CardDescription>
+          <CardDescription>{t("settings.profileInfoDesc")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="username">Username (public)</Label>
-              <Input
-                id="username"
-                value={profile.username}
-                onChange={(e) => setProfile({ ...profile, username: e.target.value })}
-                placeholder="Your public username"
-              />
-              <p className="text-xs text-muted-foreground">
-                This is shown in chats, forums, and messages
-              </p>
+              <Label htmlFor="username">{t("settings.usernamePublic")}</Label>
+              <Input id="username" value={profile.username} onChange={(e) => setProfile({ ...profile, username: e.target.value })} placeholder={t("settings.usernamePlaceholder")} />
+              <p className="text-xs text-muted-foreground">{t("settings.usernameHint")}</p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="full_name">Full Name (private)</Label>
-              <Input
-                id="full_name"
-                value={profile.full_name}
-                onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
-                placeholder="Your real name (optional)"
-              />
-              <p className="text-xs text-muted-foreground">
-                Only visible to you in settings
-              </p>
+              <Label htmlFor="full_name">{t("settings.fullNamePrivate")}</Label>
+              <Input id="full_name" value={profile.full_name} onChange={(e) => setProfile({ ...profile, full_name: e.target.value })} placeholder={t("settings.fullNamePlaceholder")} />
+              <p className="text-xs text-muted-foreground">{t("settings.fullNameHint")}</p>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Location Card */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <MapPin className="h-5 w-5" />
-            Location
+            {t("settings.location")}
           </CardTitle>
-          <CardDescription>
-            Your location helps match you with nearby collectors for trades.
-          </CardDescription>
+          <CardDescription>{t("settings.locationDesc")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="space-y-2">
-              <Label htmlFor="country">Country</Label>
-              <Input
-                id="country"
-                value={profile.country}
-                onChange={(e) => setProfile({ ...profile, country: e.target.value })}
-                placeholder="e.g., United States"
-              />
+              <Label htmlFor="country">{t("settings.country")}</Label>
+              <Input id="country" value={profile.country} onChange={(e) => setProfile({ ...profile, country: e.target.value })} placeholder={t("settings.countryPlaceholder")} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="state">State/Region</Label>
-              <Input
-                id="state"
-                value={profile.state}
-                onChange={(e) => setProfile({ ...profile, state: e.target.value })}
-                placeholder="e.g., California"
-              />
+              <Label htmlFor="state">{t("settings.stateRegion")}</Label>
+              <Input id="state" value={profile.state} onChange={(e) => setProfile({ ...profile, state: e.target.value })} placeholder={t("settings.statePlaceholder")} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="city">City</Label>
-              <Input
-                id="city"
-                value={profile.city}
-                onChange={(e) => setProfile({ ...profile, city: e.target.value })}
-                placeholder="e.g., San Francisco"
-              />
+              <Label htmlFor="city">{t("settings.city")}</Label>
+              <Input id="city" value={profile.city} onChange={(e) => setProfile({ ...profile, city: e.target.value })} placeholder={t("settings.cityPlaceholder")} />
             </div>
           </div>
 
           <div className="space-y-2 pt-4 border-t">
-            <Label htmlFor="trade_scope">Trade Match Preference</Label>
-            <Select
-              value={preferences.trade_match_scope}
-              onValueChange={(value) => setPreferences({ ...preferences, trade_match_scope: value })}
-            >
+            <Label htmlFor="trade_scope">{t("settings.tradeMatchPref")}</Label>
+            <Select value={preferences.trade_match_scope} onValueChange={(value) => setPreferences({ ...preferences, trade_match_scope: value })}>
               <SelectTrigger id="trade_scope" className="w-full sm:w-[280px]">
-                <SelectValue placeholder="Select matching scope" />
+                <SelectValue placeholder={t("settings.selectMatchScope")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="global">Global (anywhere in the world)</SelectItem>
-                <SelectItem value="same_country">Same Country Only</SelectItem>
-                <SelectItem value="same_state">Same State/Region Only</SelectItem>
-                <SelectItem value="same_city">Same City Only</SelectItem>
+                <SelectItem value="global">{t("settings.scopeGlobal")}</SelectItem>
+                <SelectItem value="same_country">{t("settings.scopeCountry")}</SelectItem>
+                <SelectItem value="same_state">{t("settings.scopeState")}</SelectItem>
+                <SelectItem value="same_city">{t("settings.scopeCity")}</SelectItem>
               </SelectContent>
             </Select>
-            <p className="text-xs text-muted-foreground">
-              Only receive trade match notifications from collectors in your selected area.
-            </p>
+            <p className="text-xs text-muted-foreground">{t("settings.tradeMatchHint")}</p>
           </div>
         </CardContent>
       </Card>
 
       <div className="flex justify-end">
         <Button onClick={handleSave} disabled={saving}>
-          {saving ? (
-            <>
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              Saving...
-            </>
-          ) : (
-            "Save Changes"
-          )}
+          {saving ? (<><Loader2 className="h-4 w-4 mr-2 animate-spin" />{t("settings.saving")}</>) : t("settings.saveChanges")}
         </Button>
       </div>
 
-      {/* Avatar Crop Dialog */}
       {imageToCrop && (
-        <AvatarCropDialog
-          open={cropDialogOpen}
-          onOpenChange={(open) => {
-            setCropDialogOpen(open);
-            if (!open && imageToCrop) {
-              URL.revokeObjectURL(imageToCrop);
-              setImageToCrop(null);
-            }
-          }}
-          imageSrc={imageToCrop}
-          onCropComplete={handleCroppedAvatar}
-        />
+        <AvatarCropDialog open={cropDialogOpen} onOpenChange={(open) => { setCropDialogOpen(open); if (!open && imageToCrop) { URL.revokeObjectURL(imageToCrop); setImageToCrop(null); } }} imageSrc={imageToCrop} onCropComplete={handleCroppedAvatar} />
       )}
     </div>
   );
