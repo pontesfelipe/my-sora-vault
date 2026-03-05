@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Camera, Upload, Loader2, AlertCircle, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -36,6 +36,22 @@ export const WatchPhotoUpload = ({ onIdentified, onPhotoUploaded, onContinueToFo
   const [identifiedWatch, setIdentifiedWatch] = useState<WatchInfo | null>(null);
   const [rejectedSuggestions, setRejectedSuggestions] = useState<Array<{ brand: string; model: string }>>([]);
   const [cameraOpen, setCameraOpen] = useState(false);
+  const uploadInputRef = useRef<HTMLInputElement>(null);
+  const captureInputRef = useRef<HTMLInputElement>(null);
+
+  const isIPhone = typeof navigator !== "undefined" && (
+    /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
+  );
+
+  const openCamera = () => {
+    if (isIPhone) {
+      captureInputRef.current?.click();
+      return;
+    }
+
+    setCameraOpen(true);
+  };
 
   const identifyFromImage = async (base64Image: string, exclusions: Array<{ brand: string; model: string }>) => {
     setIsProcessing(true);
@@ -127,15 +143,18 @@ export const WatchPhotoUpload = ({ onIdentified, onPhotoUploaded, onContinueToFo
 
     if (!file.type.startsWith('image/')) {
       toast.error('Please select an image file');
+      e.target.value = '';
       return;
     }
 
     if (file.size > 10 * 1024 * 1024) {
       toast.error('Image must be less than 10MB');
+      e.target.value = '';
       return;
     }
 
     processImage(file);
+    e.target.value = '';
   };
 
   const handleCameraCapture = async (base64Image: string) => {
@@ -253,7 +272,7 @@ export const WatchPhotoUpload = ({ onIdentified, onPhotoUploaded, onContinueToFo
                 variant="outline"
                 className="flex-1"
                 disabled={isProcessing}
-                onClick={() => document.getElementById('watch-photo-input')?.click()}
+                onClick={() => uploadInputRef.current?.click()}
               >
                 <Upload className="w-4 h-4 mr-2" />
                 Upload Photo
@@ -263,15 +282,26 @@ export const WatchPhotoUpload = ({ onIdentified, onPhotoUploaded, onContinueToFo
                 variant="outline"
                 className="flex-1"
                 disabled={isProcessing}
-                onClick={() => setCameraOpen(true)}
+                onClick={openCamera}
               >
                 <Camera className="w-4 h-4 mr-2" />
                 Take a Photo
               </Button>
               <input
+                ref={uploadInputRef}
                 id="watch-photo-input"
                 type="file"
                 accept="image/*"
+                className="hidden"
+                onChange={handleFileSelect}
+                disabled={isProcessing}
+              />
+              <input
+                ref={captureInputRef}
+                id="watch-photo-capture-input"
+                type="file"
+                accept="image/*"
+                capture="environment"
                 className="hidden"
                 onChange={handleFileSelect}
                 disabled={isProcessing}
@@ -296,6 +326,10 @@ export const WatchPhotoUpload = ({ onIdentified, onPhotoUploaded, onContinueToFo
       open={cameraOpen}
       onClose={() => setCameraOpen(false)}
       onCapture={handleCameraCapture}
+      onFallbackToUpload={() => {
+        setCameraOpen(false);
+        captureInputRef.current?.click();
+      }}
     />
     </>
   );
