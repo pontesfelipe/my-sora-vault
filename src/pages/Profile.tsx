@@ -164,8 +164,8 @@ const Profile = () => {
     } catch (error: any) {
       console.error("Error generating suggestions:", error);
       toast({
-        title: "Error",
-        description: error.message || "Failed to generate suggestions",
+        title: t("common.error"),
+        description: error.message || t("profile.failedGenerateSuggestions"),
         variant: "destructive",
       });
     } finally {

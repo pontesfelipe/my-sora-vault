@@ -306,7 +306,8 @@
     "cleared": "Limpo",
     "aiSuggestionsRemoved": "As sugestões de IA foram removidas",
     "monthlyLimitTitle": "Limite mensal atingido",
-    "monthlyLimitDesc": "Você usou todas as sugestões de IA da lista de desejos neste mês. Reinicia no próximo mês."
+    "monthlyLimitDesc": "Você usou todas as sugestões de IA da lista de desejos neste mês. Reinicia no próximo mês.",
+    "failedGenerateSuggestions": "Falha ao gerar sugestões"
   },
   "settings": {
     "title": "Configurações",
@@ -485,6 +486,10 @@
     "twoFactorDisabledToast": "Autenticação de dois fatores desativada",
     "signedOutOther": "Sessão encerrada em outros dispositivos",
     "signedOutAll": "Sessão encerrada em todos os dispositivos"
+  },
+  "notFound": {
+    "pageNotFound": "Ops! Página não encontrada",
+    "returnHome": "Voltar para o início"
   },
   "common": {
     "loading": "Carregando...",

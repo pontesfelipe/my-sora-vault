@@ -306,7 +306,8 @@
     "cleared": "クリア済み",
     "aiSuggestionsRemoved": "AIの提案が削除されました",
     "monthlyLimitTitle": "月間制限に達しました",
-    "monthlyLimitDesc": "今月のAIウィッシュリスト提案をすべて使い切りました。来月にリセットされます。"
+    "monthlyLimitDesc": "今月のAIウィッシュリスト提案をすべて使い切りました。来月にリセットされます。",
+    "failedGenerateSuggestions": "提案の生成に失敗しました"
   },
   "settings": {
     "title": "設定",

@@ -306,7 +306,8 @@
     "cleared": "Cleared",
     "aiSuggestionsRemoved": "AI suggestions have been removed",
     "monthlyLimitTitle": "Monthly Limit Reached",
-    "monthlyLimitDesc": "You've used all AI wishlist suggestions this month. Resets next month."
+    "monthlyLimitDesc": "You've used all AI wishlist suggestions this month. Resets next month.",
+    "failedGenerateSuggestions": "Failed to generate suggestions"
   },
   "settings": {
     "title": "Settings",
@@ -485,6 +486,10 @@
     "twoFactorDisabledToast": "Two-factor authentication disabled",
     "signedOutOther": "Signed out from other devices",
     "signedOutAll": "Signed out from all devices"
+  },
+  "notFound": {
+    "pageNotFound": "Oops! Page not found",
+    "returnHome": "Return to Home"
   },
   "common": {
     "loading": "Loading...",

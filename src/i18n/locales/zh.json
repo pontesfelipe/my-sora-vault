@@ -306,7 +306,8 @@
     "cleared": "已清除",
     "aiSuggestionsRemoved": "AI建议已删除",
     "monthlyLimitTitle": "已达月度限制",
-    "monthlyLimitDesc": "您已用完本月所有AI心愿单建议。下月将重置。"
+    "monthlyLimitDesc": "您已用完本月所有AI心愿单建议。下月将重置。",
+    "failedGenerateSuggestions": "生成建议失败"
   },
   "settings": {
     "title": "设置",
