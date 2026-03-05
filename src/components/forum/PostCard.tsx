@@ -82,7 +82,7 @@ export function PostCard({ post, onVote, onDelete, onEdit, onTogglePin }: PostCa
                       {post.is_pinned && (
                         <Badge variant="default" className="text-xs gap-1 bg-accent">
                           <Pin className="h-3 w-3" />
-                          Pinned
+                          {t("feed.pinned")}
                         </Badge>
                       )}
                       <Badge variant="secondary" className="text-xs">
@@ -108,7 +108,7 @@ export function PostCard({ post, onVote, onDelete, onEdit, onTogglePin }: PostCa
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent>
-                        {post.is_pinned ? 'Unpin post' : 'Pin post'}
+                        {post.is_pinned ? t("feed.unpinPost") : t("feed.pinPost")}
                       </TooltipContent>
                     </Tooltip>
                   )}
@@ -131,18 +131,18 @@ export function PostCard({ post, onVote, onDelete, onEdit, onTogglePin }: PostCa
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
-                          <AlertDialogTitle>Delete post?</AlertDialogTitle>
+                          <AlertDialogTitle>{t("feed.deletePost")}</AlertDialogTitle>
                           <AlertDialogDescription>
-                            This action cannot be undone. This will permanently delete the post and all its comments.
+                            {t("feed.deletePostDescription")}
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogCancel>{t("feed.cancel")}</AlertDialogCancel>
                           <AlertDialogAction
                             onClick={() => onDelete(post.id)}
                             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                           >
-                            Delete
+                            {t("feed.delete")}
                           </AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>
@@ -175,7 +175,7 @@ export function PostCard({ post, onVote, onDelete, onEdit, onTogglePin }: PostCa
                   onClick={() => setShowComments(!showComments)}
                 >
                   <MessageCircle className="h-4 w-4" />
-                  {post.comments_count} {post.comments_count === 1 ? 'comment' : 'comments'}
+                  {post.comments_count === 1 ? t("feed.comment", { count: post.comments_count }) : t("feed.comments", { count: post.comments_count })}
                   {showComments ? (
                     <ChevronUp className="h-4 w-4" />
                   ) : (
