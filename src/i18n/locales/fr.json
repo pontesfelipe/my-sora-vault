@@ -499,5 +499,12 @@
     "error": "Une erreur est survenue",
     "success": "Succès",
     "mode": "mode"
+  },
+  "search": {
+    "placeholder": "Rechercher montres, personnes...",
+    "clear": "Effacer la recherche",
+    "searching": "Recherche en cours...",
+    "noResults": "Aucun résultat pour \"{{query}}\"",
+    "logAsWristCheck": "Enregistrer \"{{query}}\" comme wrist check"
   }
 }

@@ -503,5 +503,12 @@
     "error": "Ocorreu um erro",
     "success": "Sucesso",
     "mode": "modo"
+  },
+  "search": {
+    "placeholder": "Buscar relógios, pessoas...",
+    "clear": "Limpar busca",
+    "searching": "Buscando...",
+    "noResults": "Nenhum resultado para \"{{query}}\"",
+    "logAsWristCheck": "Registrar \"{{query}}\" como wrist check"
   }
 }

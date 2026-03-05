@@ -499,5 +499,12 @@
     "error": "发生错误",
     "success": "成功",
     "mode": "模式"
+  },
+  "search": {
+    "placeholder": "搜索手表、用户...",
+    "clear": "清除搜索",
+    "searching": "搜索中...",
+    "noResults": "没有找到"{{query}}"的结果",
+    "logAsWristCheck": "将"{{query}}"记录为腕表打卡"
   }
 }

@@ -499,5 +499,12 @@
     "error": "エラーが発生しました",
     "success": "成功",
     "mode": "モード"
+  },
+  "search": {
+    "placeholder": "時計、ユーザーを検索...",
+    "clear": "検索をクリア",
+    "searching": "検索中...",
+    "noResults": "「{{query}}」の結果はありません",
+    "logAsWristCheck": "「{{query}}」をリストチェックとして記録"
   }
 }
