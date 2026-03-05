@@ -11,6 +11,7 @@ import { motion } from "framer-motion";
 import { PageTransition } from "@/components/PageTransition";
 import { QuickLogSheet } from "@/components/QuickLogSheet";
 import { WearCalendar } from "@/components/WearCalendar";
+import { useTranslation } from "react-i18next";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ const Home = () => {
   const { watches, wearEntries, loading, refetch } = useWatchData(selectedCollectionId);
   const [quickLogWatch, setQuickLogWatch] = useState<any>(null);
   const [quickLogOpen, setQuickLogOpen] = useState(false);
+  const { t } = useTranslation();
 
   const handleWatchCardTap = (watch: any) => {
     setQuickLogWatch(watch);
@@ -32,6 +34,13 @@ const Home = () => {
       </div>
     );
   }
+
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return t("home.goodMorning");
+    if (hour < 17) return t("home.goodAfternoon");
+    return t("home.goodEvening");
+  };
 
   return (
     <PageTransition>
@@ -54,14 +63,14 @@ const Home = () => {
             size="lg"
           >
             <Plus className="h-5 w-5" />
-            Wrist Check
+            {t("home.wristCheck")}
           </Button>
         </motion.div>
 
         {/* Wear Calendar */}
         <section>
           <h2 className="text-sm font-semibold uppercase tracking-wider text-textMuted mb-3">
-            Wear Calendar
+            {t("home.wearCalendar")}
           </h2>
           <WearCalendar
             watches={watches}
@@ -74,13 +83,13 @@ const Home = () => {
         <section>
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-semibold uppercase tracking-wider text-textMuted">
-              Most Worn
+              {t("home.mostWorn")}
             </h2>
             <button
               onClick={() => navigate("/profile")}
               className="text-xs text-accent font-medium"
             >
-              View all
+              {t("home.viewAll")}
             </button>
           </div>
 
@@ -109,7 +118,7 @@ const Home = () => {
                   </div>
                   <p className="text-xs font-medium text-textMain truncate">{watch.brand}</p>
                   <p className="text-[11px] text-textMuted truncate">{watch.model}</p>
-                  <p className="text-[10px] text-accent font-medium">{count} days</p>
+                  <p className="text-[10px] text-accent font-medium">{t("home.days", { count })}</p>
                 </motion.div>
               ))}
           </div>
@@ -130,13 +139,6 @@ const Home = () => {
     </PageTransition>
   );
 };
-
-function getGreeting() {
-  const hour = new Date().getHours();
-  if (hour < 12) return "Good morning";
-  if (hour < 17) return "Good afternoon";
-  return "Good evening";
-}
 
 function getMostWorn(
   watches: any[],

@@ -14,12 +14,14 @@ import { useWaterUsageData } from "@/hooks/useWaterUsageData";
 import { useStatsCalculations } from "@/hooks/useStatsCalculations";
 import { useCollection } from "@/contexts/CollectionContext";
 import { getCollectionConfig } from "@/types/collection";
+import { useTranslation } from "react-i18next";
 
 const Dashboard = () => {
   const { selectedCollectionId, currentCollection, currentCollectionConfig } = useCollection();
   const { watches, wearEntries, loading: watchLoading, refetch } = useWatchData(selectedCollectionId);
   const { trips, loading: tripLoading } = useTripData();
   const { waterUsages, loading: waterLoading } = useWaterUsageData();
+  const { t } = useTranslation();
 
   const stats = useStatsCalculations(watches, wearEntries, trips, waterUsages);
   const config = currentCollectionConfig;
@@ -29,11 +31,15 @@ const Dashboard = () => {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent mx-auto"></div>
-          <p className="mt-4 text-textMuted">Loading your collection...</p>
+          <p className="mt-4 text-textMuted">{t("dashboard.loadingCollection")}</p>
         </div>
       </div>
     );
   }
+
+  const subtitle = currentCollection 
+    ? t("dashboard.overview", { name: currentCollection.name })
+    : t("dashboard.overviewGeneric", { type: config.pluralLabel.toLowerCase() });
 
   return (
     <div className="space-y-6">
@@ -41,12 +47,8 @@ const Dashboard = () => {
       <div className="flex flex-col md:hidden">
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-3xl font-semibold text-textMain">Dashboard</h1>
-            <p className="mt-1 text-sm text-textMuted">
-              {currentCollection 
-                ? `Overview of ${currentCollection.name} statistics`
-                : `Overview of your ${config.pluralLabel.toLowerCase()} collection statistics`}
-            </p>
+            <h1 className="text-3xl font-semibold text-textMain">{t("dashboard.title")}</h1>
+            <p className="mt-1 text-sm text-textMuted">{subtitle}</p>
           </div>
           <CollectionSwitcher />
         </div>
@@ -60,14 +62,10 @@ const Dashboard = () => {
         <div>
           <div className="flex items-center gap-3">
             <h1 className="text-3xl md:text-4xl font-semibold text-textMain">
-              Dashboard
+              {t("dashboard.title")}
             </h1>
           </div>
-          <p className="mt-1 text-sm text-textMuted">
-            {currentCollection 
-              ? `Overview of ${currentCollection.name} statistics`
-              : `Overview of your ${config.pluralLabel.toLowerCase()} collection statistics`}
-          </p>
+          <p className="mt-1 text-sm text-textMuted">{subtitle}</p>
         </div>
         <div className="flex items-center gap-3">
           <CollectionSwitcher />
@@ -80,70 +78,70 @@ const Dashboard = () => {
       <div className="space-y-3">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
           <StatsCard
-            title={`Total ${config.pluralLabel}`}
+            title={t("dashboard.totalItems", { type: config.pluralLabel })}
             value={stats.totalWatches}
             icon={Watch}
             variant="compact"
           />
           <StatsCard
-            title={`Total Days ${config.usageVerbPast.charAt(0).toUpperCase() + config.usageVerbPast.slice(1)}`}
+            title={t("dashboard.totalDays", { verb: config.usageVerbPast.charAt(0).toUpperCase() + config.usageVerbPast.slice(1) })}
             value={stats.totalDaysWorn}
             icon={Calendar}
             variant="compact"
           />
           <StatsCard
-            title={`Most ${config.usageVerbPast.charAt(0).toUpperCase() + config.usageVerbPast.slice(1)} ${config.singularLabel}`}
-            value={stats.mostWornWatch ? `${stats.mostWornWatch.brand} ${stats.mostWornWatch.model}` : "N/A"}
+            title={t("dashboard.mostUsedItem", { verb: config.usageVerbPast.charAt(0).toUpperCase() + config.usageVerbPast.slice(1), type: config.singularLabel })}
+            value={stats.mostWornWatch ? `${stats.mostWornWatch.brand} ${stats.mostWornWatch.model}` : t("dashboard.na")}
             icon={TrendingUp}
             variant="compact"
             itemId={stats.mostWornWatch?.id}
           />
           <StatsCard
-            title={`Avg Days/${config.singularLabel}`}
+            title={t("dashboard.avgDaysPerItem", { type: config.singularLabel })}
             value={stats.avgDaysPerWatch}
             icon={Target}
             variant="compact"
           />
           <StatsCard
-            title={`Most ${config.usageVerbPast.charAt(0).toUpperCase() + config.usageVerbPast.slice(1)} ${config.primaryColorLabel}`}
-            value={stats.mostWornDialColor || "N/A"}
+            title={t("dashboard.mostUsedColor", { verb: config.usageVerbPast.charAt(0).toUpperCase() + config.usageVerbPast.slice(1), color: config.primaryColorLabel })}
+            value={stats.mostWornDialColor || t("dashboard.na")}
             icon={Palette}
             variant="compact"
           />
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
           <StatsCard
-            title={`Most ${config.usageVerbPast.charAt(0).toUpperCase() + config.usageVerbPast.slice(1)} ${config.typeLabel}`}
-            value={stats.mostWornStyle || "N/A"}
+            title={t("dashboard.mostUsedType", { verb: config.usageVerbPast.charAt(0).toUpperCase() + config.usageVerbPast.slice(1), type: config.typeLabel })}
+            value={stats.mostWornStyle || t("dashboard.na")}
             icon={Target}
             variant="compact"
           />
           <StatsCard
-            title="Trending (30 Days)"
-            value={stats.trendingWatch ? `${stats.trendingWatch.brand} ${stats.trendingWatch.model}` : "N/A"}
+            title={t("dashboard.trending30Days")}
+            value={stats.trendingWatch ? `${stats.trendingWatch.brand} ${stats.trendingWatch.model}` : t("dashboard.na")}
             icon={Flame}
             variant="compact"
             itemId={stats.trendingWatch?.id}
           />
           <StatsCard
-            title="Trending Down (90d)"
-            value={stats.trendingDownWatch ? `${stats.trendingDownWatch.brand} ${stats.trendingDownWatch.model}` : "N/A"}
+            title={t("dashboard.trendingDown90d")}
+            value={stats.trendingDownWatch ? `${stats.trendingDownWatch.brand} ${stats.trendingDownWatch.model}` : t("dashboard.na")}
             subtitle={stats.trendingDownCount ? `${stats.trendingDownCount} ${config.pluralLabel.toLowerCase()} ↓` : undefined}
             icon={TrendingDown}
             variant="compact"
             itemId={stats.trendingDownWatch?.id}
           />
           <StatsCard
-            title={`#1 Trip ${config.singularLabel}`}
-            value={stats.topTripWatch ? `${stats.topTripWatch.brand} ${stats.topTripWatch.model}` : "N/A"}
+            title={t("dashboard.topTripItem", { type: config.singularLabel })}
+            value={stats.topTripWatch ? `${stats.topTripWatch.brand} ${stats.topTripWatch.model}` : t("dashboard.na")}
             icon={Plane}
             variant="compact"
             itemId={stats.topTripWatch?.id}
           />
           {true && (
             <StatsCard
-              title="#1 Water Usage"
-              value={stats.topWaterWatch ? `${stats.topWaterWatch.brand} ${stats.topWaterWatch.model}` : "N/A"}
+              title={t("dashboard.topWaterUsage")}
+              value={stats.topWaterWatch ? `${stats.topWaterWatch.brand} ${stats.topWaterWatch.model}` : t("dashboard.na")}
               icon={Droplets}
               variant="compact"
               itemId={stats.topWaterWatch?.id}
@@ -160,7 +158,7 @@ const Dashboard = () => {
       {stats.watchesWithResaleDataCount > 0 && (
         <div className="space-y-6">
           <div>
-            <h2 className="text-2xl font-semibold mb-4 text-textMain">Collection Value & Depreciation</h2>
+            <h2 className="text-2xl font-semibold mb-4 text-textMain">{t("dashboard.collectionValue")}</h2>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
               <DepreciationCard
                 totalMSRP={stats.totalMSRP}
@@ -170,11 +168,11 @@ const Dashboard = () => {
                 depreciationPercent={stats.depreciationPercentage}
               />
               <StatsCard
-                title="Most Depreciated"
+                title={t("dashboard.mostDepreciated")}
                 value={
                   stats.mostDepreciatedWatch
                     ? `${stats.mostDepreciatedWatch.watch.brand} ${stats.mostDepreciatedWatch.watch.model}`
-                    : "N/A"
+                    : t("dashboard.na")
                 }
                 subtitle={
                   stats.mostDepreciatedWatch
@@ -186,11 +184,11 @@ const Dashboard = () => {
                 itemId={stats.mostDepreciatedWatch?.watch.id}
               />
               <StatsCard
-                title="Best Value Retention"
+                title={t("dashboard.bestValueRetention")}
                 value={
                   stats.bestValueRetention
                     ? `${stats.bestValueRetention.watch.brand} ${stats.bestValueRetention.watch.model}`
-                    : "N/A"
+                    : t("dashboard.na")
                 }
                 subtitle={
                   stats.bestValueRetention
@@ -207,7 +205,10 @@ const Dashboard = () => {
             {stats.appreciatingWatchesCount > 0 && (
               <div className="mb-4">
                 <p className="text-sm text-muted-foreground">
-                  {stats.appreciatingWatchesCount} {stats.appreciatingWatchesCount > 1 ? config.pluralLabel.toLowerCase() : config.singularLabel.toLowerCase()} currently worth more than purchase price
+                  {t("dashboard.appreciatingItems", { 
+                    count: stats.appreciatingWatchesCount, 
+                    type: stats.appreciatingWatchesCount > 1 ? config.pluralLabel.toLowerCase() : config.singularLabel.toLowerCase() 
+                  })}
                 </p>
               </div>
             )}

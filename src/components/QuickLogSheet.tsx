@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
+import { useTranslation } from "react-i18next";
 
 interface QuickLogSheetProps {
   open: boolean;
@@ -18,6 +19,7 @@ export function QuickLogSheet({ open, onOpenChange, watch, onSuccess }: QuickLog
   const [loading, setLoading] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const handleLogToday = async () => {
     if (!watch || !user) return;
@@ -26,7 +28,6 @@ export function QuickLogSheet({ open, onOpenChange, watch, onSuccess }: QuickLog
     const today = format(new Date(), "yyyy-MM-dd");
 
     try {
-      // Check if already logged today
       const { data: existing } = await supabase
         .from("wear_entries")
         .select("id")
@@ -36,7 +37,7 @@ export function QuickLogSheet({ open, onOpenChange, watch, onSuccess }: QuickLog
         .maybeSingle();
 
       if (existing) {
-        toast({ title: "Already logged", description: `${watch.brand} ${watch.model} is already logged for today.` });
+        toast({ title: t("quickLog.alreadyLogged"), description: t("quickLog.alreadyLoggedDesc", { name: `${watch.brand} ${watch.model}` }) });
         onOpenChange(false);
         return;
       }
@@ -50,11 +51,11 @@ export function QuickLogSheet({ open, onOpenChange, watch, onSuccess }: QuickLog
 
       if (error) throw error;
 
-      toast({ title: "Wrist check logged!", description: `${watch.brand} ${watch.model} — ${format(new Date(), "EEEE, MMM d")}` });
+      toast({ title: t("quickLog.wristCheckLogged"), description: `${watch.brand} ${watch.model} — ${format(new Date(), "EEEE, MMM d")}` });
       onSuccess();
       onOpenChange(false);
     } catch {
-      toast({ title: "Error", description: "Failed to log wear entry", variant: "destructive" });
+      toast({ title: t("quickLog.errorTitle"), description: t("quickLog.errorDesc"), variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -66,11 +67,10 @@ export function QuickLogSheet({ open, onOpenChange, watch, onSuccess }: QuickLog
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent className="px-4 pb-8">
         <DrawerHeader className="text-center pb-2">
-          <DrawerTitle className="text-lg">Quick Log</DrawerTitle>
+          <DrawerTitle className="text-lg">{t("quickLog.title")}</DrawerTitle>
         </DrawerHeader>
 
         <div className="flex flex-col items-center gap-4">
-          {/* Watch preview */}
           <div className="h-20 w-20 rounded-2xl bg-surfaceMuted overflow-hidden">
             {watch.ai_image_url ? (
               <img src={watch.ai_image_url} alt={`${watch.brand} ${watch.model}`} className="h-full w-full object-cover" />
@@ -101,7 +101,7 @@ export function QuickLogSheet({ open, onOpenChange, watch, onSuccess }: QuickLog
             ) : (
               <Check className="h-5 w-5" />
             )}
-            Log Today
+            {t("quickLog.logToday")}
           </Button>
         </div>
       </DrawerContent>
