@@ -1,4 +1,5 @@
 import { formatDistanceToNow } from "date-fns";
+import { useTranslation } from "react-i18next";
 import { Conversation } from "@/hooks/useMessaging";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -14,12 +15,13 @@ interface ConversationListProps {
 
 export function ConversationList({ conversations, selectedId, onSelect, onDelete }: ConversationListProps) {
   const isMobile = useIsMobile();
+  const { t } = useTranslation();
   
   if (conversations.length === 0) {
     return (
       <div className="p-4 text-center text-textMuted">
-        <p className="text-sm">No conversations yet</p>
-        <p className="text-xs mt-1">Add a friend to start chatting</p>
+        <p className="text-sm">{t("feed.noConversationsYet")}</p>
+        <p className="text-xs mt-1">{t("feed.addFriendToStart")}</p>
       </div>
     );
   }
