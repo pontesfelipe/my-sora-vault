@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,6 +27,7 @@ interface QuickAddWearDialogProps {
 }
 
 export const QuickAddWearDialog = ({ watches, onSuccess, collectionType: propType }: QuickAddWearDialogProps) => {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [selectedWatchId, setSelectedWatchId] = useState("");
@@ -195,8 +197,8 @@ export const QuickAddWearDialog = ({ watches, onSuccess, collectionType: propTyp
       if (newTotal > 1) {
         const remainingCapacity = Math.max(0, 1 - otherTotal);
         toast({
-          title: "Cannot add wear entry",
-          description: `Total wear for this date would exceed 1 day. You have ${remainingCapacity === 0 ? 'no' : remainingCapacity} remaining capacity. Other watches are already logged for ${otherTotal} day(s).`,
+          title: t("quickAddWear.cannotAdd"),
+          description: t("quickAddWear.exceedsDay", { remaining: remainingCapacity === 0 ? t("quickAddWear.noRemaining") : remainingCapacity, other: otherTotal }),
           variant: "destructive",
         });
         setLoading(false);
@@ -227,8 +229,8 @@ export const QuickAddWearDialog = ({ watches, onSuccess, collectionType: propTyp
           }
 
           toast({
-            title: "Adjusted existing entry",
-            description: `${watchNames} was logged for a full day on this date. Changed to half day to accommodate this entry.`,
+            title: t("quickAddWear.adjustedEntry"),
+            description: t("quickAddWear.adjustedDesc", { watches: watchNames }),
           });
         }
       }
@@ -265,8 +267,8 @@ export const QuickAddWearDialog = ({ watches, onSuccess, collectionType: propTyp
       if (error) throw error;
 
       toast({
-        title: "Success",
-        description: existing ? "Wear entry updated" : "Wear entry added",
+        title: t("quickAddWear.success"),
+        description: existing ? t("quickAddWear.entryUpdated") : t("quickAddWear.entryAdded"),
       });
 
       setOpen(false);
@@ -281,14 +283,14 @@ export const QuickAddWearDialog = ({ watches, onSuccess, collectionType: propTyp
     } catch (error) {
       if (error instanceof z.ZodError) {
         toast({
-          title: "Validation Error",
+          title: t("quickAddWear.validationError"),
           description: error.errors[0].message,
           variant: "destructive",
         });
       } else {
         toast({
-          title: "Error",
-          description: "Failed to add wear entry",
+          title: t("quickAddWear.error"),
+          description: t("quickAddWear.failedAdd"),
           variant: "destructive",
         });
       }
@@ -317,19 +319,19 @@ export const QuickAddWearDialog = ({ watches, onSuccess, collectionType: propTyp
       <DialogTrigger asChild>
         <Button className="gap-2">
           <Plus className="w-4 h-4" />
-          Log {config.usageNoun.charAt(0).toUpperCase() + config.usageNoun.slice(1)}
+          {t("quickAddWear.logUsage", { noun: config.usageNoun.charAt(0).toUpperCase() + config.usageNoun.slice(1) })}
         </Button>
       </DialogTrigger>
       <DialogContent className="bg-card border-border max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-foreground">Quick Add {config.usageNoun.charAt(0).toUpperCase() + config.usageNoun.slice(1)} Entry</DialogTitle>
+          <DialogTitle className="text-foreground">{t("quickAddWear.quickAddTitle", { noun: config.usageNoun.charAt(0).toUpperCase() + config.usageNoun.slice(1) })}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="watch">Select {config.singularLabel}</Label>
+            <Label htmlFor="watch">{t("quickAddWear.selectItem", { item: config.singularLabel })}</Label>
             <Select value={selectedWatchId} onValueChange={setSelectedWatchId} required>
               <SelectTrigger className="bg-background border-border">
-                <SelectValue placeholder={`Choose a ${config.singularLabel.toLowerCase()}...`} />
+                <SelectValue placeholder={t("quickAddWear.chooseItem", { item: config.singularLabel.toLowerCase() })} />
               </SelectTrigger>
               <SelectContent className="bg-popover border-border max-h-[300px]">
                 {sortedWatches.map((watch) => (
@@ -342,7 +344,7 @@ export const QuickAddWearDialog = ({ watches, onSuccess, collectionType: propTyp
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="wearDate">Date</Label>
+            <Label htmlFor="wearDate">{t("quickAddWear.date")}</Label>
             <Input
               id="wearDate"
               name="wearDate"
@@ -355,7 +357,7 @@ export const QuickAddWearDialog = ({ watches, onSuccess, collectionType: propTyp
           </div>
 
           <div className="space-y-2">
-            <Label>{config.usageNoun.charAt(0).toUpperCase() + config.usageNoun.slice(1)} Duration</Label>
+            <Label>{t("quickAddWear.duration", { noun: config.usageNoun.charAt(0).toUpperCase() + config.usageNoun.slice(1) })}</Label>
             <div className="flex gap-4 flex-wrap">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -365,7 +367,7 @@ export const QuickAddWearDialog = ({ watches, onSuccess, collectionType: propTyp
                   defaultChecked
                   className="w-4 h-4"
                 />
-                <span className="text-sm">Full Day</span>
+                <span className="text-sm">{t("quickAddWear.fullDay")}</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -374,7 +376,7 @@ export const QuickAddWearDialog = ({ watches, onSuccess, collectionType: propTyp
                   value="0.5"
                   className="w-4 h-4"
                 />
-                <span className="text-sm">Half Day</span>
+                <span className="text-sm">{t("quickAddWear.halfDay")}</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -383,7 +385,7 @@ export const QuickAddWearDialog = ({ watches, onSuccess, collectionType: propTyp
                   value="0.25"
                   className="w-4 h-4"
                 />
-                <span className="text-sm">Quarter Day</span>
+                <span className="text-sm">{t("quickAddWear.quarterDay")}</span>
               </label>
             </div>
           </div>
@@ -397,39 +399,39 @@ export const QuickAddWearDialog = ({ watches, onSuccess, collectionType: propTyp
                 onChange={(e) => setIsTrip(e.target.checked)}
                 className="w-4 h-4"
               />
-              <Label htmlFor="isTrip" className="cursor-pointer">Link to Trip</Label>
+              <Label htmlFor="isTrip" className="cursor-pointer">{t("quickAddWear.linkToTrip")}</Label>
             </div>
 
             {isTrip && (
               <div className="space-y-2 pl-6">
                 <div className="space-y-2">
-                  <Label htmlFor="tripLocation">Location</Label>
+                  <Label htmlFor="tripLocation">{t("quickAddWear.location")}</Label>
                   <Input
                     id="tripLocation"
                     name="tripLocation"
-                    placeholder="e.g., Tokyo, Japan"
+                    placeholder={t("quickAddWear.locationPlaceholder")}
                     className="bg-background border-border"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="tripPurpose">Purpose</Label>
+                  <Label htmlFor="tripPurpose">{t("quickAddWear.purpose")}</Label>
                   <Select name="tripPurpose" defaultValue="Business">
                     <SelectTrigger className="bg-background border-border">
-                      <SelectValue placeholder="Select purpose" />
+                      <SelectValue placeholder={t("quickAddWear.selectPurpose")} />
                     </SelectTrigger>
                     <SelectContent className="bg-popover border-border">
-                      <SelectItem value="Business">Business</SelectItem>
-                      <SelectItem value="Vacation">Vacation</SelectItem>
+                      <SelectItem value="Business">{t("quickAddWear.business")}</SelectItem>
+                      <SelectItem value="Vacation">{t("quickAddWear.vacation")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="tripNotes">Notes (Optional)</Label>
+                  <Label htmlFor="tripNotes">{t("quickAddWear.notesOptional")}</Label>
                   <Textarea
                     id="tripNotes"
                     value={tripNotes}
                     onChange={(e) => setTripNotes(e.target.value)}
-                    placeholder="Add any notes about this trip..."
+                    placeholder={t("quickAddWear.notesPlaceholder")}
                     className="bg-background border-border resize-none"
                     rows={3}
                   />
@@ -445,26 +447,26 @@ export const QuickAddWearDialog = ({ watches, onSuccess, collectionType: propTyp
                 onChange={(e) => setIsEvent(e.target.checked)}
                 className="w-4 h-4"
               />
-              <Label htmlFor="isEvent" className="cursor-pointer">Link to Event</Label>
+              <Label htmlFor="isEvent" className="cursor-pointer">{t("quickAddWear.linkToEvent")}</Label>
             </div>
 
             {isEvent && (
               <div className="space-y-2 pl-6">
                 <div className="space-y-2">
-                  <Label htmlFor="eventLocation">Location</Label>
+                  <Label htmlFor="eventLocation">{t("quickAddWear.location")}</Label>
                   <Input
                     id="eventLocation"
                     name="eventLocation"
-                    placeholder="e.g., Conference Center"
+                    placeholder={t("quickAddWear.eventLocationPlaceholder")}
                     className="bg-background border-border"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="eventPurpose">Purpose</Label>
+                  <Label htmlFor="eventPurpose">{t("quickAddWear.purpose")}</Label>
                   <Input
                     id="eventPurpose"
                     name="eventPurpose"
-                    placeholder="e.g., Wedding, Conference"
+                    placeholder={t("quickAddWear.eventPurposePlaceholder")}
                     className="bg-background border-border"
                   />
                 </div>
@@ -482,16 +484,16 @@ export const QuickAddWearDialog = ({ watches, onSuccess, collectionType: propTyp
                     onChange={(e) => setIsWaterActivity(e.target.checked)}
                     className="w-4 h-4"
                   />
-                  <Label htmlFor="isWaterActivity" className="cursor-pointer">Link to Water Activity</Label>
+                  <Label htmlFor="isWaterActivity" className="cursor-pointer">{t("quickAddWear.linkToWaterActivity")}</Label>
                 </div>
 
                 {isWaterActivity && (
                   <div className="space-y-2 pl-6">
                     <div className="space-y-2">
-                      <Label htmlFor="waterActivityType">Activity Type</Label>
+                      <Label htmlFor="waterActivityType">{t("quickAddWear.activityType")}</Label>
                       <Select name="waterActivityType" defaultValue="Pool">
                         <SelectTrigger className="bg-background border-border">
-                          <SelectValue placeholder="Select activity" />
+                          <SelectValue placeholder={t("quickAddWear.selectActivity")} />
                         </SelectTrigger>
                         <SelectContent className="bg-popover border-border z-50">
                           <SelectItem value="Pool">Pool</SelectItem>
@@ -507,7 +509,7 @@ export const QuickAddWearDialog = ({ watches, onSuccess, collectionType: propTyp
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                       <div className="space-y-2">
-                        <Label htmlFor="depthMeters">Depth (meters)</Label>
+                        <Label htmlFor="depthMeters">{t("quickAddWear.depthMeters")}</Label>
                         <Input
                           id="depthMeters"
                           name="depthMeters"
@@ -518,7 +520,7 @@ export const QuickAddWearDialog = ({ watches, onSuccess, collectionType: propTyp
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="durationMinutes">Duration (min)</Label>
+                        <Label htmlFor="durationMinutes">{t("quickAddWear.durationMinutes")}</Label>
                         <Input
                           id="durationMinutes"
                           name="durationMinutes"
@@ -529,11 +531,11 @@ export const QuickAddWearDialog = ({ watches, onSuccess, collectionType: propTyp
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="waterNotes">Notes</Label>
+                      <Label htmlFor="waterNotes">{t("quickAddWear.notes")}</Label>
                       <Input
                         id="waterNotes"
                         name="waterNotes"
-                        placeholder="Additional details..."
+                        placeholder={t("quickAddWear.additionalDetails")}
                         className="bg-background border-border"
                       />
                     </div>
@@ -553,17 +555,17 @@ export const QuickAddWearDialog = ({ watches, onSuccess, collectionType: propTyp
               />
               <Label htmlFor="isSport" className="cursor-pointer flex items-center gap-2">
                 <Dumbbell className="w-4 h-4" />
-                Link to Sport Activity
+                {t("quickAddWear.linkToSport")}
               </Label>
             </div>
 
             {isSport && (
               <div className="space-y-2 pl-6">
                 <div className="space-y-2">
-                  <Label htmlFor="sportType">Sport Type</Label>
+                  <Label htmlFor="sportType">{t("quickAddWear.sportType")}</Label>
                   <Select name="sportType" defaultValue="Running">
                     <SelectTrigger className="bg-background border-border">
-                      <SelectValue placeholder="Select sport" />
+                      <SelectValue placeholder={t("quickAddWear.selectSport")} />
                     </SelectTrigger>
                     <SelectContent className="bg-popover border-border z-50">
                       <SelectItem value="Running">Running</SelectItem>
@@ -585,17 +587,17 @@ export const QuickAddWearDialog = ({ watches, onSuccess, collectionType: propTyp
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="sportLocation">Location (Optional)</Label>
+                  <Label htmlFor="sportLocation">{t("quickAddWear.sportLocationOptional")}</Label>
                   <Input
                     id="sportLocation"
                     value={sportLocation}
                     onChange={(e) => setSportLocation(e.target.value)}
-                    placeholder="e.g., Central Park, Local Gym"
+                    placeholder={t("quickAddWear.sportLocationPlaceholder")}
                     className="bg-background border-border"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="sportDuration">Duration (minutes)</Label>
+                  <Label htmlFor="sportDuration">{t("quickAddWear.sportDuration")}</Label>
                   <Input
                     id="sportDuration"
                     name="sportDuration"
@@ -606,11 +608,11 @@ export const QuickAddWearDialog = ({ watches, onSuccess, collectionType: propTyp
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="sportNotes">Notes (Optional)</Label>
+                  <Label htmlFor="sportNotes">{t("quickAddWear.sportNotesOptional")}</Label>
                   <Input
                     id="sportNotes"
                     name="sportNotes"
-                    placeholder="Additional details..."
+                    placeholder={t("quickAddWear.additionalDetails")}
                     className="bg-background border-border"
                   />
                 </div>
@@ -620,7 +622,7 @@ export const QuickAddWearDialog = ({ watches, onSuccess, collectionType: propTyp
 
           <div className="flex gap-2">
             <Button type="submit" disabled={loading || !selectedWatchId} className="flex-1">
-              {loading ? "Adding..." : "Add Entry"}
+              {loading ? t("quickAddWear.adding") : t("quickAddWear.addEntry")}
             </Button>
             <Button
               type="button"
@@ -628,7 +630,7 @@ export const QuickAddWearDialog = ({ watches, onSuccess, collectionType: propTyp
               onClick={() => setOpen(false)}
               className="flex-1"
             >
-              Cancel
+              {t("quickAddWear.cancel")}
             </Button>
           </div>
         </form>
