@@ -330,6 +330,12 @@ serve(async (req) => {
     let referenceImages: string[] = [];
     let referenceSource: 'provided-url' | 'uploaded-photo' | 'none' = 'none';
 
+    console.log('Reference payload received', {
+      hasReferenceImageBase64: Boolean(referenceImageBase64),
+      referenceImageBase64Length: referenceImageBase64?.length || 0,
+      hasReferenceImageUrl: Boolean(referenceImageUrl),
+    });
+
     const normalizedUploadedReference = referenceImageBase64 ? normalizeReferenceImage(referenceImageBase64) : null;
 
     if (normalizedUploadedReference?.startsWith('data:image/')) {
