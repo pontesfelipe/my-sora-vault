@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ResponsiveDialog } from "@/components/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -145,10 +145,9 @@ export const AddWatchDialog = ({ onSuccess, externalOpen, onExternalOpenChange, 
   const { toast } = useToast();
   const { selectedCollectionId } = useCollection();
 
-  // Apply prefill when provided
-  const [prefillApplied, setPrefillApplied] = useState(false);
-  if (prefill && open && !prefillApplied) {
-    setPrefillApplied(true);
+  useEffect(() => {
+    if (!open || !prefill) return;
+
     setFormValues((prev) => ({
       ...prev,
       brand: prefill.brand || prev.brand,
@@ -158,10 +157,13 @@ export const AddWatchDialog = ({ onSuccess, externalOpen, onExternalOpenChange, 
       caseSize: prefill.case_size || prev.caseSize,
       movement: prefill.movement || prev.movement,
     }));
-    if (prefill.referenceImageBase64) setUploadedPhotoBase64(prefill.referenceImageBase64);
+
+    if (prefill.referenceImageBase64) {
+      setUploadedPhotoBase64(prefill.referenceImageBase64);
+    }
+
     setActiveTab("manual");
-  }
-  if (!open && prefillApplied) setPrefillApplied(false);
+  }, [open, prefill]);
 
   const handleLookupReference = async () => {
     const searchBrand = formValues.brand.trim();
@@ -379,6 +381,8 @@ export const AddWatchDialog = ({ onSuccess, externalOpen, onExternalOpenChange, 
 
         // Generate AI image for the watch (non-blocking)
         try {
+          const referenceImageForGeneration = uploadedPhotoBase64 || prefill?.referenceImageBase64 || null;
+
           supabase.functions.invoke('generate-watch-image', {
             body: {
               watchId: insertData.id,
@@ -391,7 +395,7 @@ export const AddWatchDialog = ({ onSuccess, externalOpen, onExternalOpenChange, 
               ...(photoHints?.bezelType ? { bezelType: photoHints.bezelType } : {}),
               ...(photoHints?.strapType ? { strapType: photoHints.strapType } : {}),
               ...(photoHints?.notes ? { specialEditionHint: photoHints.notes } : {}),
-              ...(uploadedPhotoBase64 ? { referenceImageBase64: uploadedPhotoBase64 } : {}),
+              ...(referenceImageForGeneration ? { referenceImageBase64: referenceImageForGeneration } : {}),
             }
           }).then(() => {
             console.log('AI image generated for', data.brand, data.model);

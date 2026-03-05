@@ -42,6 +42,18 @@ const COMPOSITION_RULES = [
   'Ultra high resolution, photorealistic, luxury catalog quality',
 ].join('. ');
 
+const isLikelyBase64 = (value: string) => {
+  const compact = value.replace(/\s+/g, '');
+  return /^[A-Za-z0-9+/=]+$/.test(compact) && compact.length > 128;
+};
+
+const normalizeReferenceImage = (rawImage: string) => {
+  const image = rawImage.trim();
+  if (image.startsWith('data:image/')) return image;
+  if (isLikelyBase64(image)) return `data:image/jpeg;base64,${image.replace(/\s+/g, '')}`;
+  return image;
+};
+
 // ─── IDENTITY PROFILES ───
 // Hard-coded constraints for models the AI frequently gets wrong.
 type IdentityProfile = {
@@ -147,11 +159,13 @@ function buildUserPhotoEnhancementPrompt(
 
   return [
     `USER PHOTO ENHANCEMENT: The attached image is a real photograph of a ${brand} ${canonicalModel} taken by the owner. Use this photo as the AUTHORITATIVE visual reference for EXACTLY what this watch looks like — its dial, hands, indices, bezel, bracelet/strap, case shape, and all details`,
-    `YOUR TASK: Transform this user photo into a professional, clean STUDIO PRODUCT SHOT. Keep EVERY design detail from the original photo — do NOT change or hallucinate any watch features. Only change the PRESENTATION:`,
+    `STRICT EDIT MODE: Do NOT redesign, reinterpret, restyle, or morph the watch. Keep case geometry, lug shape, crown side, dial layout, marker count, hand shape, and bezel markings EXACTLY as in the source photo`,
+    `YOUR TASK: Transform this user photo into a professional, clean STUDIO PRODUCT SHOT while preserving identity and proportions. Only change the PRESENTATION:`,
     `- Remove the background and replace with a dark studio gradient`,
     `- Correct the orientation so the watch is PERFECTLY UPRIGHT (12 o'clock at top)`,
     `- Remove any wrist, arm, table, or surface — show only the watch`,
     `- Apply clean, even studio lighting`,
+    `- Preserve real-world watch proportions from the source image (no stretching/squashing of case, dial, bezel, lugs, or strap width)`,
     `- Set hands to 10:10 if they are in a significantly different position`,
     cues,
     identity,
@@ -316,11 +330,17 @@ serve(async (req) => {
     let referenceImages: string[] = [];
     let referenceSource: 'provided-url' | 'uploaded-photo' | 'none' = 'none';
 
-    if (referenceImageBase64) {
-      referenceImages = [referenceImageBase64];
+    const normalizedUploadedReference = referenceImageBase64 ? normalizeReferenceImage(referenceImageBase64) : null;
+
+    if (normalizedUploadedReference?.startsWith('data:image/')) {
+      referenceImages = [normalizedUploadedReference];
       referenceSource = 'uploaded-photo';
       console.log('Using uploaded photo as reference');
-    } else if (referenceImageUrl) {
+    } else if (referenceImageBase64) {
+      console.warn('Uploaded reference image was provided but not in a supported format; falling back to URL/pure generation');
+    }
+
+    if (referenceImages.length === 0 && referenceImageUrl) {
       const fromProvidedUrl = await fetchImageAsBase64(referenceImageUrl);
       if (fromProvidedUrl) {
         referenceImages = [fromProvidedUrl];
@@ -419,8 +439,11 @@ serve(async (req) => {
       ];
     }
 
-    // ─── CALL AI ───
-    console.log(`Calling AI (method: ${generationMethod})...`);
+    const imageModel = generationMethod === 'photo-enhancement'
+      ? 'google/gemini-2.5-flash-image'
+      : 'google/gemini-3-pro-image-preview';
+
+    console.log(`Calling AI (method: ${generationMethod}, model: ${imageModel})...`);
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -428,7 +451,7 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-pro-image-preview",
+        model: imageModel,
         messages,
         modalities: ["image", "text"],
       }),
