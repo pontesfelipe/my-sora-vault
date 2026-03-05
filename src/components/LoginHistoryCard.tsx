@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -22,22 +23,16 @@ interface LoginEntry {
 }
 
 export const LoginHistoryCard = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [history, setHistory] = useState<LoginEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchHistory = async () => {
     if (!user) return;
-    
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('login_history')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('login_at', { ascending: false })
-        .limit(20);
-
+      const { data, error } = await supabase.from('login_history').select('*').eq('user_id', user.id).order('login_at', { ascending: false }).limit(20);
       if (error) throw error;
       setHistory(data || []);
     } catch (error) {
@@ -47,24 +42,14 @@ export const LoginHistoryCard = () => {
     }
   };
 
-  useEffect(() => {
-    fetchHistory();
-  }, [user]);
+  useEffect(() => { fetchHistory(); }, [user]);
 
   const getDeviceIcon = (deviceType: string | null) => {
     switch (deviceType?.toLowerCase()) {
-      case 'mobile':
-        return <Smartphone className="h-4 w-4" />;
-      case 'tablet':
-        return <Tablet className="h-4 w-4" />;
-      default:
-        return <Monitor className="h-4 w-4" />;
+      case 'mobile': return <Smartphone className="h-4 w-4" />;
+      case 'tablet': return <Tablet className="h-4 w-4" />;
+      default: return <Monitor className="h-4 w-4" />;
     }
-  };
-
-  const formatLocation = (country: string | null) => {
-    if (country) return country;
-    return 'Unknown location';
   };
 
   return (
@@ -73,15 +58,13 @@ export const LoginHistoryCard = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <History className="h-5 w-5 text-primary" />
-            <CardTitle>Login History</CardTitle>
+            <CardTitle>{t("settings.loginHistory")}</CardTitle>
           </div>
           <Button variant="ghost" size="sm" onClick={fetchHistory} disabled={loading}>
             <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           </Button>
         </div>
-        <CardDescription>
-          Review your recent sign-in activity
-        </CardDescription>
+        <CardDescription>{t("settings.loginHistoryDesc")}</CardDescription>
       </CardHeader>
       <CardContent>
         {loading ? (
@@ -97,56 +80,39 @@ export const LoginHistoryCard = () => {
             ))}
           </div>
         ) : history.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-8">
-            No login history recorded yet
-          </p>
+          <p className="text-sm text-muted-foreground text-center py-8">{t("settings.noLoginHistory")}</p>
         ) : (
           <ScrollArea className="h-[400px] pr-4">
             <div className="space-y-3">
               {history.map((entry) => (
-                <div
-                  key={entry.id}
-                  className="flex items-start gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
-                >
+                <div key={entry.id} className="flex items-start gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
                   <div className="flex items-center justify-center h-10 w-10 rounded-full bg-muted">
                     {getDeviceIcon(entry.device_type)}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-medium text-sm">
-                        {entry.browser || 'Unknown browser'}
-                      </span>
-                      {entry.os && (
-                        <span className="text-xs text-muted-foreground">
-                          on {entry.os}
-                        </span>
-                      )}
+                      <span className="font-medium text-sm">{entry.browser || t("settings.unknownBrowser")}</span>
+                      {entry.os && <span className="text-xs text-muted-foreground">on {entry.os}</span>}
                       {entry.success ? (
                         <Badge variant="default" className="bg-green-500/10 text-green-600 hover:bg-green-500/20">
-                          <CheckCircle className="h-3 w-3 mr-1" />
-                          Success
+                          <CheckCircle className="h-3 w-3 mr-1" />{t("settings.success")}
                         </Badge>
                       ) : (
                         <Badge variant="destructive">
-                          <XCircle className="h-3 w-3 mr-1" />
-                          Failed
+                          <XCircle className="h-3 w-3 mr-1" />{t("settings.failed")}
                         </Badge>
                       )}
                     </div>
                     <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
                       <MapPin className="h-3 w-3" />
-                      {formatLocation(entry.country)}
-                      {entry.ip_address && (
-                        <span className="ml-2">• {entry.ip_address}</span>
-                      )}
+                      {entry.country || t("settings.unknownLocation")}
+                      {entry.ip_address && <span className="ml-2">• {entry.ip_address}</span>}
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">
                       {format(new Date(entry.login_at), "MMM d, yyyy 'at' h:mm a")}
                     </p>
                     {entry.failure_reason && (
-                      <p className="text-xs text-destructive mt-1">
-                        Reason: {entry.failure_reason}
-                      </p>
+                      <p className="text-xs text-destructive mt-1">{t("settings.reason", { reason: entry.failure_reason })}</p>
                     )}
                   </div>
                 </div>
