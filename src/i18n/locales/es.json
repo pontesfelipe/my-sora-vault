@@ -500,6 +500,15 @@
     "success": "Éxito",
     "mode": "modo"
   },
+  "splash": {
+    "brandName": "Luxury Vault",
+    "tagline": "Estudio de colección de relojes",
+    "watches": "Relojes",
+    "footer": "Gestión premium de relojes"
+  },
+  "offline": {
+    "message": "Estás sin conexión — los cambios se sincronizarán al reconectar"
+  },
   "search": {
     "placeholder": "Buscar relojes, personas...",
     "clear": "Limpiar búsqueda",

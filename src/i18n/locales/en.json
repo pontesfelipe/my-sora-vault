@@ -504,6 +504,15 @@
     "success": "Success",
     "mode": "mode"
   },
+  "splash": {
+    "brandName": "Luxury Vault",
+    "tagline": "Watch Collection Studio",
+    "watches": "Watches",
+    "footer": "Premium Watch Management"
+  },
+  "offline": {
+    "message": "You're offline — changes will sync when reconnected"
+  },
   "search": {
     "placeholder": "Search watches, people...",
     "clear": "Clear search",
