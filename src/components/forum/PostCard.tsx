@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { formatDistanceToNow } from "date-fns";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -37,6 +38,7 @@ interface PostCardProps {
 
 export function PostCard({ post, onVote, onDelete, onEdit, onTogglePin }: PostCardProps) {
   const { user, isAdmin } = useAuth();
+  const { t } = useTranslation();
   const [showComments, setShowComments] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   
@@ -47,7 +49,7 @@ export function PostCard({ post, onVote, onDelete, onEdit, onTogglePin }: PostCa
   const canEdit = isOwner;
   const canPin = isAdmin;
 
-  const categoryLabel = FORUM_CATEGORIES.find(c => c.value === post.category)?.label || post.category;
+  const categoryLabel = FORUM_CATEGORIES.find(c => c.value === post.category)?.labelKey ? t(FORUM_CATEGORIES.find(c => c.value === post.category)!.labelKey) : post.category;
 
   return (
     <>

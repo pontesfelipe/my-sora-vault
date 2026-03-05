@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { MessageCircle, Users, Bell, MessageSquare, Search, Loader2 } from "lucide-react";
 import { useMessaging, Conversation } from "@/hooks/useMessaging";
 import { useForumData, FORUM_CATEGORIES } from "@/hooks/useForumData";
@@ -220,6 +221,7 @@ function MessagesSection() {
 
 function ForumSection() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   
@@ -260,7 +262,7 @@ function ForumSection() {
             <SelectItem value="all">All Categories</SelectItem>
             {FORUM_CATEGORIES.map((cat) => (
               <SelectItem key={cat.value} value={cat.value}>
-                {cat.label}
+                {t(cat.labelKey)}
               </SelectItem>
             ))}
           </SelectContent>
