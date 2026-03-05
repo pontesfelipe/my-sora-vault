@@ -31,6 +31,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -41,6 +42,7 @@ const Profile = () => {
   const { data: trustData, config: trustConfig } = useTrustLevel();
   const { isAllowed } = useAllowedUserCheck();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("collection");
   const [searchQuery, setSearchQuery] = useState("");
   const [profileData, setProfileData] = useState<any>(null);
@@ -114,8 +116,8 @@ const Profile = () => {
       if (canUseError) throw canUseError;
       if (!canUse) {
         toast({
-          title: "Monthly Limit Reached",
-          description: "You've used all AI wishlist suggestions this month. Resets next month.",
+          title: t("profile.monthlyLimitTitle"),
+          description: t("profile.monthlyLimitDesc"),
           variant: "destructive",
         });
         return;
@@ -156,8 +158,8 @@ const Profile = () => {
       refetchWishlist();
 
       toast({
-        title: "Suggestions Generated",
-        description: `Added ${data?.suggestions?.length || 0} AI-powered suggestions`,
+        title: t("profile.suggestionsGenerated"),
+        description: t("profile.addedSuggestions", { count: data?.suggestions?.length || 0 }),
       });
     } catch (error: any) {
       console.error("Error generating suggestions:", error);
@@ -180,8 +182,8 @@ const Profile = () => {
         .eq('is_ai_suggested', true);
       refetchWishlist();
       toast({
-        title: "Cleared",
-        description: "AI suggestions have been removed",
+        title: t("profile.cleared"),
+        description: t("profile.aiSuggestionsRemoved"),
       });
     } catch (error) {
       console.error("Error clearing AI suggestions:", error);
@@ -244,10 +246,10 @@ const Profile = () => {
           </div>
           <div className="flex items-center gap-4 mt-1">
             <span className="text-sm text-textMuted">
-              <strong className="text-textMain">{followerCount}</strong> followers
+              <strong className="text-textMain">{followerCount}</strong> {t("profile.followers")}
             </span>
             <span className="text-sm text-textMuted">
-              <strong className="text-textMain">{followingCount}</strong> following
+              <strong className="text-textMain">{followingCount}</strong> {t("profile.following")}
             </span>
           </div>
         </div>
@@ -277,7 +279,7 @@ const Profile = () => {
       {topWatches.length > 0 && (
         <section>
           <h2 className="text-xs font-semibold uppercase tracking-wider text-textMuted mb-2">
-            Favorites
+            {t("profile.favorites")}
           </h2>
           <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-hide">
             {topWatches.map(({ watch, count }) => (
@@ -310,7 +312,7 @@ const Profile = () => {
       {recentLogs.length > 0 && (
         <section>
           <h2 className="text-xs font-semibold uppercase tracking-wider text-textMuted mb-2">
-            Recent Wrist Checks
+            {t("profile.recentWristChecks")}
           </h2>
           <div className="space-y-1.5">
             {recentLogs.slice(0, 3).map((log) => (
@@ -352,15 +354,15 @@ const Profile = () => {
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="collection" className="gap-1.5 text-xs">
             <Grid3X3 className="h-3.5 w-3.5" />
-            Collection
+            {t("profile.collectionTab")}
           </TabsTrigger>
           <TabsTrigger value="wishlist" className="gap-1.5 text-xs">
             <Heart className="h-3.5 w-3.5" />
-            Wishlist
+            {t("profile.wishlistTab")}
           </TabsTrigger>
           <TabsTrigger value="lists" className="gap-1.5 text-xs">
             <List className="h-3.5 w-3.5" />
-            Lists
+            {t("profile.listsTab")}
           </TabsTrigger>
         </TabsList>
 
@@ -384,7 +386,7 @@ const Profile = () => {
             <Card className="p-8 text-center border-dashed border-borderSubtle">
               <Watch className="h-10 w-10 text-textMuted mx-auto mb-3" />
               <p className="text-sm text-textMuted">
-                {searchQuery ? "No matches" : "Your collection is empty"}
+                {searchQuery ? t("profile.noMatches") : t("profile.collectionEmpty")}
               </p>
             </Card>
           ) : (
@@ -399,8 +401,8 @@ const Profile = () => {
         <TabsContent value="wishlist" className="mt-4 space-y-4">
           <div className="flex justify-between items-center">
             <div>
-              <h2 className="text-base font-semibold text-textMain">My Wishlist</h2>
-              <p className="text-xs text-textMuted">Track {currentCollectionConfig.pluralLabel.toLowerCase()} you'd love to add</p>
+              <h2 className="text-base font-semibold text-textMain">{t("profile.myWishlist")}</h2>
+              <p className="text-xs text-textMuted">{t("profile.trackItems", { type: currentCollectionConfig.pluralLabel.toLowerCase() })}</p>
             </div>
             <Button size="sm" onClick={() => setWishlistDialogOpen(true)} className="gap-1.5">
               <Plus className="w-3.5 h-3.5" />
@@ -413,7 +415,7 @@ const Profile = () => {
             <CardHeader className="pb-2 px-4 pt-4">
               <CardTitle className="text-sm flex items-center gap-2">
                 <Heart className="w-4 h-4 text-primary" />
-                My Items
+                {t("profile.myItems")}
               </CardTitle>
               <CardDescription className="text-xs">
                 {wishlist.filter(item => !item.is_ai_suggested).length} {wishlist.filter(item => !item.is_ai_suggested).length === 1 ? 'item' : 'items'}
@@ -444,10 +446,10 @@ const Profile = () => {
                       <div>
                         <CardTitle className="text-sm flex items-center gap-2">
                           <Sparkles className="w-4 h-4 text-accent" />
-                          AI Suggestions
+                          {t("profile.aiSuggestions")}
                         </CardTitle>
                         <CardDescription className="text-xs">
-                          Personalized recommendations based on your taste
+                          {t("profile.personalizedRecs")}
                         </CardDescription>
                       </div>
                       <Button 
@@ -457,7 +459,7 @@ const Profile = () => {
                         className="text-textMuted hover:text-destructive h-8 text-xs"
                       >
                         <Trash2 className="w-3.5 h-3.5 mr-1" />
-                        Clear
+                        {t("profile.clear")}
                       </Button>
                     </div>
                   </CardHeader>
@@ -492,6 +494,7 @@ const Profile = () => {
 
 function ListsSection({ watches }: { watches: any[] }) {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [lists, setLists] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedList, setSelectedList] = useState<any>(null);
@@ -550,8 +553,8 @@ function ListsSection({ watches }: { watches: any[] }) {
           <ArrowUpDown className="h-4 w-4 text-accent" />
         </div>
         <div className="flex-1">
-          <p className="text-sm font-medium text-textMain">Trade</p>
-          <p className="text-xs text-textMuted">{tradeWatches.length} items</p>
+          <p className="text-sm font-medium text-textMain">{t("profile.trade")}</p>
+          <p className="text-xs text-textMuted">{t("profile.items", { count: tradeWatches.length })}</p>
         </div>
         <ChevronRight className="h-4 w-4 text-textMuted" />
       </Card>
@@ -569,7 +572,7 @@ function ListsSection({ watches }: { watches: any[] }) {
           <div className="flex-1">
             <p className="text-sm font-medium text-textMain">{list.name}</p>
             <p className="text-xs text-textMuted">
-              {list.list_items?.length || 0} items
+              {t("profile.items", { count: list.list_items?.length || 0 })}
             </p>
           </div>
           <ChevronRight className="h-4 w-4 text-textMuted" />
@@ -578,8 +581,8 @@ function ListsSection({ watches }: { watches: any[] }) {
 
       {lists.length === 0 && (
         <Card className="p-4 text-center border-dashed border-borderSubtle text-sm text-textMuted">
-          <p>Create custom lists to organize your collection</p>
-          <p className="text-xs mt-1">e.g. "Dive Watches", "My Top 10"</p>
+          <p>{t("profile.createCustomLists")}</p>
+          <p className="text-xs mt-1">{t("profile.listExamples")}</p>
         </Card>
       )}
     </div>

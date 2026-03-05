@@ -20,11 +20,13 @@ import { TradeNotificationsList } from "@/components/messaging/TradeNotification
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import { PullToRefreshIndicator } from "@/components/PullToRefreshIndicator";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 import type { Conversation } from "@/hooks/useMessaging";
 
 export default function Feed() {
   const [activeTab, setActiveTab] = useState("feed");
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   return (
     <PageTransition>
@@ -33,11 +35,11 @@ export default function Feed() {
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="feed" className="gap-2">
             <Users className="h-4 w-4" />
-            Feed
+            {t("feed.feedTab")}
           </TabsTrigger>
           <TabsTrigger value="messages" className="gap-2">
             <MessageCircle className="h-4 w-4" />
-            Messages
+            {t("feed.messagesTab")}
           </TabsTrigger>
         </TabsList>
 
@@ -58,6 +60,7 @@ function FeedSection() {
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const { t } = useTranslation();
 
   const { posts, loading, refetch, createPost, updatePost, deletePost, togglePinPost, votePost } = useForumData({
     searchQuery,
@@ -79,7 +82,7 @@ function FeedSection() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-textMuted" />
           <Input
-            placeholder="Search posts..."
+            placeholder={t("feed.searchPosts")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9 rounded-full bg-surfaceMuted border-none text-sm"
@@ -99,7 +102,7 @@ function FeedSection() {
               : "bg-surfaceMuted text-textMuted hover:text-textMain"
           }`}
         >
-          All
+          {t("feed.all")}
         </button>
         {FORUM_CATEGORIES.map((cat) => (
           <button
@@ -127,10 +130,10 @@ function FeedSection() {
         <Card className="p-8 text-center border-dashed border-borderSubtle">
           <MessageSquare className="h-10 w-10 text-textMuted mx-auto mb-3" />
           <h3 className="text-base font-medium text-textMain mb-1">
-            {searchQuery ? "No posts found" : "Nothing here yet"}
+            {searchQuery ? t("feed.noPostsFound") : t("feed.nothingYet")}
           </h3>
           <p className="text-sm text-textMuted">
-            {user ? "Be the first to share something!" : "Sign in to join the conversation"}
+            {user ? t("feed.beFirst") : t("feed.signInToJoin")}
           </p>
         </Card>
       ) : (
@@ -169,6 +172,7 @@ function MessagesSection() {
   } = useMessaging();
 
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
+  const { t } = useTranslation();
 
   if (loading) {
     return (
@@ -182,7 +186,7 @@ function MessagesSection() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <p className="text-sm text-textMuted">
-          {conversations.length} conversation{conversations.length !== 1 ? "s" : ""}
+          {conversations.length === 1 ? t("feed.conversation", { count: 1 }) : t("feed.conversations", { count: conversations.length })}
         </p>
         <AddFriendDialog onSendRequest={sendFriendRequest} />
       </div>
