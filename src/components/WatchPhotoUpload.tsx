@@ -170,6 +170,7 @@ export const WatchPhotoUpload = ({ onIdentified, onPhotoUploaded, onContinueToFo
   };
 
   return (
+    <>
     <Card className="border-2 border-dashed">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
