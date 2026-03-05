@@ -427,7 +427,7 @@ export const AddWatchDialog = ({ onSuccess, externalOpen, onExternalOpenChange, 
       setOpen(false);
       setModelRef("");
       setPurchaseDate(undefined);
-      setUploadedPhotoBase64(null);
+      setPhotoReference(null);
       setPhotoHints(null);
       setFormValues({
         brand: "",
@@ -518,7 +518,7 @@ export const AddWatchDialog = ({ onSuccess, externalOpen, onExternalOpenChange, 
                   });
                 }
               }}
-              onPhotoUploaded={(base64) => setUploadedPhotoBase64(base64)}
+              onPhotoUploaded={(base64) => setPhotoReference(base64)}
               onContinueToForm={() => setActiveTab("manual")}
             />
           </TabsContent>
