@@ -1,6 +1,6 @@
 import { AppLayout } from "@/components/AppLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Watch, Heart, Shield, Sparkles, Users, Globe, TrendingUp, BarChart3, ShoppingBag, Footprints } from "lucide-react";
+import { Watch, Heart, Shield, Sparkles, Users, Globe, TrendingUp, BarChart3 } from "lucide-react";
 import watchHero from "@/assets/watch-hero.jpg";
 
 export default function About() {
@@ -25,56 +25,26 @@ export default function About() {
             </div>
             
             <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl">
-              The premier platform for luxury enthusiasts who demand excellence in managing their collections. 
-              Track, analyze, and curate your watches, sneakers, and purses with unprecedented precision.
+              The premier platform for watch enthusiasts who demand excellence in managing their collection. 
+              Track, analyze, and curate your timepieces with unprecedented precision.
             </p>
           </div>
         </div>
 
-        {/* Collection Types */}
-        <div className="grid gap-4 sm:grid-cols-3">
-          <Card className="group overflow-hidden border-0 shadow-card hover:shadow-xl transition-all duration-500">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10">
-                  <Watch className="h-5 w-5 text-accent" />
-                </div>
-                <h3 className="font-semibold text-lg">Watches</h3>
+        {/* Watch Focus */}
+        <Card className="group overflow-hidden border-0 shadow-card hover:shadow-xl transition-all duration-500">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10">
+                <Watch className="h-5 w-5 text-accent" />
               </div>
-              <p className="text-sm text-muted-foreground">
-                Track movements, case materials, water resistance, market values, wear history, and warranty details for your timepieces.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="group overflow-hidden border-0 shadow-card hover:shadow-xl transition-all duration-500">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10">
-                  <Footprints className="h-5 w-5 text-accent" />
-                </div>
-                <h3 className="font-semibold text-lg">Sneakers</h3>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Catalog colorways, SKUs, collaborations, condition, shoe sizes, and limited edition status for your sneaker collection.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="group overflow-hidden border-0 shadow-card hover:shadow-xl transition-all duration-500">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10">
-                  <ShoppingBag className="h-5 w-5 text-accent" />
-                </div>
-                <h3 className="font-semibold text-lg">Purses</h3>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Track materials, hardware colors, authenticity verification, serial numbers, and accessories for your luxury bags.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
+              <h3 className="font-semibold text-lg">Built for Watch Collectors</h3>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Track movements, case materials, water resistance, market values, wear history, warranty details, complications, rarity, and historical significance for every timepiece in your collection.
+            </p>
+          </CardContent>
+        </Card>
 
         {/* Watch Showcase */}
         <Card className="group overflow-hidden border-0 shadow-luxury hover:shadow-xl transition-all duration-500">
@@ -88,7 +58,7 @@ export default function About() {
             <div className="absolute bottom-4 left-4 right-4">
               <h3 className="text-xl font-bold">Built for Collectors</h3>
               <p className="text-sm text-muted-foreground mt-2">
-                Whether it's a vintage timepiece, a rare sneaker drop, or a designer handbag — Luxury Vault gives each item the attention it deserves.
+                From vintage dress watches to modern tool watches — Luxury Vault gives each timepiece the attention it deserves.
               </p>
             </div>
           </div>
@@ -180,8 +150,8 @@ export default function About() {
         {/* Stats Section */}
         <div className="grid gap-4 sm:grid-cols-3">
           <div className="text-center p-6 rounded-xl bg-gradient-to-br from-accent/10 to-accent/5">
-            <div className="text-4xl font-bold text-accent mb-2">3</div>
-            <div className="text-sm text-muted-foreground">Collection Types</div>
+            <div className="text-4xl font-bold text-accent mb-2">⌚</div>
+            <div className="text-sm text-muted-foreground">Watch Focused</div>
           </div>
           <div className="text-center p-6 rounded-xl bg-gradient-to-br from-accent/10 to-accent/5">
             <div className="text-4xl font-bold text-accent mb-2">AI</div>
