@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +16,7 @@ interface EditPostDialogProps {
 }
 
 export function EditPostDialog({ post, open, onOpenChange, onSubmit }: EditPostDialogProps) {
+  const { t } = useTranslation();
   const [title, setTitle] = useState(post.title);
   const [content, setContent] = useState(post.content || "");
   const [category, setCategory] = useState(post.category);
@@ -57,7 +59,7 @@ export function EditPostDialog({ post, open, onOpenChange, onSubmit }: EditPostD
               <SelectContent>
                 {FORUM_CATEGORIES.map((cat) => (
                   <SelectItem key={cat.value} value={cat.value}>
-                    {cat.label}
+                    {t(cat.labelKey)}
                   </SelectItem>
                 ))}
               </SelectContent>

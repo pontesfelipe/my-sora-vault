@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +14,7 @@ interface CreatePostDialogProps {
 }
 
 export function CreatePostDialog({ onSubmit }: CreatePostDialogProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -82,7 +84,7 @@ export function CreatePostDialog({ onSubmit }: CreatePostDialogProps) {
               <SelectContent>
                 {FORUM_CATEGORIES.map((cat) => (
                   <SelectItem key={cat.value} value={cat.value}>
-                    {cat.label}
+                    {t(cat.labelKey)}
                   </SelectItem>
                 ))}
               </SelectContent>

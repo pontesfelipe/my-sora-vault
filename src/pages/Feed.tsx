@@ -114,7 +114,7 @@ function FeedSection() {
                 : "bg-surfaceMuted text-textMuted hover:text-textMain"
             }`}
           >
-            {cat.label}
+            {t(cat.labelKey)}
           </button>
         ))}
       </div>
@@ -203,12 +203,12 @@ function MessagesSection() {
             requests={friendRequests}
             onAccept={async (id) => {
               const result = await acceptFriendRequest(id);
-              if (result.success) toast.success("Friend request accepted!");
+              if (result.success) toast.success(t("feed.friendRequestAccepted"));
               return result;
             }}
             onDecline={async (id) => {
               const result = await declineFriendRequest(id);
-              if (result.success) toast.info("Request declined");
+              if (result.success) toast.info(t("feed.requestDeclined"));
               return result;
             }}
           />

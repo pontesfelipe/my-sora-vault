@@ -3,15 +3,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
-export const FORUM_CATEGORIES = [
-  { value: "general", label: "General Discussion" },
-  { value: "watches", label: "Watch Talk" },
-  { value: "collecting", label: "Collecting Advice" },
-  { value: "trading", label: "Trading & Exchange" },
-  { value: "reviews", label: "Reviews" },
-  { value: "news", label: "News & Updates" },
-  { value: "showcase", label: "Collection Showcase" },
+export const FORUM_CATEGORY_KEYS = [
+  "general", "watches", "collecting", "trading", "reviews", "news", "showcase",
 ] as const;
+
+export const FORUM_CATEGORIES = FORUM_CATEGORY_KEYS.map((value) => ({
+  value,
+  labelKey: `feed.categories.${value}`,
+}));
 
 export type ForumCategory = typeof FORUM_CATEGORIES[number]["value"];
 
