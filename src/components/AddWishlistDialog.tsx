@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,6 +16,7 @@ interface AddWishlistDialogProps {
 }
 
 export const AddWishlistDialog = ({ open, onOpenChange, onSuccess }: AddWishlistDialogProps) => {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const { user } = useAuth();
   const [formValues, setFormValues] = useState({
@@ -29,8 +31,8 @@ export const AddWishlistDialog = ({ open, onOpenChange, onSuccess }: AddWishlist
   const handleSubmit = async () => {
     if (!formValues.brand || !formValues.model || !formValues.dial_colors) {
       toast({
-        title: "Missing required fields",
-        description: "Please fill in brand, model, and dial colors",
+        title: t("addWishlist.missingFields"),
+        description: t("addWishlist.fillRequired"),
         variant: "destructive",
       });
       return;
@@ -53,8 +55,8 @@ export const AddWishlistDialog = ({ open, onOpenChange, onSuccess }: AddWishlist
       if (error) throw error;
 
       toast({
-        title: "Success!",
-        description: "Watch added to wishlist",
+        title: t("addWishlist.success"),
+        description: t("addWishlist.watchAdded"),
       });
 
       setFormValues({ brand: "", model: "", dial_colors: "", rank: 0, notes: "" });
@@ -63,8 +65,8 @@ export const AddWishlistDialog = ({ open, onOpenChange, onSuccess }: AddWishlist
     } catch (error) {
       console.error("Error adding to wishlist:", error);
       toast({
-        title: "Error",
-        description: "Failed to add watch to wishlist",
+        title: t("addWishlist.error"),
+        description: t("addWishlist.failedAdd"),
         variant: "destructive",
       });
     } finally {
@@ -73,41 +75,41 @@ export const AddWishlistDialog = ({ open, onOpenChange, onSuccess }: AddWishlist
   };
 
   return (
-    <ResponsiveDialog open={open} onOpenChange={onOpenChange} title="Add Watch to Wishlist">
+    <ResponsiveDialog open={open} onOpenChange={onOpenChange} title={t("addWishlist.title")}>
       <div className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="brand">Brand *</Label>
+            <Label htmlFor="brand">{t("addWishlist.brand")} *</Label>
             <Input
               id="brand"
               value={formValues.brand}
               onChange={(e) => setFormValues({ ...formValues, brand: e.target.value })}
-              placeholder="e.g., Rolex"
+              placeholder={t("addWishlist.brandPlaceholder")}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="model">Model *</Label>
+            <Label htmlFor="model">{t("addWishlist.model")} *</Label>
             <Input
               id="model"
               value={formValues.model}
               onChange={(e) => setFormValues({ ...formValues, model: e.target.value })}
-              placeholder="e.g., Submariner Date"
+              placeholder={t("addWishlist.modelPlaceholder")}
             />
           </div>
         </div>
         
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="dial_colors">Dial Colors *</Label>
+            <Label htmlFor="dial_colors">{t("addWishlist.dialColors")} *</Label>
             <Input
               id="dial_colors"
               value={formValues.dial_colors}
               onChange={(e) => setFormValues({ ...formValues, dial_colors: e.target.value })}
-              placeholder="e.g., Blue or black"
+              placeholder={t("addWishlist.dialColorsPlaceholder")}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="rank">Priority Rank</Label>
+            <Label htmlFor="rank">{t("addWishlist.priorityRank")}</Label>
             <Input
               id="rank"
               type="number"
@@ -120,22 +122,22 @@ export const AddWishlistDialog = ({ open, onOpenChange, onSuccess }: AddWishlist
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="notes">Notes</Label>
+          <Label htmlFor="notes">{t("addWishlist.notes")}</Label>
           <Textarea
             id="notes"
             value={formValues.notes}
             onChange={(e) => setFormValues({ ...formValues, notes: e.target.value })}
-            placeholder="Any additional notes about this watch..."
+            placeholder={t("addWishlist.notesPlaceholder")}
             rows={3}
           />
         </div>
 
         <div className="flex gap-2 justify-end pt-4">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+            {t("addWishlist.cancel")}
           </Button>
           <Button onClick={handleSubmit} disabled={loading}>
-            {loading ? "Adding..." : "Add to Wishlist"}
+            {loading ? t("addWishlist.adding") : t("addWishlist.addToWishlist")}
           </Button>
         </div>
       </div>

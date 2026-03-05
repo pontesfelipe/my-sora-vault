@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,7 @@ interface TastePreferencesProps {
 }
 
 export const TastePreferences = ({ onSuggest, isGenerating, remainingUsage }: TastePreferencesProps) => {
+  const { t } = useTranslation();
   const [tasteDescription, setTasteDescription] = useState("");
   const [saved, setSaved] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -66,14 +68,14 @@ export const TastePreferences = ({ onSuggest, isGenerating, remainingUsage }: Ta
 
       setSaved(true);
       toast({
-        title: "Preferences saved",
-        description: "Your taste preferences have been saved",
+        title: t("tastePrefs.preferencesSaved"),
+        description: t("tastePrefs.preferencesSavedDesc"),
       });
     } catch (error) {
       console.error("Error saving preferences:", error);
       toast({
-        title: "Error",
-        description: "Failed to save preferences",
+        title: t("common.error"),
+        description: t("tastePrefs.failedSavePrefs"),
         variant: "destructive",
       });
     }
@@ -90,8 +92,8 @@ export const TastePreferences = ({ onSuggest, isGenerating, remainingUsage }: Ta
         setTasteDescription(data.tasteProfile);
         setSaved(false);
         toast({
-          title: "Taste profile generated",
-          description: "Your collection has been analyzed. Review and save the generated profile.",
+          title: t("tastePrefs.tasteProfileGenerated"),
+          description: t("tastePrefs.tasteProfileGeneratedDesc"),
         });
       } else if (data?.error) {
         throw new Error(data.error);
@@ -99,8 +101,8 @@ export const TastePreferences = ({ onSuggest, isGenerating, remainingUsage }: Ta
     } catch (error: any) {
       console.error("Error analyzing collection:", error);
       toast({
-        title: "Error",
-        description: error.message || "Failed to analyze collection",
+        title: t("common.error"),
+        description: error.message || t("tastePrefs.failedAnalyze"),
         variant: "destructive",
       });
     } finally {
@@ -113,10 +115,10 @@ export const TastePreferences = ({ onSuggest, isGenerating, remainingUsage }: Ta
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Sparkles className="w-5 h-5" />
-          AI Wishlist Generator
+          {t("tastePrefs.title")}
         </CardTitle>
         <CardDescription>
-          Describe your taste preferences or auto-generate from your collection, then let AI suggest watches for your wishlist
+          {t("tastePrefs.description")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -129,7 +131,7 @@ export const TastePreferences = ({ onSuggest, isGenerating, remainingUsage }: Ta
             className="gap-2"
           >
             <Wand2 className={`w-4 h-4 ${isAnalyzing ? 'animate-spin' : ''}`} />
-            {isAnalyzing ? "Analyzing..." : "Auto-Generate from Collection"}
+            {isAnalyzing ? t("tastePrefs.analyzing") : t("tastePrefs.autoGenerate")}
           </Button>
         </div>
         <Textarea
@@ -138,7 +140,7 @@ export const TastePreferences = ({ onSuggest, isGenerating, remainingUsage }: Ta
             setTasteDescription(e.target.value);
             setSaved(false);
           }}
-          placeholder="Describe what you love in watches: styles, brands, complications, price range, occasions... Or click 'Auto-Generate from Collection' to analyze your existing collection."
+          placeholder={t("tastePrefs.placeholder")}
           rows={6}
           className="resize-none"
         />
@@ -151,10 +153,10 @@ export const TastePreferences = ({ onSuggest, isGenerating, remainingUsage }: Ta
           />
           <Label htmlFor="focus-gaps" className="flex items-center gap-1.5 text-sm cursor-pointer">
             <Target className="w-3.5 h-3.5" />
-            Focus on collection gaps
+            {t("tastePrefs.focusOnGaps")}
           </Label>
           <span className="text-xs text-muted-foreground ml-1">
-            (suggest watches that fill missing categories)
+            {t("tastePrefs.focusOnGapsDesc")}
           </span>
         </div>
 
@@ -167,7 +169,7 @@ export const TastePreferences = ({ onSuggest, isGenerating, remainingUsage }: Ta
               className="gap-2"
             >
               <Save className="w-4 h-4" />
-              {saved ? "Saved" : "Save Preferences"}
+              {saved ? t("tastePrefs.saved") : t("tastePrefs.savePreferences")}
             </Button>
             <Button
               onClick={() => onSuggest(tasteDescription, focusOnGaps)}
@@ -175,12 +177,12 @@ export const TastePreferences = ({ onSuggest, isGenerating, remainingUsage }: Ta
               className="gap-2"
             >
               <Sparkles className="w-4 h-4" />
-              {isGenerating ? "Generating..." : "Generate AI Suggestions"}
+              {isGenerating ? t("tastePrefs.generating") : t("tastePrefs.generateSuggestions")}
             </Button>
           </div>
           {remainingUsage !== null && remainingUsage !== undefined && (
             <span className="text-xs text-muted-foreground">
-              {remainingUsage} uses remaining this month
+              {t("tastePrefs.usesRemaining", { count: remainingUsage })}
             </span>
           )}
         </div>
