@@ -63,6 +63,7 @@ const Log = () => {
   const [showWatchPicker, setShowWatchPicker] = useState(false);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [capturedPhotoBase64, setCapturedPhotoBase64] = useState<string | null>(null);
   const [isIdentifying, setIsIdentifying] = useState(false);
   const [identifiedWatch, setIdentifiedWatch] = useState<any>(null);
   const [identificationError, setIdentificationError] = useState<string | null>(null);
@@ -373,13 +374,11 @@ const Log = () => {
     setIdentificationError(null);
     setRejectedSuggestions([]);
 
-    const reader = new FileReader();
-    reader.onload = (ev) => setPhotoPreview(ev.target?.result as string);
-    reader.readAsDataURL(file);
-
     setIsIdentifying(true);
     try {
       const base64 = await fileToBase64(file);
+      setPhotoPreview(base64);
+      setCapturedPhotoBase64(base64);
 
       // Load user's past rejections to avoid repeating old mistakes
       let pastRejections: Array<{ brand: string; model: string }> = [];
@@ -534,6 +533,7 @@ const Log = () => {
                 onClick={(e) => {
                   e.stopPropagation();
                   setPhotoPreview(null);
+                  setCapturedPhotoBase64(null);
                   setPhotoFile(null);
                   setIdentifiedWatch(null);
                   setIdentificationError(null);
@@ -609,7 +609,7 @@ const Log = () => {
                           type: identifiedWatch.type || "automatic",
                           case_size: identifiedWatch.case_size || "",
                           movement: identifiedWatch.movement || "",
-                          referenceImageBase64: photoPreview || undefined,
+                          referenceImageBase64: capturedPhotoBase64 || photoPreview || undefined,
                         });
                         setShowAddWatch(true);
                         setIdentifiedWatch(null);
@@ -651,7 +651,7 @@ const Log = () => {
                     size="sm"
                     onClick={() => {
                       setAddWatchPrefill({
-                        referenceImageBase64: photoPreview || undefined,
+                        referenceImageBase64: capturedPhotoBase64 || photoPreview || undefined,
                       });
                       setShowAddWatch(true);
                     }}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ResponsiveDialog } from "@/components/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -121,6 +121,7 @@ export const AddWatchDialog = ({ onSuccess, externalOpen, onExternalOpenChange, 
   const [modelRef, setModelRef] = useState("");
   const [purchaseDate, setPurchaseDate] = useState<Date | undefined>();
   const [uploadedPhotoBase64, setUploadedPhotoBase64] = useState<string | null>(null);
+  const uploadedPhotoBase64Ref = useRef<string | null>(null);
   const [activeTab, setActiveTab] = useState("photo");
   const [photoHints, setPhotoHints] = useState<PhotoIdentificationHints | null>(null);
   const [formValues, setFormValues] = useState({
@@ -145,6 +146,11 @@ export const AddWatchDialog = ({ onSuccess, externalOpen, onExternalOpenChange, 
   const { toast } = useToast();
   const { selectedCollectionId } = useCollection();
 
+  const setPhotoReference = (base64: string | null) => {
+    uploadedPhotoBase64Ref.current = base64;
+    setUploadedPhotoBase64(base64);
+  };
+
   useEffect(() => {
     if (!open || !prefill) return;
 
@@ -159,7 +165,7 @@ export const AddWatchDialog = ({ onSuccess, externalOpen, onExternalOpenChange, 
     }));
 
     if (prefill.referenceImageBase64) {
-      setUploadedPhotoBase64(prefill.referenceImageBase64);
+      setPhotoReference(prefill.referenceImageBase64);
     }
 
     setActiveTab("manual");
@@ -381,7 +387,13 @@ export const AddWatchDialog = ({ onSuccess, externalOpen, onExternalOpenChange, 
 
         // Generate AI image for the watch (non-blocking)
         try {
-          const referenceImageForGeneration = uploadedPhotoBase64 || prefill?.referenceImageBase64 || null;
+          const referenceImageForGeneration =
+            uploadedPhotoBase64Ref.current || uploadedPhotoBase64 || prefill?.referenceImageBase64 || null;
+
+          console.log('Generating AI watch image with reference:', {
+            hasReferenceImage: Boolean(referenceImageForGeneration),
+            referenceLength: referenceImageForGeneration?.length || 0,
+          });
 
           supabase.functions.invoke('generate-watch-image', {
             body: {
@@ -415,7 +427,7 @@ export const AddWatchDialog = ({ onSuccess, externalOpen, onExternalOpenChange, 
       setOpen(false);
       setModelRef("");
       setPurchaseDate(undefined);
-      setUploadedPhotoBase64(null);
+      setPhotoReference(null);
       setPhotoHints(null);
       setFormValues({
         brand: "",
@@ -506,7 +518,7 @@ export const AddWatchDialog = ({ onSuccess, externalOpen, onExternalOpenChange, 
                   });
                 }
               }}
-              onPhotoUploaded={(base64) => setUploadedPhotoBase64(base64)}
+              onPhotoUploaded={(base64) => setPhotoReference(base64)}
               onContinueToForm={() => setActiveTab("manual")}
             />
           </TabsContent>
