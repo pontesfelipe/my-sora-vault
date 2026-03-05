@@ -2,7 +2,6 @@ import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, Watch, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { useWatchData } from "@/hooks/useWatchData";
 import { useCollection } from "@/contexts/CollectionContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -12,6 +11,8 @@ import { motion } from "framer-motion";
 import { PageTransition } from "@/components/PageTransition";
 import { QuickLogSheet } from "@/components/QuickLogSheet";
 import { WearCalendar } from "@/components/WearCalendar";
+import { MostWornThisWeekSection } from "@/components/MostWornThisWeekSection";
+import { HomeFeedSection } from "@/components/HomeFeedSection";
 import { useTranslation } from "react-i18next";
 
 const Home = () => {
@@ -27,6 +28,7 @@ const Home = () => {
     const localeMap: Record<string, Locale> = { en: enUS, es, fr, pt, ja, zh: zhCN };
     return localeMap[i18n.language] || enUS;
   }, [i18n.language]);
+
   const handleWatchCardTap = (watch: any) => {
     setQuickLogWatch(watch);
     setQuickLogOpen(true);
@@ -84,11 +86,11 @@ const Home = () => {
           />
         </section>
 
-        {/* Most Worn Overall */}
+        {/* Your Most Worn (personal) */}
         <section>
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-semibold uppercase tracking-wider text-textMuted">
-              {t("home.mostWorn")}
+              {t("home.yourMostWorn")}
             </h2>
             <button
               onClick={() => navigate("/profile")}
@@ -128,6 +130,12 @@ const Home = () => {
               ))}
           </div>
         </section>
+
+        {/* Most Worn This Week (platform/friends) */}
+        <MostWornThisWeekSection />
+
+        {/* Social Feed */}
+        <HomeFeedSection />
 
         {/* Reserved for future sponsored content */}
         <section className="opacity-0 pointer-events-none h-0">

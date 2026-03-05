@@ -319,6 +319,42 @@ export type Database = {
         }
         Relationships: []
       }
+      editorial_content: {
+        Row: {
+          content_type: string
+          created_at: string
+          created_by: string | null
+          id: string
+          image_url: string | null
+          published_at: string
+          summary: string | null
+          title: string
+          url: string | null
+        }
+        Insert: {
+          content_type?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          image_url?: string | null
+          published_at?: string
+          summary?: string | null
+          title: string
+          url?: string | null
+        }
+        Update: {
+          content_type?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          image_url?: string | null
+          published_at?: string
+          summary?: string | null
+          title?: string
+          url?: string | null
+        }
+        Relationships: []
+      }
       events: {
         Row: {
           created_at: string
@@ -2038,6 +2074,48 @@ export type Database = {
           last_used: string
           total_uses: number
           unique_users: number
+        }[]
+      }
+      get_friends_most_worn_this_week: {
+        Args: { _user_id: string }
+        Returns: {
+          ai_image_url: string
+          brand: string
+          model: string
+          user_count: number
+          wear_count: number
+        }[]
+      }
+      get_home_feed: {
+        Args: {
+          _filter?: string
+          _limit?: number
+          _offset?: number
+          _user_id: string
+        }
+        Returns: {
+          author_avatar_url: string
+          author_id: string
+          author_username: string
+          comment_count: number
+          content: string
+          created_at: string
+          external_url: string
+          feed_id: string
+          feed_type: string
+          image_url: string
+          like_count: number
+          title: string
+        }[]
+      }
+      get_platform_most_worn_this_week: {
+        Args: never
+        Returns: {
+          ai_image_url: string
+          brand: string
+          model: string
+          user_count: number
+          wear_count: number
         }[]
       }
       get_profile_id_by_email: { Args: { _email: string }; Returns: string }
