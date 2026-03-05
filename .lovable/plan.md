@@ -1,64 +1,87 @@
 
 
-# Mobile UX Completion Plan
+## Home Page Redesign: Social Feed + Platform Analytics
 
-Based on the audit documents and codebase analysis, here is what already exists and what needs to be implemented.
+### Overview
+Redesign the Home page to add a **Social Feed module** and a **Most Worn This Week (platform-wide)** section while keeping the existing Your Week and Wrist Check features. The Feed page (currently at `/feed`) remains for full forum + messages; the Home page gets a lightweight social feed preview.
 
-## Already Done (No Work Needed)
-- Offline status hook + banner (`useOnlineStatus`, `OfflineBanner`)
-- Offline wear-entry queue (`offlineSync.ts`)
-- Haptics utility (`haptics.ts`)
-- `useIsMobile` hook
-- Long-press context menu (`useLongPress` + `WatchContextMenu`)
-- Watch grid skeleton (`WatchCardSkeleton` in `WatchCaseGrid`)
-- `PageTransition` wrapper (used on Home, Log, Feed, Profile)
-- Quick-log from Home (QuickLogSheet, one-tap log icon)
-- Some whileTap on specific cards
+### Architecture
 
----
+```text
+Home Page Layout (top to bottom):
+┌─────────────────────────┐
+│ Greeting + Date         │
+│ [Wrist Check] button    │
+├─────────────────────────┤
+│ YOUR WEEK (WearCalendar)│
+├─────────────────────────┤
+│ MOST WORN THIS WEEK     │
+│ (platform + friends)    │
+│ Horizontal scroll cards │
+├─────────────────────────┤
+│ SOCIAL FEED             │
+│ Filter chips: Friends | │
+│ Trending | News |       │
+│ Articles | Videos       │
+│ Vertical card list      │
+│ [Load More] button      │
+├─────────────────────────┤
+│ [Sponsored slot]        │
+└─────────────────────────┘
+```
 
-## Implementation Steps (in priority order)
+### Implementation Plan
 
-### 1. Global whileTap on Button component
-- In `src/components/ui/button.tsx`, wrap with `motion.button` / `motion(Slot)` from framer-motion
-- Add `whileTap={{ scale: 0.97 }}` with `prefers-reduced-motion` check
-- Single file change, affects every button in the app
+#### 1. Database: Platform-wide "Most Worn This Week" query
+- Create a new **backend function** (`get_platform_most_worn_this_week`) that aggregates `wear_entries` across all users (or friends) for the current week, returning top watches with brand/model/image/count. This avoids exposing other users' data via RLS -- a security-definer function returns only aggregated, anonymized results.
+- Create a new **backend function** (`get_friends_most_worn_this_week`) that filters to the user's friends list only.
 
-### 2. React Query cache config
-- Update `QueryClient` in `App.tsx` with `staleTime: 5min`, `gcTime: 30min`, `retry: 2`, `refetchOnWindowFocus: false`
+#### 2. Database: Social Feed content
+- Create a new table **`editorial_content`** for platform editorial/news/articles/videos (admin-managed), with columns: `id`, `title`, `summary`, `url`, `image_url`, `content_type` (news/article/video), `published_at`, `created_by`, `created_at`. RLS: public SELECT for authenticated users, admin-only INSERT/UPDATE/DELETE.
+- Create a new backend function **`get_home_feed`** that unions:
+  - Friends' recent forum posts (from `user_posts` joined with `friendships`)
+  - Comments on the current user's posts
+  - Likes on the current user's posts
+  - Trending posts (most liked/commented platform-wide, last 7 days)
+  - Editorial content from `editorial_content`
+  - Returns a unified feed with `feed_type` label (friends/trending/editorial)
 
-### 3. Replace dropdowns with Drawers on mobile
-- `CollectionSwitcher.tsx`: use `useIsMobile()` to render Drawer on mobile, keep DropdownMenu on desktop
-- `DynamicItemCard.tsx`: same pattern
-- `MentionNotificationsDropdown.tsx`: same pattern
+#### 3. New hook: `useHomeFeed`
+- Calls `get_home_feed` RPC with filter param (friends/trending/news/articles/videos/all)
+- Pagination: fetch N items, "Load More" button
+- React Query caching with 2min stale time
 
-### 4. Pull-to-refresh hook
-- Create `src/hooks/usePullToRefresh.ts` using touch events + Framer Motion indicator
-- Apply on Collection page, Feed page, Log page
-- Trigger React Query `refetch()` on pull
+#### 4. New hook: `usePlatformMostWorn`
+- Calls `get_platform_most_worn_this_week` and `get_friends_most_worn_this_week`
+- Returns combined data with tabs/toggle for "Platform" vs "Friends"
 
-### 5. Route-level AnimatePresence
-- Wrap `<Routes>` in `App.tsx` with `<AnimatePresence mode="wait">`
-- Requires `useLocation` + key on route wrapper
-- Respects `prefers-reduced-motion`
+#### 5. New component: `HomeFeedSection`
+- Filter chips at top (Friends default, Trending, News, Articles, Videos)
+- Compact vertical card list with: author avatar, text preview, optional image, like/comment counts
+- Cards labeled with subtle chip: "Friend", "Trending", "Editorial"
+- "Load More" button after initial 10 items (infinite scroll on mobile via intersection observer)
+- Tap opens detail (navigates to post or external URL)
 
-### 6. Feed skeleton component
-- Create `src/components/FeedItemSkeleton.tsx` (avatar circle + text lines + image placeholder)
-- Show 3 skeletons when feed `isLoading`
+#### 6. New component: `MostWornThisWeekSection`
+- Horizontal scrollable cards (similar to existing Most Worn but sourced from platform data)
+- Toggle between "Platform" and "Friends" via chips
+- Collapsible on mobile with "See more" if list is long
 
-### 7. Vault Assistant chat polish
-- Auto-resize textarea in VaultPal chat input
-- Scroll-to-latest floating pill using IntersectionObserver
-- Horizontal scrolling suggested question pills (`overflow-x-auto flex-nowrap`)
+#### 7. Update `Home.tsx`
+- Keep existing: greeting, Wrist Check CTA, WearCalendar
+- Rename existing "Most Worn" to "Your Most Worn" (personal)
+- Add `MostWornThisWeekSection` (platform-wide)
+- Add `HomeFeedSection`
+- Keep sponsored slot placeholder
 
-### 8. Accessibility fixes
-- Add `aria-label` to icon-only buttons in admin panel tabs and Settings
-- Fix `alt` text in GlobalSearch to use watch name
-- Increase tag/pill padding to `py-2` for 44px touch targets
+#### 8. i18n
+- Add all new keys to all 6 locale files (EN, ES, FR, PT, JA, ZH)
 
----
+#### 9. Change Control Log
+- Version 1.20, category: New Feature
 
-## Technical Notes
-- `vite-plugin-pwa` is **not recommended** here since the app uses Capacitor for native builds; a service worker may conflict with Capacitor's webview. PWA setup is skipped.
-- No new libraries needed — all work uses existing framer-motion, shadcn Drawer, Lucide icons, and Sonner toasts.
+### Technical Notes
+- The `get_home_feed` function uses `SECURITY DEFINER` to safely join across users while respecting privacy -- only returns public post data and friend activity
+- Editorial content is admin-managed via the existing Admin page (new tab)
+- No ads implemented yet; sponsored slot remains reserved
 
