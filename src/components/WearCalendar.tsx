@@ -15,6 +15,7 @@ import {
 } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface WearCalendarProps {
   watches: any[];
@@ -22,14 +23,16 @@ interface WearCalendarProps {
   onWatchTap?: (watch: any) => void;
 }
 
+const DAY_KEYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
+
 export const WearCalendar = ({ watches, wearEntries, onWatchTap }: WearCalendarProps) => {
   const [selectedWeekDate, setSelectedWeekDate] = useState<Date>(new Date());
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [calendarOpen, setCalendarOpen] = useState(false);
+  const { t } = useTranslation();
 
   const isCurrentWeek = isSameWeek(selectedWeekDate, new Date(), { weekStartsOn: 1 });
 
-  // Calculate week data based on selectedWeekDate
   const weekData = useMemo(() => {
     const weekStart = startOfWeek(selectedWeekDate, { weekStartsOn: 1 });
     const weekEnd = endOfWeek(selectedWeekDate, { weekStartsOn: 1 });
@@ -62,7 +65,7 @@ export const WearCalendar = ({ watches, wearEntries, onWatchTap }: WearCalendarP
       const dayEntries = weekEntries.filter((e: any) => e.wear_date === dateKey);
       const dayWatchIds = [...new Set(dayEntries.map((e: any) => e.watch_id))];
       return {
-        label: format(date, "EEE"),
+        dayKey: DAY_KEYS[i],
         date: format(date, "d"),
         dateKey,
         hasEntry: dayEntries.length > 0,
@@ -80,7 +83,6 @@ export const WearCalendar = ({ watches, wearEntries, onWatchTap }: WearCalendarP
     };
   }, [watches, wearEntries, selectedWeekDate]);
 
-  // Watches for selected day
   const selectedDayWatches = useMemo(() => {
     if (!selectedDay) return [];
     const day = weekData.daysOfWeek.find((d) => d.dateKey === selectedDay);
@@ -90,7 +92,6 @@ export const WearCalendar = ({ watches, wearEntries, onWatchTap }: WearCalendarP
       .filter(Boolean);
   }, [selectedDay, weekData, watches]);
 
-  // Dates that have wear entries (for calendar dots)
   const datesWithEntries = useMemo(() => {
     const set = new Set<string>();
     wearEntries.forEach((e: any) => set.add(e.wear_date));
@@ -111,11 +112,11 @@ export const WearCalendar = ({ watches, wearEntries, onWatchTap }: WearCalendarP
 
   return (
     <div className="space-y-3">
-      {/* Header: title + date picker */}
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <h2 className="text-sm font-semibold uppercase tracking-wider text-textMuted">
-            {isCurrentWeek ? "Your Week" : format(weekData.weekStart, "MMM d") + " – " + format(weekData.weekEnd, "MMM d")}
+            {isCurrentWeek ? t("calendar.yourWeek") : format(weekData.weekStart, "MMM d") + " – " + format(weekData.weekEnd, "MMM d")}
           </h2>
           {!isCurrentWeek && (
             <button
@@ -125,14 +126,14 @@ export const WearCalendar = ({ watches, wearEntries, onWatchTap }: WearCalendarP
               }}
               className="text-[10px] text-accent font-medium px-1.5 py-0.5 rounded bg-accent/10 hover:bg-accent/20 transition-colors"
             >
-              Today
+              {t("calendar.today")}
             </button>
           )}
         </div>
 
         <div className="flex items-center gap-2">
           <span className="text-xs text-textMuted">
-            {weekData.totalDays} day{weekData.totalDays !== 1 ? "s" : ""}
+            {t("calendar.dayCount", { count: weekData.totalDays })}
           </span>
           <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
             <PopoverTrigger asChild>
@@ -178,7 +179,7 @@ export const WearCalendar = ({ watches, wearEntries, onWatchTap }: WearCalendarP
             onClick={() => handleDayTap(day.dateKey)}
             className="flex flex-col items-center gap-1 group"
           >
-            <span className="text-[10px] text-textMuted font-medium">{day.label}</span>
+            <span className="text-[10px] text-textMuted font-medium">{t(`calendar.${day.dayKey}`)}</span>
             <div
               className={cn(
                 "h-8 w-8 rounded-full flex items-center justify-center text-xs font-medium transition-all",
@@ -212,7 +213,7 @@ export const WearCalendar = ({ watches, wearEntries, onWatchTap }: WearCalendarP
                   {format(parseISO(selectedDay), "EEEE, MMM d")}
                 </p>
                 <span className="text-[10px] text-textMuted">
-                  {selectedDayWatches.length} worn
+                  {t("calendar.worn", { count: selectedDayWatches.length })}
                 </span>
               </div>
               {selectedDayWatches.length > 0 ? (
@@ -242,14 +243,14 @@ export const WearCalendar = ({ watches, wearEntries, onWatchTap }: WearCalendarP
                   </Card>
                 ))
               ) : (
-                <p className="text-xs text-textMuted text-center py-2">No wrist check this day</p>
+                <p className="text-xs text-textMuted text-center py-2">{t("calendar.noWristCheckThisDay")}</p>
               )}
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Week summary watches (when no day selected) */}
+      {/* Week summary watches */}
       {!selectedDay && weekData.watches.length > 0 && (
         <div className="space-y-2">
           {weekData.watches.slice(0, 3).map(({ watch, count }, i) => (
@@ -281,7 +282,7 @@ export const WearCalendar = ({ watches, wearEntries, onWatchTap }: WearCalendarP
                     {watch!.brand} {watch!.model}
                   </p>
                   <p className="text-xs text-textMuted">
-                    {count} day{count !== 1 ? "s" : ""} this week
+                    {t("calendar.daysThisWeek", { count })}
                   </p>
                 </div>
                 <ChevronRight className="h-4 w-4 text-textMuted shrink-0" />
@@ -294,7 +295,7 @@ export const WearCalendar = ({ watches, wearEntries, onWatchTap }: WearCalendarP
       {!selectedDay && weekData.watches.length === 0 && (
         <Card className="p-6 text-center border-dashed border-borderSubtle">
           <Watch className="h-8 w-8 text-textMuted mx-auto mb-2" />
-          <p className="text-sm text-textMuted">No entries this week</p>
+          <p className="text-sm text-textMuted">{t("calendar.noEntriesThisWeek")}</p>
         </Card>
       )}
     </div>
