@@ -62,13 +62,13 @@ function shouldReuseExistingImage(opts: {
 }
 
 const COMPOSITION_RULES = [
+  '*** ABSOLUTE #1 PRIORITY — ORIENTATION ***: The watch MUST be rendered UPRIGHT and VERTICAL. 12 o\'clock at the TOP, 6 o\'clock at the BOTTOM. The watch must NEVER be lying down, tilted, horizontal, or rotated. If you generate a horizontal/laying watch, the output is INVALID and REJECTED',
   'SQUARE 1:1 aspect ratio composition',
   'The watch must be PERFECTLY CENTERED in the frame, both horizontally and vertically',
   'CRITICAL SIZE RULE: Regardless of the actual case diameter, ALL watches must appear the SAME visual size — the case (excluding strap) fills exactly 60% of image width and 50% of image height',
   'STRAIGHT-ON front-facing view looking directly at the dial face — absolutely NO side angles, NO wrist shots',
   'Maximum 3-5 degree tilt for minimal depth perception — the full dial must be completely visible and readable',
-  'ORIENTATION LOCK: 12 o\'clock marker must be at the top; watch must be upright and NEVER sideways or rotated 90°',
-  'The watch must be UPRIGHT with 12 o\'clock at the top, hands set to 10:10 position',
+  'The watch hands must be set to the 10:10 position',
   'Show a small portion of the bracelet/strap extending from both lugs (about 1-2 links or 2cm of strap)',
   'DARK background: smooth gradient from charcoal (#2a2a2a) at edges to near-black (#111111) at center',
   'Professional studio lighting: soft diffused main light from upper-left, subtle fill light from right',
@@ -76,6 +76,33 @@ const COMPOSITION_RULES = [
   'No reflections on crystal, no glare spots, no watermarks, no text overlays',
   'Ultra high resolution, photorealistic, luxury catalog quality',
 ].join('. ');
+
+function buildUserPhotoEnhancementPrompt(
+  brand: string,
+  model: string,
+  opts: { dialColor?: string; type?: string; caseSize?: string; movement?: string; bezelType?: string; strapType?: string; specialEditionHint?: string }
+): string {
+  const canonicalModel = canonicalizeModelForPrompt(brand, model);
+  const specificCues = [
+    opts.dialColor ? `Dial color: ${opts.dialColor}` : '',
+    opts.type ? `Watch type: ${opts.type}` : '',
+    opts.bezelType ? `Bezel: ${opts.bezelType}` : '',
+    opts.strapType ? `Bracelet/strap: ${opts.strapType}` : '',
+    opts.specialEditionHint ? `Edition details: ${opts.specialEditionHint}` : '',
+  ].filter(Boolean).join('. ');
+
+  return [
+    `USER PHOTO ENHANCEMENT: The attached image is a real photograph of a ${brand} ${canonicalModel} taken by the owner. Use this photo as the AUTHORITATIVE visual reference for EXACTLY what this watch looks like — its dial, hands, indices, bezel, bracelet/strap, case shape, and all details`,
+    `YOUR TASK: Transform this user photo into a professional, clean STUDIO PRODUCT SHOT. Keep EVERY design detail from the original photo — do NOT change or hallucinate any watch features. Only change the PRESENTATION:`,
+    `- Remove the background and replace with a dark studio gradient`,
+    `- Correct the orientation so the watch is PERFECTLY UPRIGHT (12 o'clock at top)`,
+    `- Remove any wrist, arm, table, or surface — show only the watch`,
+    `- Apply clean, even studio lighting`,
+    `- Set hands to 10:10 if they are in a significantly different position`,
+    specificCues,
+    `COMPOSITION: ${COMPOSITION_RULES}`,
+  ].filter(Boolean).join('. ');
+}
 
 function buildReferencePrompt(
   brand: string,
@@ -414,29 +441,30 @@ serve(async (req) => {
     let generationMethod: string;
 
     if (resolvedBase64) {
-      generationMethod = 'reference-enhanced';
-      console.log(`Using reference image for enhanced generation (${referenceSource})`);
-      const prompt = customPrompt || buildReferencePrompt(brand, model, {
-        dialColor,
-        type,
-        caseSize,
-        movement,
-        bezelType,
-        strapType,
-        specialEditionHint,
-      });
+      generationMethod = referenceSource === 'uploaded-photo' ? 'photo-enhancement' : 'reference-enhanced';
+      console.log(`Using reference image for ${generationMethod} (${referenceSource})`);
+
+      let prompt: string;
+      if (customPrompt) {
+        prompt = customPrompt;
+      } else if (referenceSource === 'uploaded-photo') {
+        // User's own photo — enhance it into a studio shot, preserving exact watch details
+        prompt = buildUserPhotoEnhancementPrompt(brand, model, {
+          dialColor, type, caseSize, movement, bezelType, strapType, specialEditionHint,
+        });
+      } else {
+        // Web-sourced or provided reference — extract design DNA and generate new
+        prompt = buildReferencePrompt(brand, model, {
+          dialColor, type, caseSize, movement, bezelType, strapType, specialEditionHint,
+        });
+      }
+
       messages = [{ role: "user", content: [{ type: "text", text: prompt }, { type: "image_url", image_url: { url: resolvedBase64 } }] }];
     } else {
       generationMethod = 'pure-generation';
       console.log('No reference image found, using pure AI generation');
       const prompt = customPrompt || buildPureGenerationPrompt(brand, model, {
-        dialColor,
-        type,
-        caseSize,
-        movement,
-        bezelType,
-        strapType,
-        specialEditionHint,
+        dialColor, type, caseSize, movement, bezelType, strapType, specialEditionHint,
       });
       messages = [{ role: "user", content: prompt }];
     }
