@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { UserPlus } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import {
   Dialog,
   DialogContent,
@@ -22,12 +23,13 @@ export function AddFriendDialog({ onSendRequest }: AddFriendDialogProps) {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const { t } = useTranslation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!email.trim()) {
-      toast.error("Please enter an email address");
+      toast.error(t("feed.enterEmail"));
       return;
     }
 
@@ -38,7 +40,7 @@ export function AddFriendDialog({ onSendRequest }: AddFriendDialogProps) {
     if (result.error) {
       toast.error(result.error);
     } else {
-      toast.success("Friend request sent!");
+      toast.success(t("feed.friendRequestSent"));
       setEmail("");
       setMessage("");
       setOpen(false);
@@ -50,16 +52,16 @@ export function AddFriendDialog({ onSendRequest }: AddFriendDialogProps) {
       <DialogTrigger asChild>
         <Button size="sm" variant="outline">
           <UserPlus className="h-4 w-4 mr-2" />
-          Add Friend
+          {t("feed.addFriend")}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Add a Friend</DialogTitle>
+          <DialogTitle>{t("feed.addAFriend")}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">Email Address</Label>
+            <Label htmlFor="email">{t("feed.emailAddress")}</Label>
             <Input
               id="email"
               type="email"
@@ -70,10 +72,10 @@ export function AddFriendDialog({ onSendRequest }: AddFriendDialogProps) {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="message">Message (optional)</Label>
+            <Label htmlFor="message">{t("feed.messageOptional")}</Label>
             <Textarea
               id="message"
-              placeholder="Hi! I'd like to connect..."
+              placeholder={t("feed.messagePlaceholder")}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               disabled={loading}
@@ -82,10 +84,10 @@ export function AddFriendDialog({ onSendRequest }: AddFriendDialogProps) {
           </div>
           <div className="flex justify-end gap-2">
             <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={loading}>
-              Cancel
+              {t("feed.cancel")}
             </Button>
             <Button type="submit" disabled={loading}>
-              {loading ? "Sending..." : "Send Request"}
+              {loading ? t("feed.sending") : t("feed.sendRequest")}
             </Button>
           </div>
         </form>

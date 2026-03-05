@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { Send } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/contexts/AuthContext";
 import { useConversationMessages } from "@/hooks/useConversationMessages";
 import { Conversation } from "@/hooks/useMessaging";
@@ -18,6 +19,7 @@ interface ChatWindowProps {
 
 export function ChatWindow({ conversation, onSendMessage, onMarkAsRead }: ChatWindowProps) {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [newMessage, setNewMessage] = useState("");
   const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -58,7 +60,7 @@ export function ChatWindow({ conversation, onSendMessage, onMarkAsRead }: ChatWi
   if (!conversation) {
     return (
       <div className="flex items-center justify-center h-full text-textMuted">
-        <p>Select a conversation to start chatting</p>
+        <p>{t("feed.selectConversation")}</p>
       </div>
     );
   }
@@ -81,7 +83,7 @@ export function ChatWindow({ conversation, onSendMessage, onMarkAsRead }: ChatWi
           </div>
         ) : messages.length === 0 ? (
           <div className="flex items-center justify-center h-full text-textMuted">
-            <p className="text-sm">No messages yet. Say hello!</p>
+            <p className="text-sm">{t("feed.noMessagesYet")}</p>
           </div>
         ) : (
           messages.map((message) => {
@@ -132,7 +134,7 @@ export function ChatWindow({ conversation, onSendMessage, onMarkAsRead }: ChatWi
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="Type a message..."
+            placeholder={t("feed.typeMessage")}
             className="flex-1"
             disabled={sending}
           />
