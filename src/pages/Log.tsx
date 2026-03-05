@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { queueWearEntry, syncWearQueue, getWearQueue } from "@/utils/offlineSync";
+import { useTranslation } from "react-i18next";
 import {
   Select,
   SelectContent,
@@ -36,6 +37,7 @@ const Log = () => {
   const { selectedCollectionId } = useCollection();
   const { watches, refetch } = useWatchData(selectedCollectionId);
   const isOnline = useOnlineStatus();
+  const { t } = useTranslation();
 
   // Sync queued entries when coming back online
   useEffect(() => {
@@ -44,7 +46,7 @@ const Log = () => {
       if (queue.length > 0) {
         syncWearQueue().then((synced) => {
           if (synced > 0) {
-            toast.success(`Synced ${synced} offline wear ${synced === 1 ? "entry" : "entries"}`);
+            toast.success(t("log.syncedOffline", { count: synced }));
             refetch();
           }
         });
@@ -320,8 +322,8 @@ const Log = () => {
       }
 
       if (lastError || !data) {
-        setIdentificationError("Could not identify this watch automatically.");
-        toast.error(lastError || "Could not identify watch. You can add it manually.");
+      setIdentificationError(t("log.couldNotIdentifyAuto"));
+      toast.error(lastError || t("log.couldNotIdentifyAuto"));
       } else {
         setIdentifiedWatch(data);
         const match = findBestMatch(data.brand, data.model, data.type, data.dial_color, data.case_size, data.movement, data.complications, data.case_shape);
@@ -329,10 +331,10 @@ const Log = () => {
           setSelectedWatchId(match.id);
           setIdentifiedWatch(null);
           setIdentificationError(null);
-          toast.success(`Matched: ${match.brand} ${match.model}`);
+          toast.success(t("log.matched", { name: `${match.brand} ${match.model}` }));
         } else {
           setIdentificationError(null);
-          toast.info(`${`Identified: ${data.brand || ""} ${data.model || ""}`.trim()} — not in your collection`);
+          toast.info(t("log.identified", { name: `${data.brand || ""} ${data.model || ""}`.trim() }));
         }
       }
     } catch (err) {
@@ -357,7 +359,7 @@ const Log = () => {
       rejected_model: rejection.model,
     }).then(() => {});
 
-    toast.info("Got it — trying again with a different identification...");
+    toast.info(t("log.tryingAgain"));
     await identifyFromImage(photoPreview, updatedRejections);
   };
 
@@ -398,8 +400,8 @@ const Log = () => {
       await identifyFromImage(base64, pastRejections);
     } catch (err) {
       console.error("AI identification failed:", err);
-      setIdentificationError("Could not identify this watch automatically.");
-      toast.error("Could not identify watch. You can add it manually.");
+      setIdentificationError(t("log.couldNotIdentifyAuto"));
+      toast.error(t("log.couldNotIdentifyAuto"));
       setIsIdentifying(false);
     }
   };
@@ -420,7 +422,7 @@ const Log = () => {
 
   const handleSubmit = async () => {
     if (!selectedWatchId || !user) {
-      toast.error("Please select a watch");
+      toast.error(t("log.selectWatch"));
       return;
     }
 
@@ -436,7 +438,7 @@ const Log = () => {
 
       if (!isOnline) {
         queueWearEntry({ ...entryData, queued_at: Date.now() });
-        toast.success("Saved offline — will sync when reconnected");
+        toast.success(t("log.savedOffline"));
         navigate("/");
         return;
       }
@@ -445,7 +447,7 @@ const Log = () => {
 
       if (error) throw error;
 
-      toast.success("Wrist check logged! 🎉");
+      toast.success(t("log.wristCheckLogged"));
       refetch();
       navigate("/");
     } catch (err: any) {
@@ -459,10 +461,10 @@ const Log = () => {
           notes: [notes, ...tags.map((t) => `#${t}`)].filter(Boolean).join(" ") || null,
           queued_at: Date.now(),
         });
-        toast.success("Saved offline — will sync when reconnected");
+        toast.success(t("log.savedOffline"));
         navigate("/");
       } else {
-        toast.error(err.message || "Failed to log");
+        toast.error(err.message || t("log.failedToLog"));
       }
     } finally {
       setIsSubmitting(false);
@@ -475,8 +477,8 @@ const Log = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-textMain">Wrist Check</h1>
-          <p className="text-sm text-textMuted">What are you wearing today?</p>
+          <h1 className="text-2xl font-bold text-textMain">{t("log.title")}</h1>
+          <p className="text-sm text-textMuted">{t("log.subtitle")}</p>
         </div>
         <button
           onClick={() => {
@@ -524,7 +526,7 @@ const Log = () => {
               <div className="absolute inset-0 bg-background/80 flex items-center justify-center">
                 <div className="flex items-center gap-2 text-accent">
                   <Sparkles className="h-5 w-5 animate-pulse" />
-                  <span className="text-sm font-medium">Identifying watch...</span>
+                  <span className="text-sm font-medium">{t("log.identifyingWatch")}</span>
                 </div>
               </div>
             )}
@@ -549,7 +551,7 @@ const Log = () => {
               className="flex flex-col items-center gap-2 text-textMuted hover:text-accent transition-colors px-4"
             >
               <Camera className="h-8 w-8" />
-              <span className="text-sm font-medium">Take Photo</span>
+              <span className="text-sm font-medium">{t("log.takePhoto")}</span>
             </button>
             <div className="w-px h-12 bg-borderSubtle" />
             <button
@@ -557,7 +559,7 @@ const Log = () => {
               className="flex flex-col items-center gap-2 text-textMuted hover:text-accent transition-colors px-4"
             >
               <Upload className="h-8 w-8" />
-              <span className="text-sm font-medium">Upload</span>
+              <span className="text-sm font-medium">{t("log.upload")}</span>
             </button>
           </div>
         )}
@@ -579,9 +581,9 @@ const Log = () => {
                     {identifiedWatch.brand} {identifiedWatch.model}
                   </p>
                   {identifiedWatch.reference && (
-                    <p className="text-xs text-textMuted">Ref: {identifiedWatch.reference}</p>
+                    <p className="text-xs text-textMuted">{t("log.ref", { ref: identifiedWatch.reference })}</p>
                   )}
-                  <p className="text-xs text-textMuted mt-1">Not found in your collection</p>
+                  <p className="text-xs text-textMuted mt-1">{t("log.notInCollection")}</p>
                   <div className="flex gap-2 mt-2">
                     <Button size="sm" variant="default" onClick={() => {
                       // Try fuzzy match one more time
@@ -597,7 +599,7 @@ const Log = () => {
                         setSelectedWatchId(match.id);
                         setIdentifiedWatch(null);
                         setIdentificationError(null);
-                        toast.success(`Matched: ${match.brand} ${match.model}`);
+                        toast.success(t("log.matched", { name: `${match.brand} ${match.model}` }));
                       } else {
                         // Open AddWatchDialog with pre-filled data
                         setAddWatchPrefill({
@@ -614,17 +616,17 @@ const Log = () => {
                       }
                     }}>
                       <Plus className="h-4 w-4 mr-1" />
-                      Add to Collection
+                      {t("log.addToCollection")}
                     </Button>
                     <Button size="sm" variant="outline" onClick={handleNotMyWatch} disabled={isIdentifying}>
                       {isIdentifying ? (
-                        <><Loader2 className="h-4 w-4 mr-1 animate-spin" />Retrying...</>
+                        <><Loader2 className="h-4 w-4 mr-1 animate-spin" />{t("log.retrying")}</>
                       ) : (
-                        <><X className="h-4 w-4 mr-1" />Not My Watch</>
+                        <><X className="h-4 w-4 mr-1" />{t("log.notMyWatch")}</>
                       )}
                     </Button>
                     <Button size="sm" variant="ghost" onClick={() => setIdentifiedWatch(null)}>
-                      Dismiss
+                      {t("log.dismiss")}
                     </Button>
                   </div>
                 </div>
@@ -652,7 +654,7 @@ const Log = () => {
                     }}
                   >
                     <Plus className="h-4 w-4 mr-1" />
-                    Add Watch Manually
+                    {t("log.addWatchManually")}
                   </Button>
                   <Button
                     size="sm"
@@ -662,7 +664,7 @@ const Log = () => {
                       setShowWatchPicker(true);
                     }}
                   >
-                    Pick from Collection
+                    {t("log.pickFromCollection")}
                   </Button>
                 </div>
               </div>
@@ -673,7 +675,7 @@ const Log = () => {
 
       {/* Watch Selector */}
       <div>
-        <label className="text-sm font-medium text-textMain mb-2 block">Watch</label>
+        <label className="text-sm font-medium text-textMain mb-2 block">{t("log.watch")}</label>
         {selectedWatch ? (
           <Card
             className="flex items-center gap-3 p-3 cursor-pointer hover:bg-surfaceMuted transition-colors border-borderSubtle"
@@ -701,7 +703,7 @@ const Log = () => {
         ) : (
           <div className="space-y-2">
             <Input
-              placeholder="Search your collection..."
+              placeholder={t("log.searchCollection")}
               value={watchSearch}
               onChange={(e) => setWatchSearch(e.target.value)}
               onFocus={() => setShowWatchPicker(true)}
@@ -716,7 +718,7 @@ const Log = () => {
                 >
                   {filteredWatches.length === 0 ? (
                     <div className="p-4 text-center space-y-2">
-                      <p className="text-sm text-textMuted">No watches found</p>
+                      <p className="text-sm text-textMuted">{t("log.noWatchesFound")}</p>
                       {watchSearch.trim() && (
                         <Button
                           size="sm"
@@ -728,7 +730,7 @@ const Log = () => {
                           }}
                         >
                           <Plus className="h-4 w-4" />
-                          Add "{watchSearch.trim()}" to collection
+                          {t("log.addToCollectionSearch", { query: watchSearch.trim() })}
                         </Button>
                       )}
                     </div>
@@ -769,7 +771,7 @@ const Log = () => {
       <div>
         <label className="text-sm font-medium text-textMain mb-2 block">
           <Tag className="h-3.5 w-3.5 inline mr-1" />
-          Tags
+          {t("log.tags")}
         </label>
         <div className="flex flex-wrap gap-2 mb-2">
           {SUGGESTED_TAGS.map((tag) => (
@@ -789,7 +791,7 @@ const Log = () => {
         </div>
         <div className="flex gap-2">
           <Input
-            placeholder="Add custom tag..."
+            placeholder={t("log.addCustomTag")}
             value={customTag}
             onChange={(e) => setCustomTag(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addCustomTag())}
@@ -819,10 +821,10 @@ const Log = () => {
       <details className="group">
         <summary className="text-sm font-medium text-textMuted cursor-pointer list-none flex items-center gap-1">
           <ChevronDown className="h-4 w-4 transition-transform group-open:rotate-180" />
-          Add notes (optional)
+          {t("log.addNotes")}
         </summary>
         <Textarea
-          placeholder="How's it wearing today?"
+          placeholder={t("log.notesPlaceholder")}
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           className="mt-2 min-h-[60px]"
@@ -839,12 +841,12 @@ const Log = () => {
         {isSubmitting ? (
           <>
             <Loader2 className="h-5 w-5 animate-spin mr-2" />
-            Logging...
+            {t("log.logging")}
           </>
         ) : (
           <>
             <Check className="h-5 w-5 mr-2" />
-            Log Wrist Check
+            {t("log.logWristCheck")}
           </>
         )}
       </Button>
@@ -855,7 +857,7 @@ const Log = () => {
           refetch().then(() => {
             if (newWatchId) {
               setSelectedWatchId(newWatchId);
-              toast.success("Watch added & selected! Ready to log.");
+              toast.success(t("log.watchAddedSelected"));
             }
           });
           setShowAddWatch(false);

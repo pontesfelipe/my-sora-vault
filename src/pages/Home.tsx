@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, Watch, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,7 @@ import { useWatchData } from "@/hooks/useWatchData";
 import { useCollection } from "@/contexts/CollectionContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { format } from "date-fns";
+import { enUS, es, fr, pt, ja, zhCN, type Locale } from "date-fns/locale";
 import { motion } from "framer-motion";
 import { PageTransition } from "@/components/PageTransition";
 import { QuickLogSheet } from "@/components/QuickLogSheet";
@@ -20,8 +21,12 @@ const Home = () => {
   const { watches, wearEntries, loading, refetch } = useWatchData(selectedCollectionId);
   const [quickLogWatch, setQuickLogWatch] = useState<any>(null);
   const [quickLogOpen, setQuickLogOpen] = useState(false);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
+  const dateLocale = useMemo(() => {
+    const localeMap: Record<string, Locale> = { en: enUS, es, fr, pt, ja, zh: zhCN };
+    return localeMap[i18n.language] || enUS;
+  }, [i18n.language]);
   const handleWatchCardTap = (watch: any) => {
     setQuickLogWatch(watch);
     setQuickLogOpen(true);
@@ -51,7 +56,7 @@ const Home = () => {
             {getGreeting()}
           </h1>
           <p className="text-sm text-textMuted mt-0.5">
-            {format(new Date(), "EEEE, MMMM d")}
+            {format(new Date(), "EEEE, MMMM d", { locale: dateLocale })}
           </p>
         </div>
 
