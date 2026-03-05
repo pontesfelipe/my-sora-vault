@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { ResponsiveDialog } from "@/components/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -111,6 +112,7 @@ interface AddWatchDialogProps {
 }
 
 export const AddWatchDialog = ({ onSuccess, externalOpen, onExternalOpenChange, prefill }: AddWatchDialogProps) => {
+  const { t } = useTranslation();
   const [internalOpen, setInternalOpen] = useState(false);
   const open = externalOpen !== undefined ? externalOpen : internalOpen;
   const setOpen = (v: boolean) => {
@@ -452,14 +454,14 @@ export const AddWatchDialog = ({ onSuccess, externalOpen, onExternalOpenChange, 
     } catch (error) {
       if (error instanceof z.ZodError) {
         toast({
-          title: "Validation Error",
+          title: t("addWatch.validationError"),
           description: error.errors[0].message,
           variant: "destructive",
         });
       } else {
         toast({
-          title: "Error",
-          description: "Failed to add watch",
+          title: t("addWatch.error"),
+          description: t("addWatch.failedAdd"),
           variant: "destructive",
         });
       }
@@ -475,14 +477,14 @@ export const AddWatchDialog = ({ onSuccess, externalOpen, onExternalOpenChange, 
       {!isExternallyControlled && (
         <Button onClick={() => setOpen(true)} className="gap-2">
           <Plus className="w-4 h-4" />
-          Add to Collection
+          {t("addWatch.addToCollection")}
         </Button>
       )}
-      <ResponsiveDialog open={open} onOpenChange={setOpen} title="Add New Watch" className="max-w-md max-h-[90vh] flex flex-col">
+      <ResponsiveDialog open={open} onOpenChange={setOpen} title={t("addWatch.addNewWatch")} className="max-w-md max-h-[90vh] flex flex-col">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col flex-1 min-h-0">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="photo">📸 Photo Upload</TabsTrigger>
-            <TabsTrigger value="manual">✍️ Manual Entry</TabsTrigger>
+            <TabsTrigger value="photo">{t("addWatch.photoUpload")}</TabsTrigger>
+            <TabsTrigger value="manual">{t("addWatch.manualEntry")}</TabsTrigger>
           </TabsList>
           
           <TabsContent value="photo" className="flex-1 overflow-y-auto mt-4">
@@ -526,33 +528,33 @@ export const AddWatchDialog = ({ onSuccess, externalOpen, onExternalOpenChange, 
           <TabsContent value="manual" className="flex-1 overflow-y-auto">
             <div className="bg-muted/50 p-3 rounded-lg border border-border mb-4">
               <p className="text-sm text-muted-foreground">
-                <strong className="text-foreground">Quick Add:</strong> Enter Brand and Model Reference, then click Search to auto-fill details from the web.
+                <strong className="text-foreground">Quick Add:</strong> {t("addWatch.searchRefHint")}
               </p>
             </div>
 
             <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
               <div className="space-y-4 overflow-y-auto pr-2 flex-1">
             <div className="space-y-2">
-              <Label htmlFor="brand">Brand</Label>
+              <Label htmlFor="brand">{t("addWatch.brand")}</Label>
               <Input
                 id="brand"
                 value={formValues.brand}
                 onChange={(e) => setFormValues({ ...formValues, brand: e.target.value })}
                 required
                 maxLength={100}
-                placeholder="e.g., Omega, Rolex, IWC"
+                placeholder={t("addWatch.brandPlaceholder")}
                 className="bg-background border-border"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="modelRef">Model Reference (Optional)</Label>
+              <Label htmlFor="modelRef">{t("addWatch.modelRef")}</Label>
               <div className="flex gap-2">
                 <Input
                   id="modelRef"
                   value={modelRef}
                   onChange={(e) => setModelRef(e.target.value)}
-                  placeholder="e.g., 310.30.42.50.01.001"
+                  placeholder={t("addWatch.modelRefPlaceholder")}
                   className="bg-background border-border"
                 />
                 <Button
@@ -567,16 +569,16 @@ export const AddWatchDialog = ({ onSuccess, externalOpen, onExternalOpenChange, 
                   ) : (
                     <Search className="w-4 h-4 mr-1" />
                   )}
-                  {loading ? "Searching..." : "Search"}
+                  {loading ? t("addWatch.searching") : t("addWatch.search")}
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground">
-                With brand entered above, click Search to auto-fill remaining fields
+                {t("addWatch.searchRefHint")}
               </p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="model">Model</Label>
+              <Label htmlFor="model">{t("addWatch.model")}</Label>
               <Input
                 id="model"
                 value={formValues.model}
@@ -588,7 +590,7 @@ export const AddWatchDialog = ({ onSuccess, externalOpen, onExternalOpenChange, 
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="dialColor">Dial Color</Label>
+              <Label htmlFor="dialColor">{t("addWatch.dialColor")}</Label>
               <Input
                 id="dialColor"
                 value={formValues.dialColor}
@@ -600,18 +602,18 @@ export const AddWatchDialog = ({ onSuccess, externalOpen, onExternalOpenChange, 
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="type">Type</Label>
+              <Label htmlFor="type">{t("addWatch.type")}</Label>
               <WatchTypeMultiSelect
                 value={formValues.type}
                 onChange={(value) => setFormValues({ ...formValues, type: value })}
               />
               <p className="text-xs text-muted-foreground">
-                Select one or more watch types
+                {t("addWatch.selectTypes")}
               </p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="cost">Price Paid ($)</Label>
+              <Label htmlFor="cost">{t("addWatch.pricePaid")}</Label>
               <Input
                 id="cost"
                 value={formValues.cost}
@@ -620,12 +622,12 @@ export const AddWatchDialog = ({ onSuccess, externalOpen, onExternalOpenChange, 
                 step="0.01"
                 min="0"
                 className="bg-background border-border"
-                placeholder="Amount you paid (optional)"
+                placeholder={t("addWatch.pricePaidPlaceholder")}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="msrp">MSRP (Optional)</Label>
+              <Label htmlFor="msrp">{t("addWatch.msrp")}</Label>
               <Input
                 id="msrp"
                 value={formValues.msrp}
@@ -634,42 +636,42 @@ export const AddWatchDialog = ({ onSuccess, externalOpen, onExternalOpenChange, 
                 step="0.01"
                 min="0"
                 className="bg-background border-border"
-                placeholder="Manufacturer's suggested retail price"
+                placeholder={t("addWatch.msrpPlaceholder")}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="rarity">Rarity</Label>
+              <Label htmlFor="rarity">{t("addWatch.rarity")}</Label>
               <Select
                 value={formValues.rarity}
                 onValueChange={(value) => setFormValues({ ...formValues, rarity: value as any })}
               >
                 <SelectTrigger className="bg-background border-border">
-                  <SelectValue placeholder="Select rarity" />
+                  <SelectValue placeholder={t("addWatch.selectRarity")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="common">Common</SelectItem>
-                  <SelectItem value="uncommon">Uncommon</SelectItem>
-                  <SelectItem value="rare">Rare</SelectItem>
-                  <SelectItem value="very_rare">Very Rare</SelectItem>
-                  <SelectItem value="grail">Grail</SelectItem>
+                  <SelectItem value="common">{t("addWatch.common")}</SelectItem>
+                  <SelectItem value="uncommon">{t("addWatch.uncommon")}</SelectItem>
+                  <SelectItem value="rare">{t("addWatch.rare")}</SelectItem>
+                  <SelectItem value="very_rare">{t("addWatch.veryRare")}</SelectItem>
+                  <SelectItem value="grail">{t("addWatch.grail")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="historicalSignificance">Historical Significance</Label>
+              <Label htmlFor="historicalSignificance">{t("addWatch.historicalSignificance")}</Label>
               <Select
                 value={formValues.historicalSignificance}
                 onValueChange={(value) => setFormValues({ ...formValues, historicalSignificance: value as any })}
               >
                 <SelectTrigger className="bg-background border-border">
-                  <SelectValue placeholder="Select significance" />
+                  <SelectValue placeholder={t("addWatch.selectSignificance")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="regular">Regular</SelectItem>
-                  <SelectItem value="notable">Notable</SelectItem>
-                  <SelectItem value="historically_significant">Historically Significant</SelectItem>
+                  <SelectItem value="regular">{t("addWatch.regular")}</SelectItem>
+                  <SelectItem value="notable">{t("addWatch.notable")}</SelectItem>
+                  <SelectItem value="historically_significant">{t("addWatch.historicallySignificant")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -686,12 +688,12 @@ export const AddWatchDialog = ({ onSuccess, externalOpen, onExternalOpenChange, 
                 htmlFor="availableForTrade"
                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
-                Open to Trade
+                {t("addWatch.openToTrade")}
               </Label>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="averageResalePrice">Avg. US Resale Price (Optional)</Label>
+              <Label htmlFor="averageResalePrice">{t("addWatch.avgResalePrice")}</Label>
               <Input
                 id="averageResalePrice"
                 value={formValues.averageResalePrice}
@@ -699,13 +701,13 @@ export const AddWatchDialog = ({ onSuccess, externalOpen, onExternalOpenChange, 
                 type="number"
                 step="0.01"
                 min="0"
-                placeholder="Auto-filled from online sources"
+                placeholder={t("addWatch.resalePlaceholder")}
                 className="bg-background border-border"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="whenBought">Date of Purchase (Optional)</Label>
+              <Label htmlFor="whenBought">{t("addWatch.dateOfPurchase")}</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
@@ -716,7 +718,7 @@ export const AddWatchDialog = ({ onSuccess, externalOpen, onExternalOpenChange, 
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {purchaseDate ? format(purchaseDate, "PPP") : <span>Pick a date</span>}
+                    {purchaseDate ? format(purchaseDate, "PPP") : <span>{t("addWatch.pickDate")}</span>}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -757,7 +759,7 @@ export const AddWatchDialog = ({ onSuccess, externalOpen, onExternalOpenChange, 
                 
                 if (additionalInfo.length > 0) {
                   toast({
-                    title: "Additional Information",
+                    title: t("addWatch.additionalInfo"),
                     description: additionalInfo.join(' • '),
                   });
                 }
@@ -767,7 +769,7 @@ export const AddWatchDialog = ({ onSuccess, externalOpen, onExternalOpenChange, 
             <Separator className="my-6" />
 
             <div className="space-y-2">
-              <Label htmlFor="warrantyDate">Warranty Date</Label>
+              <Label htmlFor="warrantyDate">{t("addWatch.warrantyDate")}</Label>
               <Input
                 id="warrantyDate"
                 value={formValues.warrantyDate}
@@ -778,7 +780,7 @@ export const AddWatchDialog = ({ onSuccess, externalOpen, onExternalOpenChange, 
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="warrantyCard">Warranty Card (Optional)</Label>
+              <Label htmlFor="warrantyCard">{t("addWatch.warrantyCard")}</Label>
               <Input
                 id="warrantyCard"
                 type="file"
@@ -792,65 +794,65 @@ export const AddWatchDialog = ({ onSuccess, externalOpen, onExternalOpenChange, 
             {(formValues.caseSize || formValues.lugToLugSize || formValues.casebackMaterial || 
               formValues.movement || formValues.hasSapphire !== null) && (
               <div className="space-y-3 pt-4 border-t border-border">
-                <h3 className="text-sm font-semibold text-foreground">Additional Specifications</h3>
+                <h3 className="text-sm font-semibold text-foreground">{t("addWatch.additionalSpecs")}</h3>
                 
                 {formValues.caseSize && (
                   <div className="space-y-1">
-                    <Label htmlFor="caseSize" className="text-xs">Case Size</Label>
+                    <Label htmlFor="caseSize" className="text-xs">{t("addWatch.caseSize")}</Label>
                     <Input
                       id="caseSize"
                       value={formValues.caseSize}
                       onChange={(e) => setFormValues({ ...formValues, caseSize: e.target.value })}
                       className="bg-background border-border text-sm"
-                      placeholder="e.g., 41mm"
+                      placeholder={t("addWatch.caseSizePlaceholder")}
                     />
                   </div>
                 )}
                 
                 {formValues.lugToLugSize && (
                   <div className="space-y-1">
-                    <Label htmlFor="lugToLugSize" className="text-xs">Lug to Lug</Label>
+                    <Label htmlFor="lugToLugSize" className="text-xs">{t("addWatch.lugToLug")}</Label>
                     <Input
                       id="lugToLugSize"
                       value={formValues.lugToLugSize}
                       onChange={(e) => setFormValues({ ...formValues, lugToLugSize: e.target.value })}
                       className="bg-background border-border text-sm"
-                      placeholder="e.g., 48mm"
+                      placeholder={t("addWatch.lugToLugPlaceholder")}
                     />
                   </div>
                 )}
                 
                 {formValues.casebackMaterial && (
                   <div className="space-y-1">
-                    <Label htmlFor="casebackMaterial" className="text-xs">Caseback Material</Label>
+                    <Label htmlFor="casebackMaterial" className="text-xs">{t("addWatch.casebackMaterial")}</Label>
                     <Input
                       id="casebackMaterial"
                       value={formValues.casebackMaterial}
                       onChange={(e) => setFormValues({ ...formValues, casebackMaterial: e.target.value })}
                       className="bg-background border-border text-sm"
-                      placeholder="e.g., Stainless Steel"
+                      placeholder={t("addWatch.casebackPlaceholder")}
                     />
                   </div>
                 )}
                 
                 {formValues.movement && (
                   <div className="space-y-1">
-                    <Label htmlFor="movement" className="text-xs">Movement</Label>
+                    <Label htmlFor="movement" className="text-xs">{t("addWatch.movement")}</Label>
                     <Input
                       id="movement"
                       value={formValues.movement}
                       onChange={(e) => setFormValues({ ...formValues, movement: e.target.value })}
                       className="bg-background border-border text-sm"
-                      placeholder="e.g., Omega Co-Axial 8800"
+                      placeholder={t("addWatch.movementPlaceholder")}
                     />
                   </div>
                 )}
                 
                 {formValues.hasSapphire !== null && (
                   <div className="space-y-1">
-                    <Label className="text-xs">Sapphire Crystal</Label>
+                    <Label className="text-xs">{t("addWatch.sapphireCrystal")}</Label>
                     <div className="text-sm text-foreground">
-                      {formValues.hasSapphire ? "Yes" : "No"}
+                      {formValues.hasSapphire ? t("addWatch.yes") : t("addWatch.no")}
                     </div>
                   </div>
                 )}
@@ -860,7 +862,7 @@ export const AddWatchDialog = ({ onSuccess, externalOpen, onExternalOpenChange, 
 
           <div className="flex gap-2 pt-4 border-t border-border mt-4">
             <Button type="submit" disabled={loading} className="flex-1">
-              {loading ? "Adding..." : "Add Watch"}
+              {loading ? t("addWatch.adding") : t("addWatch.addWatch")}
             </Button>
             <Button
               type="button"
@@ -868,7 +870,7 @@ export const AddWatchDialog = ({ onSuccess, externalOpen, onExternalOpenChange, 
               onClick={() => setOpen(false)}
               className="flex-1"
             >
-              Cancel
+              {t("addWatch.cancel")}
             </Button>
           </div>
         </form>
