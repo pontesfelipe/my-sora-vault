@@ -441,29 +441,30 @@ serve(async (req) => {
     let generationMethod: string;
 
     if (resolvedBase64) {
-      generationMethod = 'reference-enhanced';
-      console.log(`Using reference image for enhanced generation (${referenceSource})`);
-      const prompt = customPrompt || buildReferencePrompt(brand, model, {
-        dialColor,
-        type,
-        caseSize,
-        movement,
-        bezelType,
-        strapType,
-        specialEditionHint,
-      });
+      generationMethod = referenceSource === 'uploaded-photo' ? 'photo-enhancement' : 'reference-enhanced';
+      console.log(`Using reference image for ${generationMethod} (${referenceSource})`);
+
+      let prompt: string;
+      if (customPrompt) {
+        prompt = customPrompt;
+      } else if (referenceSource === 'uploaded-photo') {
+        // User's own photo — enhance it into a studio shot, preserving exact watch details
+        prompt = buildUserPhotoEnhancementPrompt(brand, model, {
+          dialColor, type, caseSize, movement, bezelType, strapType, specialEditionHint,
+        });
+      } else {
+        // Web-sourced or provided reference — extract design DNA and generate new
+        prompt = buildReferencePrompt(brand, model, {
+          dialColor, type, caseSize, movement, bezelType, strapType, specialEditionHint,
+        });
+      }
+
       messages = [{ role: "user", content: [{ type: "text", text: prompt }, { type: "image_url", image_url: { url: resolvedBase64 } }] }];
     } else {
       generationMethod = 'pure-generation';
       console.log('No reference image found, using pure AI generation');
       const prompt = customPrompt || buildPureGenerationPrompt(brand, model, {
-        dialColor,
-        type,
-        caseSize,
-        movement,
-        bezelType,
-        strapType,
-        specialEditionHint,
+        dialColor, type, caseSize, movement, bezelType, strapType, specialEditionHint,
       });
       messages = [{ role: "user", content: prompt }];
     }
