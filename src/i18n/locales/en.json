@@ -503,5 +503,12 @@
     "error": "An error occurred",
     "success": "Success",
     "mode": "mode"
+  },
+  "search": {
+    "placeholder": "Search watches, people...",
+    "clear": "Clear search",
+    "searching": "Searching...",
+    "noResults": "No results for \"{{query}}\"",
+    "logAsWristCheck": "Log \"{{query}}\" as a wrist check"
   }
 }

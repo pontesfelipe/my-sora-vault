@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useWatchData } from "@/hooks/useWatchData";
 import { useCollection } from "@/contexts/CollectionContext";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 interface SearchResult {
   type: "watch" | "user" | "tag";
@@ -28,6 +29,7 @@ export function GlobalSearch() {
   const { user } = useAuth();
   const { selectedCollectionId } = useCollection();
   const { watches } = useWatchData(selectedCollectionId);
+  const { t } = useTranslation();
 
   // Close on click outside
   useEffect(() => {
@@ -146,7 +148,7 @@ export function GlobalSearch() {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-textMuted" />
         <Input
           ref={inputRef}
-          placeholder="Search watches, people..."
+          placeholder={t("search.placeholder")}
           value={query}
           onChange={(e) => {
             setQuery(e.target.value);
@@ -154,7 +156,7 @@ export function GlobalSearch() {
           }}
           onFocus={() => setIsOpen(true)}
           className="pl-9 pr-9 h-9 rounded-full bg-surfaceMuted border-none text-sm"
-          aria-label="Search watches and people"
+          aria-label={t("search.placeholder")}
         />
         {query && (
           <button
@@ -163,7 +165,7 @@ export function GlobalSearch() {
               setResults([]);
             }}
             className="absolute right-3 top-1/2 -translate-y-1/2"
-            aria-label="Clear search"
+            aria-label={t("search.clear")}
           >
             <X className="h-4 w-4 text-textMuted" />
           </button>
@@ -179,10 +181,10 @@ export function GlobalSearch() {
             className="absolute top-full mt-2 left-0 right-0 bg-surface border border-borderSubtle rounded-xl shadow-luxury overflow-hidden z-50"
           >
             {loading ? (
-              <div className="p-4 text-center text-sm text-textMuted">Searching...</div>
+              <div className="p-4 text-center text-sm text-textMuted">{t("search.searching")}</div>
             ) : results.length === 0 && query.trim() ? (
               <div className="p-4 space-y-3">
-                <p className="text-sm text-textMuted text-center">No results for "{query}"</p>
+                <p className="text-sm text-textMuted text-center">{t("search.noResults", { query })}</p>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -190,7 +192,7 @@ export function GlobalSearch() {
                   className="w-full justify-start gap-2 text-accent"
                 >
                   <Plus className="h-4 w-4" />
-                  Log "{query}" as a wrist check
+                  {t("search.logAsWristCheck", { query })}
                 </Button>
               </div>
             ) : (
