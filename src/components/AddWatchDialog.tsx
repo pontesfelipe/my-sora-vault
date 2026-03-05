@@ -106,6 +106,7 @@ interface AddWatchDialogProps {
     movement?: string;
     complications?: string[];
     case_shape?: string;
+    referenceImageBase64?: string;
   };
 }
 
@@ -157,6 +158,7 @@ export const AddWatchDialog = ({ onSuccess, externalOpen, onExternalOpenChange, 
       caseSize: prefill.case_size || prev.caseSize,
       movement: prefill.movement || prev.movement,
     }));
+    if (prefill.referenceImageBase64) setUploadedPhotoBase64(prefill.referenceImageBase64);
     setActiveTab("manual");
   }
   if (!open && prefillApplied) setPrefillApplied(false);

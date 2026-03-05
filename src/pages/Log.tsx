@@ -609,6 +609,7 @@ const Log = () => {
                           type: identifiedWatch.type || "automatic",
                           case_size: identifiedWatch.case_size || "",
                           movement: identifiedWatch.movement || "",
+                          referenceImageBase64: photoPreview || undefined,
                         });
                         setShowAddWatch(true);
                         setIdentifiedWatch(null);
@@ -649,7 +650,9 @@ const Log = () => {
                   <Button
                     size="sm"
                     onClick={() => {
-                      setAddWatchPrefill({});
+                      setAddWatchPrefill({
+                        referenceImageBase64: photoPreview || undefined,
+                      });
                       setShowAddWatch(true);
                     }}
                   >
