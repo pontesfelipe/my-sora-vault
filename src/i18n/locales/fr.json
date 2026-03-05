@@ -306,7 +306,8 @@
     "cleared": "Effacé",
     "aiSuggestionsRemoved": "Les suggestions IA ont été supprimées",
     "monthlyLimitTitle": "Limite mensuelle atteinte",
-    "monthlyLimitDesc": "Vous avez utilisé toutes les suggestions IA ce mois-ci. Réinitialisation le mois prochain."
+    "monthlyLimitDesc": "Vous avez utilisé toutes les suggestions IA ce mois-ci. Réinitialisation le mois prochain.",
+    "failedGenerateSuggestions": "Échec de la génération des suggestions"
   },
   "settings": {
     "title": "Paramètres",

@@ -339,8 +339,8 @@ const Log = () => {
       }
     } catch (err) {
       console.error("AI identification failed:", err);
-      setIdentificationError("Could not identify this watch automatically.");
-      toast.error("Could not identify watch. You can add it manually.");
+      setIdentificationError(t("log.couldNotIdentifyAuto"));
+      toast.error(`${t("log.couldNotIdentifyAuto")} ${t("log.addManuallyHint")}`);
     } finally {
       setIsIdentifying(false);
     }

@@ -306,7 +306,8 @@
     "cleared": "Borrado",
     "aiSuggestionsRemoved": "Las sugerencias de IA han sido eliminadas",
     "monthlyLimitTitle": "Límite mensual alcanzado",
-    "monthlyLimitDesc": "Has usado todas las sugerencias de IA de la lista de deseos este mes. Se reinicia el próximo mes."
+    "monthlyLimitDesc": "Has usado todas las sugerencias de IA de la lista de deseos este mes. Se reinicia el próximo mes.",
+    "failedGenerateSuggestions": "Error al generar sugerencias"
   },
   "settings": {
     "title": "Ajustes",
