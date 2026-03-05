@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Trash2, Star } from "lucide-react";
@@ -34,6 +35,7 @@ interface WishlistTableProps {
 }
 
 export const WishlistTable = ({ items, onDelete, showAISuggested = false, showDeleteButton = true }: WishlistTableProps) => {
+  const { t } = useTranslation();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const { toast } = useToast();
 
@@ -53,8 +55,8 @@ export const WishlistTable = ({ items, onDelete, showAISuggested = false, showDe
       if (error) throw error;
 
       toast({
-        title: "Deleted",
-        description: "Watch removed from wishlist",
+        title: t("wishlistTable.deleted"),
+        description: t("wishlistTable.removedFromWishlist"),
       });
 
       setDeleteId(null);
@@ -62,8 +64,8 @@ export const WishlistTable = ({ items, onDelete, showAISuggested = false, showDe
     } catch (error) {
       console.error("Error deleting wishlist item:", error);
       toast({
-        title: "Error",
-        description: "Failed to delete watch from wishlist",
+        title: t("wishlistTable.error"),
+        description: t("wishlistTable.failedDelete"),
         variant: "destructive",
       });
     }
@@ -78,8 +80,8 @@ export const WishlistTable = ({ items, onDelete, showAISuggested = false, showDe
     return (
       <div className="text-center py-8 text-muted-foreground">
         {showAISuggested 
-          ? "No AI suggestions yet. Add your taste preferences to get personalized recommendations."
-          : "Your wishlist is empty. Add some watches you'd like to own!"}
+          ? t("wishlistTable.noAiSuggestions")
+          : t("wishlistTable.emptyWishlist")}
       </div>
     );
   }
@@ -90,12 +92,12 @@ export const WishlistTable = ({ items, onDelete, showAISuggested = false, showDe
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[60px] sm:w-[80px]">Rank</TableHead>
-              <TableHead>Brand</TableHead>
-              <TableHead>Model</TableHead>
-              <TableHead className="hidden sm:table-cell">Dial Colors</TableHead>
-              <TableHead className="hidden md:table-cell">Notes</TableHead>
-              {showDeleteButton && <TableHead className="w-[60px] sm:w-[100px]">Actions</TableHead>}
+              <TableHead className="w-[60px] sm:w-[80px]">{t("wishlistTable.rank")}</TableHead>
+              <TableHead>{t("wishlistTable.brand")}</TableHead>
+              <TableHead>{t("wishlistTable.model")}</TableHead>
+              <TableHead className="hidden sm:table-cell">{t("wishlistTable.dialColors")}</TableHead>
+              <TableHead className="hidden md:table-cell">{t("wishlistTable.notes")}</TableHead>
+              {showDeleteButton && <TableHead className="w-[60px] sm:w-[100px]">{t("wishlistTable.actions")}</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -141,14 +143,14 @@ export const WishlistTable = ({ items, onDelete, showAISuggested = false, showDe
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Remove from Wishlist?</AlertDialogTitle>
+            <AlertDialogTitle>{t("wishlistTable.removeFromWishlist")}</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently remove this watch from your wishlist.
+              {t("wishlistTable.removeDescription")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
+            <AlertDialogCancel>{t("wishlistTable.cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete}>{t("wishlistTable.delete")}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
