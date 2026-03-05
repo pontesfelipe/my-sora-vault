@@ -121,6 +121,7 @@ export const AddWatchDialog = ({ onSuccess, externalOpen, onExternalOpenChange, 
   const [modelRef, setModelRef] = useState("");
   const [purchaseDate, setPurchaseDate] = useState<Date | undefined>();
   const [uploadedPhotoBase64, setUploadedPhotoBase64] = useState<string | null>(null);
+  const uploadedPhotoBase64Ref = useRef<string | null>(null);
   const [activeTab, setActiveTab] = useState("photo");
   const [photoHints, setPhotoHints] = useState<PhotoIdentificationHints | null>(null);
   const [formValues, setFormValues] = useState({
@@ -145,6 +146,11 @@ export const AddWatchDialog = ({ onSuccess, externalOpen, onExternalOpenChange, 
   const { toast } = useToast();
   const { selectedCollectionId } = useCollection();
 
+  const setPhotoReference = (base64: string | null) => {
+    uploadedPhotoBase64Ref.current = base64;
+    setUploadedPhotoBase64(base64);
+  };
+
   useEffect(() => {
     if (!open || !prefill) return;
 
@@ -159,7 +165,7 @@ export const AddWatchDialog = ({ onSuccess, externalOpen, onExternalOpenChange, 
     }));
 
     if (prefill.referenceImageBase64) {
-      setUploadedPhotoBase64(prefill.referenceImageBase64);
+      setPhotoReference(prefill.referenceImageBase64);
     }
 
     setActiveTab("manual");
