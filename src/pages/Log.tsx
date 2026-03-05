@@ -535,6 +535,7 @@ const Log = () => {
                   setPhotoPreview(null);
                   setCapturedPhotoBase64(null);
                   setPhotoFile(null);
+                  setIdentifiedWatch(null);
                   setIdentificationError(null);
                   setSelectedWatchId("");
                 }}
