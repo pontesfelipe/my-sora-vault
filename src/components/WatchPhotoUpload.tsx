@@ -138,6 +138,28 @@ export const WatchPhotoUpload = ({ onIdentified, onPhotoUploaded, onContinueToFo
     processImage(file);
   };
 
+  const handleCameraCapture = async (base64Image: string) => {
+    setIdentifiedWatch(null);
+    setRejectedSuggestions([]);
+    setPreview(base64Image);
+    onPhotoUploaded?.(base64Image);
+
+    let pastRejections: Array<{ brand: string; model: string }> = [];
+    if (user) {
+      const { data: pastData } = await supabase
+        .from("watch_id_rejections")
+        .select("rejected_brand, rejected_model")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(20);
+      if (pastData) {
+        pastRejections = pastData.map(r => ({ brand: r.rejected_brand, model: r.rejected_model }));
+        setRejectedSuggestions(pastRejections);
+      }
+    }
+    await identifyFromImage(base64Image, pastRejections);
+  };
+
   const getConfidenceBadgeVariant = (confidence: string) => {
     switch (confidence) {
       case 'high': return 'default';
