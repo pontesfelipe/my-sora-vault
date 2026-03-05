@@ -298,6 +298,54 @@ async function fetchImageAsBase64(imageUrl: string): Promise<string | null> {
   }
 }
 
+function extractGeneratedImageUrlFromResponse(data: any): string | null {
+  const message = data?.choices?.[0]?.message;
+  if (!message) return null;
+
+  const directCandidates = [
+    message?.images?.[0]?.image_url?.url,
+    message?.images?.[0]?.url,
+    message?.images?.[0]?.image_url,
+    message?.image_url?.url,
+    message?.image_url,
+  ].filter((v): v is string => typeof v === 'string' && v.length > 0);
+
+  if (directCandidates.length > 0) return directCandidates[0];
+
+  const content = message?.content;
+
+  if (typeof content === 'string') {
+    const dataUrlMatch = content.match(/data:image\/(png|jpeg|jpg|webp);base64,[A-Za-z0-9+/=]+/i);
+    if (dataUrlMatch?.[0]) return dataUrlMatch[0];
+
+    const httpUrlMatch = content.match(/https?:\/\/[^\s"'<>]+/i);
+    if (httpUrlMatch?.[0]) return httpUrlMatch[0];
+  }
+
+  if (Array.isArray(content)) {
+    for (const part of content) {
+      const partCandidates = [
+        part?.image_url?.url,
+        part?.image_url,
+        part?.url,
+      ].filter((v): v is string => typeof v === 'string' && v.length > 0);
+
+      const direct = partCandidates.find((u) => u.startsWith('data:image/') || /^https?:\/\//i.test(u));
+      if (direct) return direct;
+
+      if (typeof part?.text === 'string') {
+        const dataUrlMatch = part.text.match(/data:image\/(png|jpeg|jpg|webp);base64,[A-Za-z0-9+/=]+/i);
+        if (dataUrlMatch?.[0]) return dataUrlMatch[0];
+
+        const httpUrlMatch = part.text.match(/https?:\/\/[^\s"'<>]+/i);
+        if (httpUrlMatch?.[0]) return httpUrlMatch[0];
+      }
+    }
+  }
+
+  return null;
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -499,16 +547,43 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    const imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-    if (!imageUrl) throw new Error('No image generated');
+    const imageUrl = extractGeneratedImageUrlFromResponse(data);
+    if (!imageUrl) {
+      const message = data?.choices?.[0]?.message;
+      console.error('Image response missing generated image URL', {
+        topLevelKeys: Object.keys(data || {}),
+        choiceKeys: Object.keys(data?.choices?.[0] || {}),
+        messageKeys: Object.keys(message || {}),
+        contentType: Array.isArray(message?.content) ? 'array' : typeof message?.content,
+      });
+      throw new Error('No image generated');
+    }
 
-    // Upload to storage
-    const base64Match = imageUrl.match(/^data:image\/(png|jpeg|webp);base64,(.+)$/);
-    if (!base64Match) throw new Error('Invalid image format from AI');
+    let binaryData: Uint8Array;
+    let imageFormat: 'png' | 'jpeg' | 'webp' = 'png';
 
-    const imageFormat = base64Match[1];
-    const base64Data = base64Match[2];
-    const binaryData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+    const base64Match = imageUrl.match(/^data:image\/(png|jpeg|jpg|webp);base64,(.+)$/i);
+    if (base64Match) {
+      const rawFormat = base64Match[1].toLowerCase();
+      imageFormat = rawFormat === 'jpg' ? 'jpeg' : (rawFormat as 'png' | 'jpeg' | 'webp');
+      const base64Data = base64Match[2];
+      binaryData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+    } else if (/^https?:\/\//i.test(imageUrl)) {
+      const fetchedImage = await fetch(imageUrl);
+      if (!fetchedImage.ok) throw new Error(`Generated image URL fetch failed: ${fetchedImage.status}`);
+
+      const fetchedType = (fetchedImage.headers.get('content-type') || '').toLowerCase();
+      if (!fetchedType.startsWith('image/')) throw new Error('Generated image URL did not return an image');
+
+      if (fetchedType.includes('webp')) imageFormat = 'webp';
+      else if (fetchedType.includes('jpeg') || fetchedType.includes('jpg')) imageFormat = 'jpeg';
+      else imageFormat = 'png';
+
+      binaryData = new Uint8Array(await fetchedImage.arrayBuffer());
+    } else {
+      throw new Error('Invalid image format from AI');
+    }
+
     const fileName = `${watchId || crypto.randomUUID()}_ai.${imageFormat}`;
 
     const { error: uploadError } = await supabaseClient.storage
