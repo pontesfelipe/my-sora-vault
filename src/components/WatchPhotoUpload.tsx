@@ -35,6 +35,7 @@ export const WatchPhotoUpload = ({ onIdentified, onPhotoUploaded, onContinueToFo
   const [preview, setPreview] = useState<string | null>(null);
   const [identifiedWatch, setIdentifiedWatch] = useState<WatchInfo | null>(null);
   const [rejectedSuggestions, setRejectedSuggestions] = useState<Array<{ brand: string; model: string }>>([]);
+  const [cameraOpen, setCameraOpen] = useState(false);
 
   const identifyFromImage = async (base64Image: string, exclusions: Array<{ brand: string; model: string }>) => {
     setIsProcessing(true);
