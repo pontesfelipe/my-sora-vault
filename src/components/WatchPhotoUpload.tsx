@@ -262,7 +262,7 @@ export const WatchPhotoUpload = ({ onIdentified, onPhotoUploaded, onContinueToFo
                 variant="outline"
                 className="flex-1"
                 disabled={isProcessing}
-                onClick={() => document.getElementById('watch-camera-input')?.click()}
+                onClick={() => setCameraOpen(true)}
               >
                 <Camera className="w-4 h-4 mr-2" />
                 Take a Photo
@@ -271,15 +271,6 @@ export const WatchPhotoUpload = ({ onIdentified, onPhotoUploaded, onContinueToFo
                 id="watch-photo-input"
                 type="file"
                 accept="image/*"
-                className="hidden"
-                onChange={handleFileSelect}
-                disabled={isProcessing}
-              />
-              <input
-                id="watch-camera-input"
-                type="file"
-                accept="image/*"
-                capture="environment"
                 className="hidden"
                 onChange={handleFileSelect}
                 disabled={isProcessing}
