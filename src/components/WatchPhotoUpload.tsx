@@ -291,5 +291,11 @@ export const WatchPhotoUpload = ({ onIdentified, onPhotoUploaded, onContinueToFo
         )}
       </CardContent>
     </Card>
+    <CameraViewfinder
+      open={cameraOpen}
+      onClose={() => setCameraOpen(false)}
+      onCapture={handleCameraCapture}
+    />
+    </>
   );
 };
