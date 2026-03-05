@@ -387,7 +387,13 @@ export const AddWatchDialog = ({ onSuccess, externalOpen, onExternalOpenChange, 
 
         // Generate AI image for the watch (non-blocking)
         try {
-          const referenceImageForGeneration = uploadedPhotoBase64 || prefill?.referenceImageBase64 || null;
+          const referenceImageForGeneration =
+            uploadedPhotoBase64Ref.current || uploadedPhotoBase64 || prefill?.referenceImageBase64 || null;
+
+          console.log('Generating AI watch image with reference:', {
+            hasReferenceImage: Boolean(referenceImageForGeneration),
+            referenceLength: referenceImageForGeneration?.length || 0,
+          });
 
           supabase.functions.invoke('generate-watch-image', {
             body: {
