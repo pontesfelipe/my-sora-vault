@@ -62,13 +62,13 @@ function shouldReuseExistingImage(opts: {
 }
 
 const COMPOSITION_RULES = [
+  '*** ABSOLUTE #1 PRIORITY — ORIENTATION ***: The watch MUST be rendered UPRIGHT and VERTICAL. 12 o\'clock at the TOP, 6 o\'clock at the BOTTOM. The watch must NEVER be lying down, tilted, horizontal, or rotated. If you generate a horizontal/laying watch, the output is INVALID and REJECTED',
   'SQUARE 1:1 aspect ratio composition',
   'The watch must be PERFECTLY CENTERED in the frame, both horizontally and vertically',
   'CRITICAL SIZE RULE: Regardless of the actual case diameter, ALL watches must appear the SAME visual size — the case (excluding strap) fills exactly 60% of image width and 50% of image height',
   'STRAIGHT-ON front-facing view looking directly at the dial face — absolutely NO side angles, NO wrist shots',
   'Maximum 3-5 degree tilt for minimal depth perception — the full dial must be completely visible and readable',
-  'ORIENTATION LOCK: 12 o\'clock marker must be at the top; watch must be upright and NEVER sideways or rotated 90°',
-  'The watch must be UPRIGHT with 12 o\'clock at the top, hands set to 10:10 position',
+  'The watch hands must be set to the 10:10 position',
   'Show a small portion of the bracelet/strap extending from both lugs (about 1-2 links or 2cm of strap)',
   'DARK background: smooth gradient from charcoal (#2a2a2a) at edges to near-black (#111111) at center',
   'Professional studio lighting: soft diffused main light from upper-left, subtle fill light from right',
