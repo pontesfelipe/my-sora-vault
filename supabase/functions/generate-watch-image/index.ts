@@ -484,6 +484,26 @@ serve(async (req) => {
       console.log(`Reference source selected: ${referenceSource}`);
     }
 
+    // ─── SYSTEM MESSAGE FOR STRICT STANDARDIZATION ───
+    const systemMessage = {
+      role: "system",
+      content: [
+        "You are a professional watch product photography AI. You generate STANDARDIZED catalog images.",
+        "MANDATORY OUTPUT RULES (violation = rejected image):",
+        "1. ORIENTATION: Watch MUST be UPRIGHT — 12 o'clock at TOP, 6 o'clock at BOTTOM. NEVER tilted, horizontal, or laying flat.",
+        "2. SIZE: The watch case (excluding strap) MUST fill exactly 55-65% of image width and 45-55% of image height. ALL watches must appear the SAME visual size regardless of actual case diameter. A 36mm watch and a 44mm watch must look the same size in the output.",
+        "3. CENTERING: Watch must be PERFECTLY centered horizontally and vertically in the frame.",
+        "4. ASPECT: Output MUST be square (1:1 aspect ratio).",
+        "5. VIEW: Straight-on front-facing view ONLY — NO angles, NO wrist shots, NO side profiles.",
+        "6. HANDS: Set to 10:10 position.",
+        "7. STRAP: Show 1-2 links or ~2cm of strap extending from both lugs.",
+        "8. BACKGROUND: Smooth dark gradient (charcoal #2a2a2a edges to near-black #111 center). NO props, NO surfaces.",
+        "9. LIGHTING: Professional studio — soft diffused main light upper-left, subtle fill from right. NO harsh reflections or glare on crystal.",
+        "10. QUALITY: Ultra-high resolution, photorealistic, luxury catalog quality. Sharp focus on entire dial.",
+        "Think of this as producing images for a STANDARDIZED watch database where every image must be visually consistent with every other image in size, framing, and style.",
+      ].join("\n"),
+    };
+
     // Build messages with standardized prompts
     let messages: any[];
     let generationMethod: string;
@@ -496,25 +516,29 @@ serve(async (req) => {
       if (customPrompt) {
         prompt = customPrompt;
       } else if (referenceSource === 'uploaded-photo') {
-        // User's own photo — enhance it into a studio shot, preserving exact watch details
         prompt = buildUserPhotoEnhancementPrompt(brand, model, {
           dialColor, type, caseSize, movement, bezelType, strapType, specialEditionHint,
         });
       } else {
-        // Web-sourced or provided reference — extract design DNA and generate new
         prompt = buildReferencePrompt(brand, model, {
           dialColor, type, caseSize, movement, bezelType, strapType, specialEditionHint,
         });
       }
 
-      messages = [{ role: "user", content: [{ type: "text", text: prompt }, { type: "image_url", image_url: { url: resolvedBase64 } }] }];
+      messages = [
+        systemMessage,
+        { role: "user", content: [{ type: "text", text: prompt }, { type: "image_url", image_url: { url: resolvedBase64 } }] },
+      ];
     } else {
       generationMethod = 'pure-generation';
       console.log('No reference image found, using pure AI generation');
       const prompt = customPrompt || buildPureGenerationPrompt(brand, model, {
         dialColor, type, caseSize, movement, bezelType, strapType, specialEditionHint,
       });
-      messages = [{ role: "user", content: prompt }];
+      messages = [
+        systemMessage,
+        { role: "user", content: prompt },
+      ];
     }
 
     // Call AI for image generation
