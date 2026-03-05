@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -75,6 +76,7 @@ interface WatchSpecs {
 }
 
 const WatchDetail = () => {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -185,16 +187,16 @@ const WatchDetail = () => {
 
       if (error) {
         toast({
-          title: "Error",
-          description: "Failed to delete entry",
+          title: t("watchDetail.error"),
+          description: t("watchDetail.failedDeleteEntry"),
           variant: "destructive",
         });
         return;
       }
 
       toast({
-        title: "Success",
-        description: "Wear entry deleted",
+        title: t("watchDetail.success"),
+        description: t("watchDetail.wearEntryDeleted"),
       });
 
       fetchData();
@@ -217,16 +219,16 @@ const WatchDetail = () => {
         if (error) throw error;
 
         toast({
-          title: "Deleted",
-          description: `${watch.brand} ${watch.model} has been removed from your collection`,
+          title: t("watchDetail.deleted"),
+          description: t("watchDetail.watchRemoved", { brand: watch.brand, model: watch.model }),
         });
 
         navigate("/", { replace: true });
       } catch (error) {
         console.error("Error deleting watch:", error);
         toast({
-          title: "Error",
-          description: "Failed to delete watch",
+          title: t("watchDetail.error"),
+          description: t("watchDetail.failedDeleteWatch"),
           variant: "destructive",
         });
       } finally {
@@ -238,7 +240,7 @@ const WatchDetail = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">Loading...</p>
+        <p className="text-muted-foreground">{t("common.loading")}</p>
       </div>
     );
   }
@@ -247,8 +249,8 @@ const WatchDetail = () => {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <p className="text-muted-foreground mb-4">Watch not found</p>
-          <Button onClick={() => navigate("/")}>Go Back</Button>
+          <p className="text-muted-foreground mb-4">{t("watchDetail.watchNotFound")}</p>
+          <Button onClick={() => navigate("/")}>{t("watchDetail.goBack")}</Button>
         </div>
       </div>
     );
@@ -274,7 +276,7 @@ const WatchDetail = () => {
         <div className="container mx-auto px-4 py-6">
           <Button variant="ghost" onClick={() => navigate("/")} className="mb-4 gap-2">
             <ArrowLeft className="w-4 h-4" />
-            Back to Collection
+            {t("watchDetail.backToCollection")}
           </Button>
           <div className="flex items-start justify-between">
             <div className="flex-1">
@@ -285,25 +287,25 @@ const WatchDetail = () => {
               <EditWatchDialog watch={watch} onSuccess={fetchData} />
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant="destructive" size="icon" aria-label="Delete watch">
+                  <Button variant="destructive" size="icon" aria-label={t("watchDetail.deleteWatch")}>
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent className="bg-card border-border">
                   <AlertDialogHeader>
-                    <AlertDialogTitle className="text-foreground">Delete {watch.brand} {watch.model}?</AlertDialogTitle>
+                    <AlertDialogTitle className="text-foreground">{t("watchDetail.deleteTitle", { brand: watch.brand, model: watch.model })}</AlertDialogTitle>
                     <AlertDialogDescription className="text-muted-foreground">
-                      This will permanently remove this watch and all related data (wear logs, specs, and water usage). This action cannot be undone.
+                      {t("watchDetail.deleteDescription")}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel disabled={isDeletingWatch}>Cancel</AlertDialogCancel>
+                    <AlertDialogCancel disabled={isDeletingWatch}>{t("watchDetail.cancel")}</AlertDialogCancel>
                     <AlertDialogAction
                       onClick={handleDeleteWatch}
                       disabled={isDeletingWatch}
                       className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                     >
-                      {isDeletingWatch ? "Deleting..." : "Delete"}
+                      {isDeletingWatch ? t("watchDetail.deleting") : t("watchDetail.delete")}
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
@@ -330,38 +332,38 @@ const WatchDetail = () => {
 
           <Tabs defaultValue="specs" className="w-full">
           <TabsList className="grid w-full max-w-md mx-auto grid-cols-3 mb-8">
-            <TabsTrigger value="specs">Specifications</TabsTrigger>
-            <TabsTrigger value="stats">Statistics</TabsTrigger>
-            <TabsTrigger value="history">Wear History</TabsTrigger>
+            <TabsTrigger value="specs">{t("watchDetail.specifications")}</TabsTrigger>
+            <TabsTrigger value="stats">{t("watchDetail.statistics")}</TabsTrigger>
+            <TabsTrigger value="history">{t("watchDetail.wearHistory")}</TabsTrigger>
           </TabsList>
 
           {/* Specifications Tab */}
           <TabsContent value="specs">
             <Card className="border-border bg-card p-6">
-              <h2 className="text-xl font-semibold text-foreground mb-6">Watch Specifications</h2>
+              <h2 className="text-xl font-semibold text-foreground mb-6">{t("watchDetail.watchSpecifications")}</h2>
               
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">Brand</p>
+                    <p className="text-sm text-muted-foreground mb-1">{t("watchDetail.brand")}</p>
                     <p className="text-lg font-medium text-foreground">{watch.brand}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">Model</p>
+                    <p className="text-sm text-muted-foreground mb-1">{t("watchDetail.model")}</p>
                     <p className="text-lg font-medium text-foreground">{watch.model}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">Dial Color</p>
+                    <p className="text-sm text-muted-foreground mb-1">{t("watchDetail.dialColor")}</p>
                     <p className="text-lg font-medium text-foreground">{watch.dial_color}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">Type</p>
+                    <p className="text-sm text-muted-foreground mb-1">{t("watchDetail.type")}</p>
                     <p className="text-lg font-medium text-foreground">{watch.type}</p>
                   </div>
                   {watch.complications && watch.complications.length > 0 && (
                     <div>
-                      <p className="text-sm text-muted-foreground mb-1">Functions / Complications</p>
+                      <p className="text-sm text-muted-foreground mb-1">{t("watchDetail.functionsComplications")}</p>
                       <div className="flex flex-wrap gap-1.5">
                         {watch.complications.map((c) => (
                           <Badge key={c} variant="secondary" className="text-sm">
@@ -373,27 +375,27 @@ const WatchDetail = () => {
                   )}
                   {watch.case_shape && (
                     <div>
-                      <p className="text-sm text-muted-foreground mb-1">Case Shape</p>
+                      <p className="text-sm text-muted-foreground mb-1">{t("watchDetail.caseShape")}</p>
                       <p className="text-lg font-medium text-foreground">{watch.case_shape}</p>
                     </div>
                   )}
                   {watchSpecs && (
                     <>
                       <div>
-                        <p className="text-sm text-muted-foreground mb-1">Movement</p>
-                        <p className="text-lg font-medium text-foreground">{watch.movement || watchSpecs?.movement || "N/A"}</p>
+                        <p className="text-sm text-muted-foreground mb-1">{t("watchDetail.movement")}</p>
+                        <p className="text-lg font-medium text-foreground">{watch.movement || watchSpecs?.movement || t("watchDetail.na")}</p>
                       </div>
                       <div>
-                        <p className="text-sm text-muted-foreground mb-1">Power Reserve</p>
-                        <p className="text-lg font-medium text-foreground">{watchSpecs.power_reserve || 'N/A'}</p>
+                        <p className="text-sm text-muted-foreground mb-1">{t("watchDetail.powerReserve")}</p>
+                        <p className="text-lg font-medium text-foreground">{watchSpecs.power_reserve || t("watchDetail.na")}</p>
                       </div>
                       <div>
-                        <p className="text-sm text-muted-foreground mb-1">Crystal</p>
-                        <p className="text-lg font-medium text-foreground">{watchSpecs.crystal || 'N/A'}</p>
+                        <p className="text-sm text-muted-foreground mb-1">{t("watchDetail.crystal")}</p>
+                        <p className="text-lg font-medium text-foreground">{watchSpecs.crystal || t("watchDetail.na")}</p>
                       </div>
                       <div>
-                        <p className="text-sm text-muted-foreground mb-1">Case Material</p>
-                        <p className="text-lg font-medium text-foreground">{watchSpecs.case_material || 'N/A'}</p>
+                        <p className="text-sm text-muted-foreground mb-1">{t("watchDetail.caseMaterial")}</p>
+                        <p className="text-lg font-medium text-foreground">{watchSpecs.case_material || t("watchDetail.na")}</p>
                       </div>
                     </>
                   )}
@@ -402,29 +404,29 @@ const WatchDetail = () => {
                   {watchSpecs && (
                     <>
                       <div>
-                        <p className="text-sm text-muted-foreground mb-1">Case Size</p>
-                        <p className="text-lg font-medium text-foreground">{watch.case_size || watchSpecs?.case_size || "N/A"}</p>
+                        <p className="text-sm text-muted-foreground mb-1">{t("watchDetail.caseSize")}</p>
+                        <p className="text-lg font-medium text-foreground">{watch.case_size || watchSpecs?.case_size || t("watchDetail.na")}</p>
                       </div>
                       <div>
-                        <p className="text-sm text-muted-foreground mb-1">Lug to Lug</p>
-                        <p className="text-lg font-medium text-foreground">{watch.lug_to_lug_size || watchSpecs?.lug_to_lug || "N/A"}</p>
+                        <p className="text-sm text-muted-foreground mb-1">{t("watchDetail.lugToLug")}</p>
+                        <p className="text-lg font-medium text-foreground">{watch.lug_to_lug_size || watchSpecs?.lug_to_lug || t("watchDetail.na")}</p>
                       </div>
                       <div>
-                        <p className="text-sm text-muted-foreground mb-1">Water Resistance</p>
-                        <p className="text-lg font-medium text-foreground">{watchSpecs.water_resistance || 'N/A'}</p>
+                        <p className="text-sm text-muted-foreground mb-1">{t("watchDetail.waterResistance")}</p>
+                        <p className="text-lg font-medium text-foreground">{watchSpecs.water_resistance || t("watchDetail.na")}</p>
                       </div>
                       <div>
-                        <p className="text-sm text-muted-foreground mb-1">Caseback</p>
-                        <p className="text-lg font-medium text-foreground">{watchSpecs.caseback || 'N/A'}</p>
+                        <p className="text-sm text-muted-foreground mb-1">{t("watchDetail.caseback")}</p>
+                        <p className="text-lg font-medium text-foreground">{watchSpecs.caseback || t("watchDetail.na")}</p>
                       </div>
                       <div>
-                        <p className="text-sm text-muted-foreground mb-1">Band</p>
-                        <p className="text-lg font-medium text-foreground">{watchSpecs.band || 'N/A'}</p>
+                        <p className="text-sm text-muted-foreground mb-1">{t("watchDetail.band")}</p>
+                        <p className="text-lg font-medium text-foreground">{watchSpecs.band || t("watchDetail.na")}</p>
                       </div>
                     </>
                   )}
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">Purchase Cost</p>
+                    <p className="text-sm text-muted-foreground mb-1">{t("watchDetail.purchaseCost")}</p>
                     <div className="flex items-center gap-2">
                       {showCost ? (
                         <p className="text-lg font-medium text-foreground">${watch.cost.toLocaleString()}</p>
@@ -447,7 +449,7 @@ const WatchDetail = () => {
                   </div>
                   {watch.average_resale_price && (
                     <div>
-                      <p className="text-sm text-muted-foreground mb-1">Avg. US Resale Price (Used)</p>
+                      <p className="text-sm text-muted-foreground mb-1">{t("watchDetail.avgResalePrice")}</p>
                       <div className="flex items-center gap-2">
                         {showCost ? (
                           <p className="text-lg font-medium text-foreground">${watch.average_resale_price.toLocaleString()}</p>
@@ -455,18 +457,18 @@ const WatchDetail = () => {
                           <p className="text-lg font-medium text-muted-foreground">••••••</p>
                         )}
                       </div>
-                      <p className="text-xs text-muted-foreground mt-1">Market data from US resale platforms</p>
+                      <p className="text-xs text-muted-foreground mt-1">{t("watchDetail.marketDataNote")}</p>
                     </div>
                   )}
                   {watch.warranty_date && (
                     <div>
-                      <p className="text-sm text-muted-foreground mb-1">Warranty Status</p>
+                      <p className="text-sm text-muted-foreground mb-1">{t("watchDetail.warrantyStatus")}</p>
                       <div>
                         <p className="text-lg font-medium text-foreground">
                           {new Date(watch.warranty_date) < new Date() ? (
-                            <span className="text-destructive">Expired ({new Date(watch.warranty_date).toLocaleDateString()})</span>
+                            <span className="text-destructive">{t("watchDetail.expired")} ({new Date(watch.warranty_date).toLocaleDateString()})</span>
                           ) : (
-                            <span className="text-green-500">Valid until {new Date(watch.warranty_date).toLocaleDateString()}</span>
+                            <span className="text-green-500">{t("watchDetail.validUntil")} {new Date(watch.warranty_date).toLocaleDateString()}</span>
                           )}
                         </p>
                         {watch.warranty_card_url && (
@@ -476,14 +478,14 @@ const WatchDetail = () => {
                             rel="noopener noreferrer"
                             className="text-sm text-primary hover:underline mt-1 inline-block"
                           >
-                            View Warranty Card
+                            {t("watchDetail.viewWarrantyCard")}
                           </a>
                         )}
                       </div>
                     </div>
                   )}
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">Total Wear Entries</p>
+                    <p className="text-sm text-muted-foreground mb-1">{t("watchDetail.totalWearEntries")}</p>
                     <p className="text-lg font-medium text-foreground">{wearEntries.length}</p>
                   </div>
                 </div>
@@ -492,11 +494,11 @@ const WatchDetail = () => {
               {/* Classification Information */}
               {(watch.rarity || watch.historical_significance || watch.available_for_trade !== undefined) && (
                 <div className="mt-6 pt-6 border-t border-border">
-                  <h3 className="text-lg font-semibold text-foreground mb-4">Classification</h3>
+                  <h3 className="text-lg font-semibold text-foreground mb-4">{t("watchDetail.classification")}</h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {watch.rarity && (
                       <div>
-                        <p className="text-sm text-muted-foreground mb-1">Rarity</p>
+                        <p className="text-sm text-muted-foreground mb-1">{t("watchDetail.rarity")}</p>
                         <Badge variant="secondary" className="text-base capitalize">
                           {watch.rarity}
                         </Badge>
@@ -504,7 +506,7 @@ const WatchDetail = () => {
                     )}
                     {watch.historical_significance && (
                       <div>
-                        <p className="text-sm text-muted-foreground mb-1">Historical</p>
+                        <p className="text-sm text-muted-foreground mb-1">{t("watchDetail.historical")}</p>
                         <Badge variant="secondary" className="text-base capitalize">
                           {watch.historical_significance}
                         </Badge>
@@ -512,12 +514,12 @@ const WatchDetail = () => {
                     )}
                     {watch.available_for_trade !== undefined && (
                       <div>
-                        <p className="text-sm text-muted-foreground mb-1">Open to Trade</p>
+                        <p className="text-sm text-muted-foreground mb-1">{t("watchDetail.openToTrade")}</p>
                         <Badge 
                           variant={watch.available_for_trade ? "default" : "secondary"} 
                           className="text-base"
                         >
-                          {watch.available_for_trade ? "Available" : "Not Available"}
+                          {watch.available_for_trade ? t("watchDetail.available") : t("watchDetail.notAvailable")}
                         </Badge>
                       </div>
                     )}
@@ -527,7 +529,7 @@ const WatchDetail = () => {
                     <div className="mt-6">
                       <div className="flex items-center gap-2 mb-3">
                         <Info className="w-4 h-4 text-primary" />
-                        <p className="text-sm font-medium text-foreground">Why This Classification?</p>
+                        <p className="text-sm font-medium text-foreground">{t("watchDetail.whyThisClassification")}</p>
                       </div>
                       <div className="bg-muted/30 border border-border rounded-lg p-4">
                         <p className="text-sm text-foreground leading-relaxed whitespace-pre-line">
@@ -539,11 +541,11 @@ const WatchDetail = () => {
                     <div className="mt-6">
                       <div className="flex items-center gap-2 mb-3">
                         <Info className="w-4 h-4 text-muted-foreground" />
-                        <p className="text-sm font-medium text-muted-foreground">Classification Reasoning</p>
+                        <p className="text-sm font-medium text-muted-foreground">{t("watchDetail.classificationReasoning")}</p>
                       </div>
                       <div className="bg-muted/20 border border-border rounded-lg p-4">
                         <p className="text-sm text-muted-foreground italic">
-                          No classification analysis available yet. Use the AI metadata analysis feature to generate insights about this watch's rarity and historical significance.
+                          {t("watchDetail.noClassificationAnalysis")}
                         </p>
                       </div>
                     </div>
@@ -561,7 +563,7 @@ const WatchDetail = () => {
                 <Card className="border-border bg-card p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-muted-foreground mb-1">Total Days Worn</p>
+                      <p className="text-sm text-muted-foreground mb-1">{t("watchDetail.totalDaysWorn")}</p>
                       <p className="text-3xl font-bold text-primary">{totalDays}</p>
                     </div>
                     <Calendar className="w-8 h-8 text-primary" />
@@ -571,7 +573,7 @@ const WatchDetail = () => {
                 <Card className="border-border bg-card p-6">
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
-                      <p className="text-sm text-muted-foreground mb-1">Purchase Cost</p>
+                      <p className="text-sm text-muted-foreground mb-1">{t("watchDetail.purchaseCost")}</p>
                       <div className="flex items-center gap-2">
                         {showCost ? (
                           <p className="text-3xl font-bold text-foreground">${watch.cost.toLocaleString()}</p>
@@ -599,7 +601,7 @@ const WatchDetail = () => {
                 <Card className="border-border bg-card p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-muted-foreground mb-1">Cost Per Day</p>
+                      <p className="text-sm text-muted-foreground mb-1">{t("watchDetail.costPerDay")}</p>
                       {showCost ? (
                         <p className="text-3xl font-bold text-primary">${costPerUse.toFixed(0)}</p>
                       ) : (
@@ -614,7 +616,7 @@ const WatchDetail = () => {
                   <Card className="border-border bg-card p-6">
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
-                        <p className="text-sm text-muted-foreground mb-1">Avg. Resale Price (Used)</p>
+                        <p className="text-sm text-muted-foreground mb-1">{t("watchDetail.avgResalePrice")}</p>
                         <div className="flex items-center gap-2">
                           {showCost ? (
                             <p className="text-3xl font-bold text-foreground">${watch.average_resale_price.toLocaleString()}</p>
@@ -631,13 +633,13 @@ const WatchDetail = () => {
 
               {/* Monthly Breakdown */}
               <Card className="border-border bg-card p-6">
-                <h2 className="text-xl font-semibold text-foreground mb-4">Monthly Breakdown</h2>
+                <h2 className="text-xl font-semibold text-foreground mb-4">{t("watchDetail.monthlyBreakdown")}</h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {Object.entries(monthlyData).map(([month, days]) => (
                     <div key={month} className="p-4 bg-muted rounded-lg">
                       <p className="text-sm text-muted-foreground mb-1">{month}</p>
                       <p className="text-2xl font-bold text-primary">{days}</p>
-                      <p className="text-xs text-muted-foreground">days</p>
+                      <p className="text-xs text-muted-foreground">{t("common.days")}</p>
                     </div>
                   ))}
                 </div>
@@ -648,19 +650,19 @@ const WatchDetail = () => {
           {/* Wear History Tab */}
           <TabsContent value="history">
             <div className="mb-4">
-              <p className="text-sm text-muted-foreground">Total days worn</p>
+              <p className="text-sm text-muted-foreground">{t("watchDetail.totalDaysWornLabel")}</p>
               <p className="text-3xl font-bold text-primary">
                 {wearEntries.reduce((sum, entry) => sum + Number(entry.days), 0)}
               </p>
             </div>
             <Card className="border-border bg-card p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold text-foreground">Wear History</h2>
+                <h2 className="text-xl font-semibold text-foreground">{t("watchDetail.wearHistory")}</h2>
                 <AddWearDialog watchId={watch.id} onSuccess={fetchData} />
               </div>
 
                {wearEntries.length === 0 ? (
-                <p className="text-center text-muted-foreground py-8">No wear entries yet. Add your first one above!</p>
+                <p className="text-center text-muted-foreground py-8">{t("watchDetail.noWearEntriesYet")}</p>
               ) : (
                 <div className="space-y-3">
                   {wearEntries.map((entry) => (
@@ -670,14 +672,14 @@ const WatchDetail = () => {
                     >
                       <div className="flex-1 cursor-pointer" onClick={() => handleEditEntry(entry)}>
                         <p className="font-medium text-foreground">
-                          {parseLocalDate(entry.wear_date).toLocaleDateString('en-US', {
+                          {parseLocalDate(entry.wear_date).toLocaleDateString(undefined, {
                             month: 'short',
                             day: 'numeric',
                             year: 'numeric',
                           })}
                         </p>
                         <p className="text-sm text-muted-foreground">
-                          {entry.days} {entry.days === 1 ? 'day' : 'days'}
+                          {entry.days} {entry.days === 1 ? t("common.day") : t("common.days")}
                         </p>
                          {entry.notes && (
                            <p className="text-sm text-muted-foreground mt-1">{entry.notes}</p>
@@ -711,18 +713,18 @@ const WatchDetail = () => {
                         </AlertDialogTrigger>
                         <AlertDialogContent className="bg-card border-border">
                           <AlertDialogHeader>
-                            <AlertDialogTitle className="text-foreground">Delete Entry</AlertDialogTitle>
+                            <AlertDialogTitle className="text-foreground">{t("watchDetail.deleteEntry")}</AlertDialogTitle>
                             <AlertDialogDescription className="text-muted-foreground">
-                              Are you sure you want to delete this wear entry?
+                              {t("watchDetail.deleteEntryConfirm")}
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogCancel>{t("watchDetail.cancel")}</AlertDialogCancel>
                             <AlertDialogAction
                               onClick={() => handleDeleteEntry(entry.id)}
                               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                             >
-                              Delete
+                              {t("watchDetail.delete")}
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
