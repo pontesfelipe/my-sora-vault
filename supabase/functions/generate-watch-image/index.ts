@@ -77,6 +77,33 @@ const COMPOSITION_RULES = [
   'Ultra high resolution, photorealistic, luxury catalog quality',
 ].join('. ');
 
+function buildUserPhotoEnhancementPrompt(
+  brand: string,
+  model: string,
+  opts: { dialColor?: string; type?: string; caseSize?: string; movement?: string; bezelType?: string; strapType?: string; specialEditionHint?: string }
+): string {
+  const canonicalModel = canonicalizeModelForPrompt(brand, model);
+  const specificCues = [
+    opts.dialColor ? `Dial color: ${opts.dialColor}` : '',
+    opts.type ? `Watch type: ${opts.type}` : '',
+    opts.bezelType ? `Bezel: ${opts.bezelType}` : '',
+    opts.strapType ? `Bracelet/strap: ${opts.strapType}` : '',
+    opts.specialEditionHint ? `Edition details: ${opts.specialEditionHint}` : '',
+  ].filter(Boolean).join('. ');
+
+  return [
+    `USER PHOTO ENHANCEMENT: The attached image is a real photograph of a ${brand} ${canonicalModel} taken by the owner. Use this photo as the AUTHORITATIVE visual reference for EXACTLY what this watch looks like — its dial, hands, indices, bezel, bracelet/strap, case shape, and all details`,
+    `YOUR TASK: Transform this user photo into a professional, clean STUDIO PRODUCT SHOT. Keep EVERY design detail from the original photo — do NOT change or hallucinate any watch features. Only change the PRESENTATION:`,
+    `- Remove the background and replace with a dark studio gradient`,
+    `- Correct the orientation so the watch is PERFECTLY UPRIGHT (12 o'clock at top)`,
+    `- Remove any wrist, arm, table, or surface — show only the watch`,
+    `- Apply clean, even studio lighting`,
+    `- Set hands to 10:10 if they are in a significantly different position`,
+    specificCues,
+    `COMPOSITION: ${COMPOSITION_RULES}`,
+  ].filter(Boolean).join('. ');
+}
+
 function buildReferencePrompt(
   brand: string,
   model: string,
