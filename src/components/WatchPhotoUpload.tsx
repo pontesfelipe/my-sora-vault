@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { CameraViewfinder } from "@/components/CameraViewfinder";
 
 interface WatchInfo {
   brand: string;
@@ -34,6 +35,7 @@ export const WatchPhotoUpload = ({ onIdentified, onPhotoUploaded, onContinueToFo
   const [preview, setPreview] = useState<string | null>(null);
   const [identifiedWatch, setIdentifiedWatch] = useState<WatchInfo | null>(null);
   const [rejectedSuggestions, setRejectedSuggestions] = useState<Array<{ brand: string; model: string }>>([]);
+  const [cameraOpen, setCameraOpen] = useState(false);
 
   const identifyFromImage = async (base64Image: string, exclusions: Array<{ brand: string; model: string }>) => {
     setIsProcessing(true);
@@ -136,6 +138,28 @@ export const WatchPhotoUpload = ({ onIdentified, onPhotoUploaded, onContinueToFo
     processImage(file);
   };
 
+  const handleCameraCapture = async (base64Image: string) => {
+    setIdentifiedWatch(null);
+    setRejectedSuggestions([]);
+    setPreview(base64Image);
+    onPhotoUploaded?.(base64Image);
+
+    let pastRejections: Array<{ brand: string; model: string }> = [];
+    if (user) {
+      const { data: pastData } = await supabase
+        .from("watch_id_rejections")
+        .select("rejected_brand, rejected_model")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(20);
+      if (pastData) {
+        pastRejections = pastData.map(r => ({ brand: r.rejected_brand, model: r.rejected_model }));
+        setRejectedSuggestions(pastRejections);
+      }
+    }
+    await identifyFromImage(base64Image, pastRejections);
+  };
+
   const getConfidenceBadgeVariant = (confidence: string) => {
     switch (confidence) {
       case 'high': return 'default';
@@ -146,6 +170,7 @@ export const WatchPhotoUpload = ({ onIdentified, onPhotoUploaded, onContinueToFo
   };
 
   return (
+    <>
     <Card className="border-2 border-dashed">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
@@ -238,7 +263,7 @@ export const WatchPhotoUpload = ({ onIdentified, onPhotoUploaded, onContinueToFo
                 variant="outline"
                 className="flex-1"
                 disabled={isProcessing}
-                onClick={() => document.getElementById('watch-camera-input')?.click()}
+                onClick={() => setCameraOpen(true)}
               >
                 <Camera className="w-4 h-4 mr-2" />
                 Take a Photo
@@ -247,15 +272,6 @@ export const WatchPhotoUpload = ({ onIdentified, onPhotoUploaded, onContinueToFo
                 id="watch-photo-input"
                 type="file"
                 accept="image/*"
-                className="hidden"
-                onChange={handleFileSelect}
-                disabled={isProcessing}
-              />
-              <input
-                id="watch-camera-input"
-                type="file"
-                accept="image/*"
-                capture="environment"
                 className="hidden"
                 onChange={handleFileSelect}
                 disabled={isProcessing}
@@ -276,5 +292,11 @@ export const WatchPhotoUpload = ({ onIdentified, onPhotoUploaded, onContinueToFo
         )}
       </CardContent>
     </Card>
+    <CameraViewfinder
+      open={cameraOpen}
+      onClose={() => setCameraOpen(false)}
+      onCapture={handleCameraCapture}
+    />
+    </>
   );
 };
