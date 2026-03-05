@@ -160,13 +160,13 @@ function buildUserPhotoEnhancementPrompt(
   return [
     `USER PHOTO ENHANCEMENT: The attached image is a real photograph of a ${brand} ${canonicalModel} taken by the owner. Use this photo as the AUTHORITATIVE visual reference for EXACTLY what this watch looks like — its dial, hands, indices, bezel, bracelet/strap, case shape, and all details`,
     `STRICT EDIT MODE: Do NOT redesign, reinterpret, restyle, or morph the watch. Keep case geometry, lug shape, crown side, dial layout, marker count, hand shape, and bezel markings EXACTLY as in the source photo`,
-    `YOUR TASK: Transform this user photo into a professional, clean STUDIO PRODUCT SHOT while preserving identity and proportions. Only change the PRESENTATION:`,
+    `YOUR TASK: Transform this user photo into a professional, clean STUDIO PRODUCT SHOT. Only change the PRESENTATION:`,
     `- Remove the background and replace with a dark studio gradient`,
     `- Correct the orientation so the watch is PERFECTLY UPRIGHT (12 o'clock at top)`,
     `- Remove any wrist, arm, table, or surface — show only the watch`,
     `- Apply clean, even studio lighting`,
-    `- Preserve real-world watch proportions from the source image (no stretching/squashing of case, dial, bezel, lugs, or strap width)`,
     `- Set hands to 10:10 if they are in a significantly different position`,
+    `*** CRITICAL ZOOM/SIZE OVERRIDE ***: Do NOT preserve the original photo's framing distance. IGNORE how close or far the camera was. You MUST ZOOM IN or ENLARGE the watch so the case (excluding strap) fills exactly 60% of the output image width and 50% of the output image height. The watch must appear LARGE and CLOSE-UP, as if photographed with a macro lens from 30cm away. If the source photo shows the watch small or far away, you MUST dramatically enlarge it to fill the frame. Every watch in our catalog must appear the SAME visual size regardless of the source photo's zoom level`,
     cues,
     identity,
     `COMPOSITION: ${COMPOSITION_RULES}`,
@@ -439,9 +439,8 @@ serve(async (req) => {
       ];
     }
 
-    const imageModel = generationMethod === 'photo-enhancement'
-      ? 'google/gemini-2.5-flash-image'
-      : 'google/gemini-3-pro-image-preview';
+    // Use the pro model for ALL generation methods for better quality and size consistency
+    const imageModel = 'google/gemini-3-pro-image-preview';
 
     console.log(`Calling AI (method: ${generationMethod}, model: ${imageModel})...`);
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
