@@ -500,6 +500,15 @@
     "success": "成功",
     "mode": "モード"
   },
+  "splash": {
+    "brandName": "Luxury Vault",
+    "tagline": "ウォッチコレクションスタジオ",
+    "watches": "時計",
+    "footer": "プレミアムウォッチ管理"
+  },
+  "offline": {
+    "message": "オフラインです — 再接続時に変更が同期されます"
+  },
   "search": {
     "placeholder": "時計、ユーザーを検索...",
     "clear": "検索をクリア",
