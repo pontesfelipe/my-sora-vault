@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Search, RefreshCw, History, ChevronDown, ChevronUp, Plus, Heart, Sparkles, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -48,6 +49,7 @@ import {
 } from "@dnd-kit/sortable";
 
 const Collection = () => {
+  const { t } = useTranslation();
   const { selectedCollectionId, currentCollection, currentCollectionType, currentCollectionConfig, collections, collectionsLoading, refetchCollections } = useCollection();
   const { watches, wearEntries, loading, refetch } = useWatchData(selectedCollectionId);
   const { pastWatches, wearEntries: pastWearEntries, loading: pastLoading, refetch: refetchPast } = usePastWatchData();
@@ -135,8 +137,8 @@ const Collection = () => {
       }
 
       toast({
-        title: "Order Updated",
-        description: "Watch order has been saved",
+        title: t("collectionPage.orderUpdated"),
+        description: t("collectionPage.orderSaved"),
       });
     } catch (error) {
       console.error("Error updating watch order:", error);
@@ -158,8 +160,8 @@ const Collection = () => {
     let errorCount = 0;
 
     toast({
-      title: "Updating Prices",
-      description: `Fetching market prices for ${watches.length} watches...`,
+      title: t("collectionPage.updating"),
+      description: t("collectionPage.updatingPrices", { count: watches.length }),
     });
 
     for (const watch of watches) {
@@ -203,8 +205,8 @@ const Collection = () => {
     refetch();
 
     toast({
-      title: "Bulk Update Complete",
-      description: `Updated ${successCount} watches. ${errorCount > 0 ? `${errorCount} failed.` : ''}`,
+      title: t("collectionPage.bulkUpdateComplete"),
+      description: t("collectionPage.bulkUpdateResult", { success: successCount, failed: errorCount > 0 ? errorCount : '' }),
     });
   };
 
@@ -221,8 +223,8 @@ const Collection = () => {
       if (canUseError) throw canUseError;
       if (!canUse) {
         toast({
-          title: "Monthly Limit Reached",
-          description: "You've used all AI wishlist suggestions this month. Resets next month.",
+          title: t("collectionPage.monthlyLimitTitle"),
+          description: t("collectionPage.monthlyLimitDesc"),
           variant: "destructive",
         });
         return;
@@ -274,8 +276,8 @@ const Collection = () => {
       refetchWishlist();
 
       toast({
-        title: "Suggestions Generated",
-        description: `Added ${data?.suggestions?.length || 0} AI-powered watch suggestions`,
+        title: t("collectionPage.suggestionsGenerated"),
+        description: t("collectionPage.addedSuggestions", { count: data?.suggestions?.length || 0 }),
       });
     } catch (error: any) {
       console.error("Error generating suggestions:", error);
@@ -299,8 +301,8 @@ const Collection = () => {
       
       refetchWishlist();
       toast({
-        title: "Cleared",
-        description: "AI suggestions have been removed",
+        title: t("collectionPage.cleared"),
+        description: t("collectionPage.aiSuggestionsRemoved"),
       });
     } catch (error) {
       console.error("Error clearing AI suggestions:", error);
@@ -317,7 +319,7 @@ const Collection = () => {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent mx-auto"></div>
-          <p className="mt-4 text-textMuted">Loading collection...</p>
+          <p className="mt-4 text-textMuted">{t("collectionPage.loadingCollection")}</p>
         </div>
       </div>
     );
@@ -383,11 +385,11 @@ const Collection = () => {
         <TabsList className="grid w-full grid-cols-2 mb-6">
           <TabsTrigger value="collection" className="gap-2">
             <Search className="w-4 h-4 hidden sm:inline" />
-            Collection
+            {t("collectionPage.collectionTab")}
           </TabsTrigger>
           <TabsTrigger value="wishlist" className="gap-2">
             <Heart className="w-4 h-4 hidden sm:inline" />
-            Wishlist
+            {t("collectionPage.wishlistTab")}
           </TabsTrigger>
         </TabsList>
 
@@ -409,7 +411,7 @@ const Collection = () => {
                 className="gap-2"
               >
                 <RefreshCw className={`w-4 h-4 ${isBulkUpdating ? 'animate-spin' : ''}`} />
-                {isBulkUpdating ? 'Updating...' : 'Update All Prices'}
+                {isBulkUpdating ? t("collectionPage.updating") : t("collectionPage.updateAllPrices")}
               </Button>
               <AnalyzeWatchMetadataDialog watches={watches} onSuccess={refetch} />
             </div>
@@ -428,10 +430,10 @@ const Collection = () => {
             </div>
             <Select value={selectedBrand} onValueChange={setSelectedBrand}>
               <SelectTrigger className="w-full sm:w-[200px]">
-                <SelectValue placeholder="Filter by brand" />
+                <SelectValue placeholder={t("collectionPage.filterByBrand")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Brands</SelectItem>
+                <SelectItem value="all">{t("collectionPage.allBrands")}</SelectItem>
                 {uniqueBrands.map((brand) => (
                   <SelectItem key={brand} value={brand}>
                     {brand}
@@ -446,8 +448,8 @@ const Collection = () => {
             <div className="text-center py-12">
               <p className="text-muted-foreground">
                 {searchQuery || selectedBrand !== "all"
-                  ? `No ${currentCollectionConfig.pluralLabel.toLowerCase()} match your filters`
-                  : `No ${currentCollectionConfig.pluralLabel.toLowerCase()} yet. Add your first ${currentCollectionConfig.singularLabel.toLowerCase()}!`}
+                  ? t("collectionPage.noMatchFilters", { type: currentCollectionConfig.pluralLabel.toLowerCase() })
+                  : t("collectionPage.noItemsYet", { type: currentCollectionConfig.pluralLabel.toLowerCase(), singular: currentCollectionConfig.singularLabel.toLowerCase() })}
               </p>
             </div>
           ) : (
@@ -463,7 +465,7 @@ const Collection = () => {
               >
                 <div className="flex items-center gap-2">
                   <History className="w-5 h-5 text-textMuted" />
-                  <h2 className="text-xl font-semibold text-textMain">Past {currentCollectionConfig.pluralLabel}</h2>
+                  <h2 className="text-xl font-semibold text-textMain">{t("collectionPage.pastItems", { type: currentCollectionConfig.pluralLabel })}</h2>
                   <span className="text-sm text-textMuted">({pastWatches.length})</span>
                 </div>
                 {showPastWatches ? (
@@ -476,7 +478,7 @@ const Collection = () => {
               {showPastWatches && (
                 <>
                   <p className="text-sm text-textMuted mb-4">
-                    {currentCollectionConfig.pluralLabel} you've sold or traded. Historical {currentCollectionConfig.usageNoun} data is preserved.
+                    {t("collectionPage.pastItemsDesc", { type: currentCollectionConfig.pluralLabel, noun: currentCollectionConfig.usageNoun })}
                   </p>
                   <PastWatchesStats pastWatches={pastWatches} wearEntries={pastWearEntries} />
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -500,12 +502,12 @@ const Collection = () => {
         <TabsContent value="wishlist" className="space-y-6">
           <div className="flex justify-between items-center">
             <div>
-              <h2 className="text-xl font-semibold text-textMain">My Wishlist</h2>
-              <p className="text-sm text-textMuted">Track {currentCollectionConfig.pluralLabel.toLowerCase()} you'd love to add to your collection</p>
+              <h2 className="text-xl font-semibold text-textMain">{t("collectionPage.myWishlist")}</h2>
+              <p className="text-sm text-textMuted">{t("collectionPage.trackItemsDesc", { type: currentCollectionConfig.pluralLabel.toLowerCase() })}</p>
             </div>
             <Button onClick={() => setWishlistDialogOpen(true)} className="gap-2">
               <Plus className="w-4 h-4" />
-              Add to Wishlist
+              {t("collectionPage.addToWishlist")}
             </Button>
           </div>
 
@@ -514,10 +516,10 @@ const Collection = () => {
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center gap-2">
                 <Heart className="w-5 h-5 text-primary" />
-                My Wishlist Items
+                {t("collectionPage.myWishlistItems")}
               </CardTitle>
               <CardDescription>
-                {userWishlistItems.length} {userWishlistItems.length === 1 ? 'item' : 'items'} on your wishlist
+                {userWishlistItems.length === 1 ? t("collectionPage.itemOnWishlist", { count: 1 }) : t("collectionPage.itemsOnWishlist", { count: userWishlistItems.length })}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -545,10 +547,10 @@ const Collection = () => {
                       <div>
                         <CardTitle className="text-lg flex items-center gap-2">
                           <Sparkles className="w-5 h-5 text-accent" />
-                          AI Suggestions
+                          {t("collectionPage.aiSuggestions")}
                         </CardTitle>
                         <CardDescription>
-                          Personalized recommendations based on your taste
+                          {t("collectionPage.personalizedRecs")}
                         </CardDescription>
                       </div>
                       <Button 
@@ -558,7 +560,7 @@ const Collection = () => {
                         className="text-muted-foreground hover:text-destructive"
                       >
                         <Trash2 className="w-4 h-4 mr-1" />
-                        Clear All
+                        {t("collectionPage.clearAll")}
                       </Button>
                     </div>
                   </CardHeader>
