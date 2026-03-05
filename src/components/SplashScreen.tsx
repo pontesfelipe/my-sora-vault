@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Watch } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface SplashScreenProps {
   onComplete?: () => void;
@@ -9,6 +10,7 @@ interface SplashScreenProps {
 export const SplashScreen = ({ onComplete, minDuration = 1500 }: SplashScreenProps) => {
   const [isVisible, setIsVisible] = useState(true);
   const [isFading, setIsFading] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -59,10 +61,10 @@ export const SplashScreen = ({ onComplete, minDuration = 1500 }: SplashScreenPro
           style={{ animationDelay: '0.3s', animationFillMode: 'backwards' }}
         >
           <h1 className="text-4xl font-bold tracking-tight text-textMain">
-            Luxury Vault
+            {t("splash.brandName")}
           </h1>
           <p className="text-sm text-textMuted tracking-widest uppercase">
-            Watch Collection Studio
+            {t("splash.tagline")}
           </p>
         </div>
 
@@ -75,7 +77,7 @@ export const SplashScreen = ({ onComplete, minDuration = 1500 }: SplashScreenPro
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent/10 transition-all group-hover:bg-accent/20">
               <Watch className="h-6 w-6 text-accent" />
             </div>
-            <span className="text-xs text-textMuted">Watches</span>
+            <span className="text-xs text-textMuted">{t("splash.watches")}</span>
           </div>
         </div>
 
@@ -97,7 +99,7 @@ export const SplashScreen = ({ onComplete, minDuration = 1500 }: SplashScreenPro
         className="absolute bottom-8 text-xs text-textMuted/50 animate-fade-in"
         style={{ animationDelay: '0.9s', animationFillMode: 'backwards' }}
       >
-        Premium Watch Management
+        {t("splash.footer")}
       </div>
     </div>
   );
