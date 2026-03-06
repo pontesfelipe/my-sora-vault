@@ -1,13 +1,15 @@
 import { useNavigate } from "react-router-dom";
-import { Heart, MessageCircle, ExternalLink } from "lucide-react";
+import { Heart, MessageCircle, ExternalLink, ShieldCheck } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useHomeFeed, FeedFilter } from "@/hooks/useHomeFeed";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { UserAvatar } from "@/components/UserAvatar";
+import { TrustLevelBadge } from "@/components/TrustLevelBadge";
 import { FeedItemSkeleton } from "@/components/FeedItemSkeleton";
 import { formatDistanceToNow } from "date-fns";
+import type { TrustLevel } from "@/hooks/useTrustLevel";
 
 const FILTER_OPTIONS: FeedFilter[] = ["friends", "trending", "news", "articles", "videos"];
 
@@ -84,14 +86,20 @@ export function HomeFeedSection() {
                   size="sm"
                 />
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-sm font-medium text-textMain truncate">
-                      {item.author_username || t("home.anonymous")}
-                    </span>
-                    <Badge variant="outline" className="text-[10px] px-1.5 py-0">
-                      {getBadgeLabel(item.feed_type)}
-                    </Badge>
-                  </div>
+                    <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+                     <span className="text-sm font-medium text-textMain truncate">
+                       {item.author_username || t("home.anonymous")}
+                     </span>
+                     {item.author_trust_level && item.author_trust_level !== "observer" && (
+                       <TrustLevelBadge
+                         level={item.author_trust_level as TrustLevel}
+                         size="sm"
+                       />
+                     )}
+                     <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                       {getBadgeLabel(item.feed_type)}
+                     </Badge>
+                   </div>
                   <p className="text-sm text-textSoft line-clamp-2 mb-2">
                     {item.content || item.title}
                   </p>
