@@ -56,7 +56,7 @@ export function SocialFeedPreview() {
             onClick={() => setFilter(f)}
             className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
               filter === f
-                ? "bg-accent text-white"
+                ? "bg-accent text-accent-foreground"
                 : "bg-surfaceMuted text-textMuted hover:text-textMain"
             }`}
           >
@@ -94,7 +94,7 @@ export function SocialFeedPreview() {
                       <span className="text-sm font-medium text-textMain truncate">
                         {item.author_username || t("home.anonymous")}
                       </span>
-                      {/* Trust Level Badge (Phase 4) */}
+                      {/* Trust Level Badge */}
                       {item.author_trust_level && item.author_trust_level !== "observer" && (
                         <TrustLevelBadge
                           level={item.author_trust_level as TrustLevel}
@@ -108,11 +108,11 @@ export function SocialFeedPreview() {
                     <p className="text-sm text-textSoft line-clamp-2 mb-2">
                       {item.content || item.title}
                     </p>
-                    {/* Authenticated watch badge (Phase 4) */}
+                    {/* Authenticated watch badge */}
                     {item.watch_authenticated && (
                       <div className="flex items-center gap-1 mb-2">
-                        <ShieldCheck className="h-3 w-3 text-emerald-500" />
-                        <span className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
+                        <ShieldCheck className="h-3 w-3 text-accent" />
+                        <span className="text-[10px] font-medium text-accent">
                           {t("home.authenticated")}
                         </span>
                       </div>

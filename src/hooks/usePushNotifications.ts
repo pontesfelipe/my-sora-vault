@@ -10,16 +10,17 @@ export function usePushNotifications() {
     if (!Capacitor.isNativePlatform() || !user) return;
 
     try {
-      const { PushNotifications } = await import("@capacitor/push-notifications");
+      // Dynamic import — only available in native builds
+      const mod = await import("@capacitor/push-notifications" as any);
+      const PushNotifications = mod.PushNotifications;
 
       const permResult = await PushNotifications.requestPermissions();
       if (permResult.receive !== "granted") return;
 
       await PushNotifications.register();
 
-      PushNotifications.addListener("registration", async (token) => {
-        // Store token in database
-        await supabase.from("push_tokens").upsert(
+      PushNotifications.addListener("registration", async (token: any) => {
+        await (supabase as any).from("push_tokens").upsert(
           {
             user_id: user.id,
             token: token.value,
@@ -29,11 +30,11 @@ export function usePushNotifications() {
         );
       });
 
-      PushNotifications.addListener("pushNotificationReceived", (notification) => {
+      PushNotifications.addListener("pushNotificationReceived", (notification: any) => {
         console.log("Push notification received:", notification);
       });
 
-      PushNotifications.addListener("pushNotificationActionPerformed", (action) => {
+      PushNotifications.addListener("pushNotificationActionPerformed", (action: any) => {
         const data = action.notification.data;
         if (data?.route) {
           window.location.href = data.route;

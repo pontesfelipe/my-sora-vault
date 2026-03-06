@@ -29,7 +29,7 @@ export function NotificationSettingsSection() {
   useEffect(() => {
     if (!user) return;
     const fetchPrefs = async () => {
-      const { data } = await supabase
+      const { data } = await (supabase as any)
         .from("notification_preferences")
         .select("*")
         .eq("user_id", user.id)
@@ -52,7 +52,7 @@ export function NotificationSettingsSection() {
     const newPrefs = { ...prefs, [key]: value };
     setPrefs(newPrefs);
 
-    await supabase
+    await (supabase as any)
       .from("notification_preferences")
       .upsert(
         {
