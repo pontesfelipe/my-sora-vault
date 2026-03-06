@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import watchHero from "@/assets/watch-hero.jpg";
@@ -40,6 +41,7 @@ interface WatchShowcaseCardProps {
 
 export const WatchShowcaseCard = ({ watch, totalDays, index, onDelete }: WatchShowcaseCardProps) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -186,15 +188,15 @@ export const WatchShowcaseCard = ({ watch, totalDays, index, onDelete }: WatchSh
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete {watch.brand} {watch.model}?</AlertDialogTitle>
+            <AlertDialogTitle>{t("common.deleteConfirmTitle", { item: `${watch.brand} ${watch.model}` })}</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently remove this item and all its related data (wear logs, specs, etc.). This action cannot be undone.
+              {t("common.deleteConfirmDescription", { item: watch.model })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleting}>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} disabled={isDeleting} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              {isDeleting ? "Deleting..." : "Delete"}
+              {isDeleting ? t("common.deleting") : t("common.delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

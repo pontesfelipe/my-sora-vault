@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Trip } from "@/types/watch";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -39,6 +40,7 @@ interface TripTimelineProps {
 }
 
 export const TripTimeline = ({ trips, limit, type, watches, onUpdate }: TripTimelineProps) => {
+  const { t } = useTranslation();
   const [selectedYear, setSelectedYear] = useState<string>("all");
   
   // Get available years from trips
@@ -384,15 +386,15 @@ export const TripTimeline = ({ trips, limit, type, watches, onUpdate }: TripTime
       <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete {type === "trip" ? "Trip" : "Event"}?</AlertDialogTitle>
+            <AlertDialogTitle>{t("common.deleteConfirmTitle", { item: type === "trip" ? "Trip" : "Event" })}</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete this {type === "trip" ? "trip" : "event"}.
+              {t("common.deleteConfirmDescription", { item: type === "trip" ? "trip" : "event" })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} disabled={loading}>
-              {loading ? "Deleting..." : "Delete"}
+              {loading ? t("common.deleting") : t("common.delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -402,11 +404,11 @@ export const TripTimeline = ({ trips, limit, type, watches, onUpdate }: TripTime
       <Dialog open={!!editItem} onOpenChange={(open) => !open && setEditItem(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit {type === "trip" ? "Trip" : "Event"}</DialogTitle>
+            <DialogTitle>{t("common.edit")} {type === "trip" ? "Trip" : "Event"}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleUpdate} className="space-y-4">
             <div>
-              <Label htmlFor="edit-location">Location</Label>
+              <Label htmlFor="edit-location">{t("common.location")}</Label>
               <Input
                 id="edit-location"
                 value={formData.location}
@@ -415,7 +417,7 @@ export const TripTimeline = ({ trips, limit, type, watches, onUpdate }: TripTime
               />
             </div>
             <div>
-              <Label htmlFor="edit-startDate">{type === "trip" ? "Start Date" : "Date"}</Label>
+              <Label htmlFor="edit-startDate">{type === "trip" ? t("common.startDate") : t("common.date")}</Label>
               <Input
                 id="edit-startDate"
                 type="date"
@@ -425,7 +427,7 @@ export const TripTimeline = ({ trips, limit, type, watches, onUpdate }: TripTime
               />
             </div>
             <div>
-              <Label htmlFor="edit-totalDays">Total {type === "trip" ? "Trip" : "Event"} Days</Label>
+              <Label htmlFor="edit-totalDays">{t("common.totalDays", { type: type === "trip" ? "Trip" : "Event" })}</Label>
               <Input
                 id="edit-totalDays"
                 type="number"
@@ -438,21 +440,21 @@ export const TripTimeline = ({ trips, limit, type, watches, onUpdate }: TripTime
             </div>
             {editItem?.linkedWatches && editItem.linkedWatches.length > 0 && (
               <div className="p-3 bg-muted/50 rounded-md">
-                <Label className="text-sm text-muted-foreground">Linked Watches (from wear logs)</Label>
+                <Label className="text-sm text-muted-foreground">{t("common.linkedWatches")}</Label>
                 <div className="mt-2 space-y-1">
                   {editItem.linkedWatches.map((lw) => (
                     <p key={lw.watchId} className="text-sm">
-                      {lw.brand} {lw.model} • {lw.days} {lw.days === 1 ? 'day' : 'days'}
+                      {lw.brand} {lw.model} • {lw.days} {lw.days === 1 ? t("common.day") : t("common.days")}
                     </p>
                   ))}
                 </div>
                 <p className="text-xs text-muted-foreground mt-2">
-                  To change linked watches, edit the wear logs directly.
+                  {t("common.editLinkedWatchesHint")}
                 </p>
               </div>
             )}
             <div>
-              <Label htmlFor="edit-purpose">{type === "trip" ? "Purpose" : "Purpose/Name"}</Label>
+              <Label htmlFor="edit-purpose">{t("common.purpose")}</Label>
               {type === "trip" ? (
                 <Select
                   value={formData.purpose}
@@ -477,7 +479,7 @@ export const TripTimeline = ({ trips, limit, type, watches, onUpdate }: TripTime
               )}
             </div>
             <div>
-              <Label htmlFor="edit-notes">Notes (Optional)</Label>
+              <Label htmlFor="edit-notes">{t("common.notesOptional")}</Label>
               <Textarea
                 id="edit-notes"
                 value={formData.notes}
@@ -489,10 +491,10 @@ export const TripTimeline = ({ trips, limit, type, watches, onUpdate }: TripTime
             </div>
             <div className="flex gap-2">
               <Button type="submit" disabled={loading}>
-                {loading ? "Updating..." : "Update"}
+                {loading ? t("common.updating") : t("common.update")}
               </Button>
               <Button type="button" variant="outline" onClick={() => setEditItem(null)}>
-                Cancel
+                {t("common.cancel")}
               </Button>
             </div>
           </form>

@@ -33,7 +33,7 @@ export function WatchContextMenu({
 
   const actions = [
     {
-      label: "View Details",
+      label: t("common.viewDetails"),
       icon: Eye,
       onClick: () => {
         onOpenChange(false);
@@ -49,7 +49,7 @@ export function WatchContextMenu({
       },
     },
     {
-      label: "Edit",
+      label: t("common.edit"),
       icon: Pencil,
       onClick: () => {
         onOpenChange(false);
@@ -57,7 +57,7 @@ export function WatchContextMenu({
       },
     },
     {
-      label: "Delete",
+      label: t("common.delete"),
       icon: Trash2,
       variant: "destructive" as const,
       onClick: () => {
