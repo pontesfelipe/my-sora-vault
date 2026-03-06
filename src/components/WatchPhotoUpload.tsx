@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Camera, Upload, Loader2, AlertCircle, X } from "lucide-react";
+import { Camera, Upload, Loader2, AlertCircle, X, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { CameraViewfinder } from "@/components/CameraViewfinder";
 
 interface WatchInfo {
+  is_watch?: boolean;
   brand: string;
   model: string;
   dial_color: string;
@@ -23,6 +24,8 @@ interface WatchInfo {
   notes?: string;
 }
 
+const MAX_REJECTIONS_PER_PHOTO = 3;
+
 interface WatchPhotoUploadProps {
   onIdentified: (info: WatchInfo) => void;
   onPhotoUploaded?: (base64: string) => void;
@@ -35,6 +38,9 @@ export const WatchPhotoUpload = ({ onIdentified, onPhotoUploaded, onContinueToFo
   const [preview, setPreview] = useState<string | null>(null);
   const [identifiedWatch, setIdentifiedWatch] = useState<WatchInfo | null>(null);
   const [rejectedSuggestions, setRejectedSuggestions] = useState<Array<{ brand: string; model: string }>>([]);
+  const [sessionRejectionCount, setSessionRejectionCount] = useState(0);
+  const [maxRetriesReached, setMaxRetriesReached] = useState(false);
+  const [notAWatch, setNotAWatch] = useState(false);
   const [cameraOpen, setCameraOpen] = useState(false);
   const uploadInputRef = useRef<HTMLInputElement>(null);
   const captureInputRef = useRef<HTMLInputElement>(null);
@@ -62,6 +68,7 @@ export const WatchPhotoUpload = ({ onIdentified, onPhotoUploaded, onContinueToFo
 
   const identifyFromImage = async (base64Image: string, exclusions: Array<{ brand: string; model: string }>) => {
     setIsProcessing(true);
+    setNotAWatch(false);
     try {
       const body: any = { image: base64Image };
       if (exclusions.length > 0) body.excluded_suggestions = exclusions;
@@ -69,6 +76,14 @@ export const WatchPhotoUpload = ({ onIdentified, onPhotoUploaded, onContinueToFo
       const { data, error } = await supabase.functions.invoke('identify-watch-from-photo', { body });
 
       if (error) throw error;
+
+      // Image validation: AI determined this isn't a watch
+      if (data.is_watch === false) {
+        setNotAWatch(true);
+        setIdentifiedWatch(null);
+        toast.error('No watch detected in this image. Please take a clear photo of a watch.');
+        return;
+      }
 
       setIdentifiedWatch(data);
       toast.success(`Watch identified with ${data.confidence} confidence!`, {
@@ -94,7 +109,9 @@ export const WatchPhotoUpload = ({ onIdentified, onPhotoUploaded, onContinueToFo
   const processImage = async (file: File) => {
     setIdentifiedWatch(null);
     setRejectedSuggestions([]);
-
+    setSessionRejectionCount(0);
+    setMaxRetriesReached(false);
+    setNotAWatch(false);
     const reader = new FileReader();
     reader.readAsDataURL(file);
 
@@ -128,6 +145,10 @@ export const WatchPhotoUpload = ({ onIdentified, onPhotoUploaded, onContinueToFo
 
   const handleNotMyWatch = async () => {
     if (!identifiedWatch || !preview || !user) return;
+    
+    const newCount = sessionRejectionCount + 1;
+    setSessionRejectionCount(newCount);
+    
     const rejection = { brand: identifiedWatch.brand || "", model: identifiedWatch.model || "" };
     const updatedRejections = [...rejectedSuggestions, rejection];
     setRejectedSuggestions(updatedRejections);
@@ -139,9 +160,26 @@ export const WatchPhotoUpload = ({ onIdentified, onPhotoUploaded, onContinueToFo
       rejected_model: rejection.model,
     }).then(() => {});
 
+    // After 3 rejections, stop retrying and ask for a new photo
+    if (newCount >= MAX_REJECTIONS_PER_PHOTO) {
+      setMaxRetriesReached(true);
+      setIdentifiedWatch(null);
+      toast.warning("We couldn't identify your watch after multiple attempts. Please try with a new photo.");
+      return;
+    }
+
     toast.info("Got it — trying again with a different identification...");
     setIdentifiedWatch(null);
     await identifyFromImage(preview, updatedRejections);
+  };
+
+  const handleRetakePhoto = () => {
+    setPreview(null);
+    setIdentifiedWatch(null);
+    setRejectedSuggestions([]);
+    setSessionRejectionCount(0);
+    setMaxRetriesReached(false);
+    setNotAWatch(false);
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -256,6 +294,47 @@ export const WatchPhotoUpload = ({ onIdentified, onPhotoUploaded, onContinueToFo
                       }}
                     >
                       Continue to Add Watch
+                    </Button>
+                  </div>
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {/* Max retries reached - ask for new photo */}
+            {maxRetriesReached && !isProcessing && (
+              <Alert className="border-destructive/50 bg-destructive/5">
+                <AlertCircle className="h-4 w-4 text-destructive" />
+                <AlertDescription className="space-y-3">
+                  <p className="font-medium">We couldn't identify your watch after {MAX_REJECTIONS_PER_PHOTO} attempts.</p>
+                  <p className="text-sm text-muted-foreground">
+                    Please try taking a new photo with better lighting, a clearer angle, or closer to the watch face.
+                  </p>
+                  <div className="flex gap-2 pt-2">
+                    <Button variant="outline" size="sm" onClick={handleRetakePhoto}>
+                      <RotateCcw className="w-4 h-4 mr-1" />
+                      Take New Photo
+                    </Button>
+                    <Button size="sm" variant="secondary" onClick={() => onContinueToForm?.()}>
+                      Enter Manually
+                    </Button>
+                  </div>
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {/* Not a watch detected */}
+            {notAWatch && !isProcessing && (
+              <Alert className="border-destructive/50 bg-destructive/5">
+                <AlertCircle className="h-4 w-4 text-destructive" />
+                <AlertDescription className="space-y-3">
+                  <p className="font-medium">No watch detected in this image.</p>
+                  <p className="text-sm text-muted-foreground">
+                    Please upload a clear photo of a watch showing the dial, hands, and any visible branding.
+                  </p>
+                  <div className="flex gap-2 pt-2">
+                    <Button variant="outline" size="sm" onClick={handleRetakePhoto}>
+                      <RotateCcw className="w-4 h-4 mr-1" />
+                      Try Again
                     </Button>
                   </div>
                 </AlertDescription>

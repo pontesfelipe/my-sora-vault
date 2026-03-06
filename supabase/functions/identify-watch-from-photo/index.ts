@@ -15,6 +15,7 @@ const inputSchema = z.object({
     brand: z.string(),
     model: z.string(),
   })).optional().default([]),
+  validate_only: z.boolean().optional().default(false),
 });
 
 const isLikelyBase64 = (value: string) => {
@@ -54,7 +55,7 @@ serve(async (req) => {
       );
     }
     
-    const { image, excluded_suggestions } = parseResult.data;
+    const { image, excluded_suggestions, validate_only } = parseResult.data;
     const normalizedImage = normalizeImageForGateway(image);
     if (!(normalizedImage.startsWith('data:image/') || normalizedImage.startsWith('http://') || normalizedImage.startsWith('https://'))) {
       return new Response(
@@ -88,6 +89,10 @@ serve(async (req) => {
             role: 'system',
             content: [
               'You are a world-class watch identification expert with encyclopedic knowledge of every watch brand, reference number, and edition ever produced — from mainstream luxury (Rolex, Omega, Breitling, etc.) to microbrands and vintage pieces.',
+              '',
+              'IMAGE VALIDATION (HIGHEST PRIORITY):',
+              'Before attempting identification, determine if the image actually contains a watch/timepiece. If the image does NOT contain a clearly visible watch (e.g., it shows a random object, a person without a watch, scenery, food, text, etc.), you MUST set is_watch to false and return minimal fields. Do NOT hallucinate a watch identification from a non-watch image.',
+              '',
               'You must identify not just the general model line but the EXACT reference/edition. Pay close attention to: dial color and texture, bezel type and markings (GMT, tachymeter, dive scale), bracelet/strap type and material, subdial layout, hand style, crown guards, case shape, lume plot pattern, date window position, and any text/logos on the dial.',
               'Distinguish between standard editions, limited editions, special editions, anniversary models, and regional variants. Always provide the most specific reference number you can determine.',
               '',
@@ -127,6 +132,10 @@ serve(async (req) => {
               parameters: {
                 type: 'object',
                 properties: {
+                  is_watch: {
+                    type: 'boolean',
+                    description: 'Whether the image actually contains a watch/timepiece. Set to false if no watch is visible.'
+                  },
                   brand: {
                     type: 'string',
                     description: 'The watch brand name (e.g., Rolex, Omega, Seiko)'
@@ -182,7 +191,7 @@ serve(async (req) => {
                     description: 'Additional observations, distinguishing features, or uncertainties about the identification'
                   }
                 },
-                required: ['brand', 'model', 'dial_color', 'type', 'confidence', 'complications'],
+                required: ['is_watch', 'brand', 'model', 'dial_color', 'type', 'confidence', 'complications'],
                 additionalProperties: false
               }
             }
