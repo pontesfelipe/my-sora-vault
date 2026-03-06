@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Camera, Upload, Loader2, AlertCircle, X } from "lucide-react";
+import { Camera, Upload, Loader2, AlertCircle, X, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -294,6 +294,47 @@ export const WatchPhotoUpload = ({ onIdentified, onPhotoUploaded, onContinueToFo
                       }}
                     >
                       Continue to Add Watch
+                    </Button>
+                  </div>
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {/* Max retries reached - ask for new photo */}
+            {maxRetriesReached && !isProcessing && (
+              <Alert className="border-destructive/50 bg-destructive/5">
+                <AlertCircle className="h-4 w-4 text-destructive" />
+                <AlertDescription className="space-y-3">
+                  <p className="font-medium">We couldn't identify your watch after {MAX_REJECTIONS_PER_PHOTO} attempts.</p>
+                  <p className="text-sm text-muted-foreground">
+                    Please try taking a new photo with better lighting, a clearer angle, or closer to the watch face.
+                  </p>
+                  <div className="flex gap-2 pt-2">
+                    <Button variant="outline" size="sm" onClick={handleRetakePhoto}>
+                      <RotateCcw className="w-4 h-4 mr-1" />
+                      Take New Photo
+                    </Button>
+                    <Button size="sm" variant="secondary" onClick={() => onContinueToForm?.()}>
+                      Enter Manually
+                    </Button>
+                  </div>
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {/* Not a watch detected */}
+            {notAWatch && !isProcessing && (
+              <Alert className="border-destructive/50 bg-destructive/5">
+                <AlertCircle className="h-4 w-4 text-destructive" />
+                <AlertDescription className="space-y-3">
+                  <p className="font-medium">No watch detected in this image.</p>
+                  <p className="text-sm text-muted-foreground">
+                    Please upload a clear photo of a watch showing the dial, hands, and any visible branding.
+                  </p>
+                  <div className="flex gap-2 pt-2">
+                    <Button variant="outline" size="sm" onClick={handleRetakePhoto}>
+                      <RotateCcw className="w-4 h-4 mr-1" />
+                      Try Again
                     </Button>
                   </div>
                 </AlertDescription>
