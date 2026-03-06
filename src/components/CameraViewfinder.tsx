@@ -47,6 +47,12 @@ export function CameraViewfinder({ open, onClose, onCapture, onFallbackToUpload 
 
     let lastError: unknown = null;
 
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      setError("Camera access is not available. This may require a secure (HTTPS) connection. Please use the upload option instead.");
+      setIsStarting(false);
+      return;
+    }
+
     try {
       for (const constraints of attempts) {
         try {
@@ -75,7 +81,7 @@ export function CameraViewfinder({ open, onClose, onCapture, onFallbackToUpload 
       } else if (errorName === "NotFoundError") {
         setError("No camera was found on this device.");
       } else {
-        setError("Could not open the guided camera. Use retry or the iPhone camera fallback.");
+        setError("Could not open the camera. Use retry or upload a photo instead.");
       }
     } finally {
       setIsStarting(false);
@@ -147,7 +153,7 @@ export function CameraViewfinder({ open, onClose, onCapture, onFallbackToUpload 
               </Button>
               {onFallbackToUpload && (
                 <Button variant="secondary" onClick={onFallbackToUpload}>
-                  <Upload className="w-4 h-4 mr-2" /> Use iPhone Camera
+                  <Upload className="w-4 h-4 mr-2" /> Upload Photo
                 </Button>
               )}
             </div>

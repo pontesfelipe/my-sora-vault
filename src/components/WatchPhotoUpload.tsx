@@ -50,7 +50,14 @@ export const WatchPhotoUpload = ({ onIdentified, onPhotoUploaded, onContinueToFo
       return;
     }
 
-    setCameraOpen(true);
+    // On desktop/Android, check if camera API is available
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      setCameraOpen(true);
+    } else {
+      // Fallback: open file picker for upload
+      toast.info("Camera not available — opening file picker instead.");
+      uploadInputRef.current?.click();
+    }
   };
 
   const identifyFromImage = async (base64Image: string, exclusions: Array<{ brand: string; model: string }>) => {
@@ -328,7 +335,7 @@ export const WatchPhotoUpload = ({ onIdentified, onPhotoUploaded, onContinueToFo
       onCapture={handleCameraCapture}
       onFallbackToUpload={() => {
         setCameraOpen(false);
-        captureInputRef.current?.click();
+        uploadInputRef.current?.click();
       }}
     />
     </>
