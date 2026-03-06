@@ -68,6 +68,7 @@ export const WatchPhotoUpload = ({ onIdentified, onPhotoUploaded, onContinueToFo
 
   const identifyFromImage = async (base64Image: string, exclusions: Array<{ brand: string; model: string }>) => {
     setIsProcessing(true);
+    setNotAWatch(false);
     try {
       const body: any = { image: base64Image };
       if (exclusions.length > 0) body.excluded_suggestions = exclusions;
@@ -75,6 +76,14 @@ export const WatchPhotoUpload = ({ onIdentified, onPhotoUploaded, onContinueToFo
       const { data, error } = await supabase.functions.invoke('identify-watch-from-photo', { body });
 
       if (error) throw error;
+
+      // Image validation: AI determined this isn't a watch
+      if (data.is_watch === false) {
+        setNotAWatch(true);
+        setIdentifiedWatch(null);
+        toast.error('No watch detected in this image. Please take a clear photo of a watch.');
+        return;
+      }
 
       setIdentifiedWatch(data);
       toast.success(`Watch identified with ${data.confidence} confidence!`, {
