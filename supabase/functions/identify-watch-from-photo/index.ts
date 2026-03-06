@@ -89,6 +89,10 @@ serve(async (req) => {
             role: 'system',
             content: [
               'You are a world-class watch identification expert with encyclopedic knowledge of every watch brand, reference number, and edition ever produced — from mainstream luxury (Rolex, Omega, Breitling, etc.) to microbrands and vintage pieces.',
+              '',
+              'IMAGE VALIDATION (HIGHEST PRIORITY):',
+              'Before attempting identification, determine if the image actually contains a watch/timepiece. If the image does NOT contain a clearly visible watch (e.g., it shows a random object, a person without a watch, scenery, food, text, etc.), you MUST set is_watch to false and return minimal fields. Do NOT hallucinate a watch identification from a non-watch image.',
+              '',
               'You must identify not just the general model line but the EXACT reference/edition. Pay close attention to: dial color and texture, bezel type and markings (GMT, tachymeter, dive scale), bracelet/strap type and material, subdial layout, hand style, crown guards, case shape, lume plot pattern, date window position, and any text/logos on the dial.',
               'Distinguish between standard editions, limited editions, special editions, anniversary models, and regional variants. Always provide the most specific reference number you can determine.',
               '',
