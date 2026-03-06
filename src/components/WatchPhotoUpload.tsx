@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { CameraViewfinder } from "@/components/CameraViewfinder";
 
 interface WatchInfo {
+  is_watch?: boolean;
   brand: string;
   model: string;
   dial_color: string;
@@ -22,6 +23,8 @@ interface WatchInfo {
   confidence: 'high' | 'medium' | 'low';
   notes?: string;
 }
+
+const MAX_REJECTIONS_PER_PHOTO = 3;
 
 interface WatchPhotoUploadProps {
   onIdentified: (info: WatchInfo) => void;
