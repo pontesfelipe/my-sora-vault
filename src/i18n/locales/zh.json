@@ -621,6 +621,28 @@
     "aiSuggestionsRemoved": "AI建议已被移除",
     "failedGenerateSuggestions": "生成建议失败"
   },
+  "collectionSwitcher": {
+    "selectCollection": "选择收藏",
+    "myCollections": "我的收藏",
+    "createNewCollection": "创建新收藏",
+    "singleCollectionLimit": "你只能创建一个收藏。请让其他人与你共享他们的收藏。",
+    "byOwner": "由 {{owner}}"
+  },
+  "createCollectionDialog": {
+    "newCollection": "新建收藏",
+    "title": "创建新的手表收藏",
+    "description": "先给你的收藏起个名字吧。",
+    "collectionName": "收藏名称",
+    "namePlaceholder": "我的手表收藏",
+    "watchType": "手表",
+    "watchTypeDescription": "通过机芯、表壳尺寸和防水性能等细节追踪你的手表收藏",
+    "cancel": "取消",
+    "creating": "创建中...",
+    "create": "创建收藏",
+    "nameRequired": "收藏名称为必填项",
+    "createdSuccess": "手表收藏已创建！",
+    "createFailed": "创建收藏失败"
+  },
   "tastePrefs": {
     "title": "AI心愿单生成器",
     "description": "描述您的品味偏好或从收藏自动生成，让AI为您推荐手表",

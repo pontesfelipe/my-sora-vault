@@ -625,6 +625,28 @@
     "aiSuggestionsRemoved": "AI suggestions have been removed",
     "failedGenerateSuggestions": "Failed to generate suggestions"
   },
+  "collectionSwitcher": {
+    "selectCollection": "Select Collection",
+    "myCollections": "My Collections",
+    "createNewCollection": "Create New Collection",
+    "singleCollectionLimit": "You can only create one collection. Ask others to share theirs with you.",
+    "byOwner": "by {{owner}}"
+  },
+  "createCollectionDialog": {
+    "newCollection": "New Collection",
+    "title": "Create New Watch Collection",
+    "description": "Give your collection a name to get started.",
+    "collectionName": "Collection Name",
+    "namePlaceholder": "My Watch Collection",
+    "watchType": "Watches",
+    "watchTypeDescription": "Track your watch collection with movement, case size, and water resistance details",
+    "cancel": "Cancel",
+    "creating": "Creating...",
+    "create": "Create Collection",
+    "nameRequired": "Collection name is required",
+    "createdSuccess": "Watch collection created!",
+    "createFailed": "Failed to create collection"
+  },
   "tastePrefs": {
     "title": "AI Wishlist Generator",
     "description": "Describe your taste preferences or auto-generate from your collection, then let AI suggest watches for your wishlist",

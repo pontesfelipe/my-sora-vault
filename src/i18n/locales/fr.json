@@ -621,6 +621,28 @@
     "aiSuggestionsRemoved": "Les suggestions IA ont été supprimées",
     "failedGenerateSuggestions": "Échec de la génération des suggestions"
   },
+  "collectionSwitcher": {
+    "selectCollection": "Sélectionner une collection",
+    "myCollections": "Mes collections",
+    "createNewCollection": "Créer une nouvelle collection",
+    "singleCollectionLimit": "Vous ne pouvez créer qu'une seule collection. Demandez aux autres de partager la leur avec vous.",
+    "byOwner": "par {{owner}}"
+  },
+  "createCollectionDialog": {
+    "newCollection": "Nouvelle collection",
+    "title": "Créer une nouvelle collection de montres",
+    "description": "Donnez un nom à votre collection pour commencer.",
+    "collectionName": "Nom de la collection",
+    "namePlaceholder": "Ma collection de montres",
+    "watchType": "Montres",
+    "watchTypeDescription": "Suivez votre collection de montres avec le mouvement, la taille du boîtier et l'étanchéité",
+    "cancel": "Annuler",
+    "creating": "Création...",
+    "create": "Créer la collection",
+    "nameRequired": "Le nom de la collection est requis",
+    "createdSuccess": "Collection de montres créée !",
+    "createFailed": "Échec de la création de la collection"
+  },
   "tastePrefs": {
     "title": "Générateur de liste de souhaits IA",
     "description": "Décrivez vos préférences ou générez automatiquement depuis votre collection, et laissez l'IA suggérer des montres",

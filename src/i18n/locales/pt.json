@@ -625,6 +625,28 @@
     "aiSuggestionsRemoved": "As sugestões de IA foram removidas",
     "failedGenerateSuggestions": "Falha ao gerar sugestões"
   },
+  "collectionSwitcher": {
+    "selectCollection": "Selecionar coleção",
+    "myCollections": "Minhas coleções",
+    "createNewCollection": "Criar nova coleção",
+    "singleCollectionLimit": "Você só pode criar uma coleção. Peça para outras pessoas compartilharem a delas com você.",
+    "byOwner": "por {{owner}}"
+  },
+  "createCollectionDialog": {
+    "newCollection": "Nova coleção",
+    "title": "Criar nova coleção de relógios",
+    "description": "Dê um nome à sua coleção para começar.",
+    "collectionName": "Nome da coleção",
+    "namePlaceholder": "Minha coleção de relógios",
+    "watchType": "Relógios",
+    "watchTypeDescription": "Acompanhe sua coleção de relógios com detalhes de movimento, tamanho da caixa e resistência à água",
+    "cancel": "Cancelar",
+    "creating": "Criando...",
+    "create": "Criar coleção",
+    "nameRequired": "O nome da coleção é obrigatório",
+    "createdSuccess": "Coleção de relógios criada!",
+    "createFailed": "Falha ao criar coleção"
+  },
   "tastePrefs": {
     "title": "Gerador de lista de desejos com IA",
     "description": "Descreva suas preferências de gosto ou gere automaticamente a partir da sua coleção, e deixe a IA sugerir relógios",

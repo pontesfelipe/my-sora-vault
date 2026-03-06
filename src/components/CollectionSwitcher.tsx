@@ -20,10 +20,12 @@ import { useCollection } from "@/contexts/CollectionContext";
 import { useCollectionData } from "@/hooks/useCollectionData";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { CreateCollectionTypeDialog } from "./CreateCollectionTypeDialog";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 export const CollectionSwitcher = () => {
+  const { t } = useTranslation();
   const { selectedCollectionId, setSelectedCollectionId, currentCollection } = useCollection();
   const { collections, refetch } = useCollectionData();
   const { isAdmin } = useAuth();
@@ -33,33 +35,54 @@ export const CollectionSwitcher = () => {
 
   const getRoleIcon = (role: string) => {
     switch (role) {
-      case 'owner': return <Crown className="w-3 h-3" />;
-      case 'editor': return <Edit3 className="w-3 h-3" />;
-      case 'viewer': return <Eye className="w-3 h-3" />;
-      default: return null;
+      case "owner":
+        return <Crown className="w-3 h-3" />;
+      case "editor":
+        return <Edit3 className="w-3 h-3" />;
+      case "viewer":
+        return <Eye className="w-3 h-3" />;
+      default:
+        return null;
+    }
+  };
+
+  const getRoleLabel = (role: string) => {
+    switch (role) {
+      case "owner":
+        return t("collectionPage.roleOwner");
+      case "editor":
+        return t("collectionPage.roleEditor");
+      case "viewer":
+      default:
+        return t("collectionPage.roleViewer");
     }
   };
 
   const getRoleBadgeVariant = (role: string): "default" | "secondary" | "outline" => {
     switch (role) {
-      case 'owner': return 'default';
-      case 'editor': return 'secondary';
-      case 'viewer': return 'outline';
-      default: return 'outline';
+      case "owner":
+        return "default";
+      case "editor":
+        return "secondary";
+      case "viewer":
+        return "outline";
+      default:
+        return "outline";
     }
   };
 
-  const ownedCollections = collections.filter(c => c.role === 'owner');
+  const ownedCollections = collections.filter((c) => c.role === "owner");
   const canCreateCollection = isAdmin || ownedCollections.length === 0;
+  const currentRole = currentCollection?.role || "viewer";
 
   const triggerButton = (
     <Button variant="outline" className="gap-2">
       <Watch className="w-4 h-4" />
-      {currentCollection?.name || "Select Collection"}
+      {currentCollection?.name || t("collectionSwitcher.selectCollection")}
       {currentCollection && (
-        <Badge variant={getRoleBadgeVariant(currentCollection.role || 'viewer')} className="gap-1">
-          {getRoleIcon(currentCollection.role)}
-          {currentCollection.role}
+        <Badge variant={getRoleBadgeVariant(currentRole)} className="gap-1">
+          {getRoleIcon(currentRole)}
+          {getRoleLabel(currentRole)}
         </Badge>
       )}
     </Button>
@@ -67,30 +90,33 @@ export const CollectionSwitcher = () => {
 
   const collectionItems = (onSelect: (id: string) => void) => (
     <>
-      {collections.map((collection) => (
-        <button
-          key={collection.id}
-          onClick={() => onSelect(collection.id)}
-          className="flex items-center justify-between w-full px-4 py-3 hover:bg-surfaceMuted transition-colors text-left"
-        >
-          <div className="flex items-center gap-2 min-w-0 flex-1">
-            {collection.id === selectedCollectionId && <Check className="w-4 h-4 flex-shrink-0 text-accent" />}
-            <Watch className="w-4 h-4 flex-shrink-0 text-textMuted" />
-            <div className="flex flex-col min-w-0">
-              <span className="truncate text-sm text-textMain">{collection.name}</span>
-              {isAdmin && (collection.ownerName || collection.ownerEmail) && (
-                <span className="text-xs text-textMuted truncate">
-                  by {collection.ownerName || collection.ownerEmail}
-                </span>
-              )}
+      {collections.map((collection) => {
+        const role = collection.role || "viewer";
+        const ownerLabel = collection.ownerName || collection.ownerEmail;
+
+        return (
+          <button
+            key={collection.id}
+            onClick={() => onSelect(collection.id)}
+            className="flex items-center justify-between w-full px-4 py-3 hover:bg-surfaceMuted transition-colors text-left"
+          >
+            <div className="flex items-center gap-2 min-w-0 flex-1">
+              {collection.id === selectedCollectionId && <Check className="w-4 h-4 flex-shrink-0 text-accent" />}
+              <Watch className="w-4 h-4 flex-shrink-0 text-textMuted" />
+              <div className="flex flex-col min-w-0">
+                <span className="truncate text-sm text-textMain">{collection.name}</span>
+                {isAdmin && ownerLabel && (
+                  <span className="text-xs text-textMuted truncate">{t("collectionSwitcher.byOwner", { owner: ownerLabel })}</span>
+                )}
+              </div>
             </div>
-          </div>
-          <Badge variant={getRoleBadgeVariant(collection.role || 'viewer')} className="gap-1 flex-shrink-0 ml-2">
-            {getRoleIcon(collection.role)}
-            {collection.role}
-          </Badge>
-        </button>
-      ))}
+            <Badge variant={getRoleBadgeVariant(role)} className="gap-1 flex-shrink-0 ml-2">
+              {getRoleIcon(role)}
+              {getRoleLabel(role)}
+            </Badge>
+          </button>
+        );
+      })}
 
       {canCreateCollection && (
         <button
@@ -98,13 +124,13 @@ export const CollectionSwitcher = () => {
           className="flex items-center gap-2 w-full px-4 py-3 hover:bg-surfaceMuted transition-colors text-left text-sm text-textMain border-t border-borderSubtle"
         >
           <Plus className="w-4 h-4" />
-          Create New Collection
+          {t("collectionSwitcher.createNewCollection")}
         </button>
       )}
 
       {!canCreateCollection && (
         <div className="px-4 py-3 text-xs text-textMuted border-t border-borderSubtle">
-          You can only create one collection. Ask others to share theirs with you.
+          {t("collectionSwitcher.singleCollectionLimit")}
         </div>
       )}
     </>
@@ -117,7 +143,7 @@ export const CollectionSwitcher = () => {
           <DrawerTrigger asChild>{triggerButton}</DrawerTrigger>
           <DrawerContent>
             <DrawerHeader>
-              <DrawerTitle>My Collections</DrawerTitle>
+              <DrawerTitle>{t("collectionSwitcher.myCollections")}</DrawerTitle>
             </DrawerHeader>
             <div className="max-h-[60vh] overflow-y-auto pb-safe">
               {collectionItems((id) => {
@@ -145,53 +171,53 @@ export const CollectionSwitcher = () => {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>{triggerButton}</DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-72">
-          <DropdownMenuLabel>My Collections</DropdownMenuLabel>
+          <DropdownMenuLabel>{t("collectionSwitcher.myCollections")}</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          
-          {collections.map((collection) => (
-            <DropdownMenuItem
-              key={collection.id}
-              onClick={() => setSelectedCollectionId(collection.id)}
-              className="flex items-center justify-between cursor-pointer"
-            >
-              <div className="flex items-center gap-2 min-w-0 flex-1">
-                {collection.id === selectedCollectionId && <Check className="w-4 h-4 flex-shrink-0" />}
-                <Watch className="w-4 h-4 flex-shrink-0" />
-                <div className="flex flex-col min-w-0">
-                  <span className="truncate">{collection.name}</span>
-                  {isAdmin && (collection.ownerName || collection.ownerEmail) && (
-                    <span className="text-xs text-muted-foreground truncate">
-                      by {collection.ownerName || collection.ownerEmail}
-                    </span>
-                  )}
+
+          {collections.map((collection) => {
+            const role = collection.role || "viewer";
+            const ownerLabel = collection.ownerName || collection.ownerEmail;
+
+            return (
+              <DropdownMenuItem
+                key={collection.id}
+                onClick={() => setSelectedCollectionId(collection.id)}
+                className="flex items-center justify-between cursor-pointer"
+              >
+                <div className="flex items-center gap-2 min-w-0 flex-1">
+                  {collection.id === selectedCollectionId && <Check className="w-4 h-4 flex-shrink-0" />}
+                  <Watch className="w-4 h-4 flex-shrink-0" />
+                  <div className="flex flex-col min-w-0">
+                    <span className="truncate">{collection.name}</span>
+                    {isAdmin && ownerLabel && (
+                      <span className="text-xs text-muted-foreground truncate">
+                        {t("collectionSwitcher.byOwner", { owner: ownerLabel })}
+                      </span>
+                    )}
+                  </div>
                 </div>
-              </div>
-              <Badge variant={getRoleBadgeVariant(collection.role || 'viewer')} className="gap-1 flex-shrink-0 ml-2">
-                {getRoleIcon(collection.role)}
-                {collection.role}
-              </Badge>
-            </DropdownMenuItem>
-          ))}
+                <Badge variant={getRoleBadgeVariant(role)} className="gap-1 flex-shrink-0 ml-2">
+                  {getRoleIcon(role)}
+                  {getRoleLabel(role)}
+                </Badge>
+              </DropdownMenuItem>
+            );
+          })}
 
           {canCreateCollection && (
             <>
               <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => setShowCreateDialog(true)}
-                className="cursor-pointer"
-              >
+              <DropdownMenuItem onClick={() => setShowCreateDialog(true)} className="cursor-pointer">
                 <Plus className="w-4 h-4 mr-2" />
-                Create New Collection
+                {t("collectionSwitcher.createNewCollection")}
               </DropdownMenuItem>
             </>
           )}
-          
+
           {!canCreateCollection && (
             <>
               <DropdownMenuSeparator />
-              <div className="px-2 py-1.5 text-xs text-muted-foreground">
-                You can only create one collection. Ask others to share theirs with you.
-              </div>
+              <div className="px-2 py-1.5 text-xs text-muted-foreground">{t("collectionSwitcher.singleCollectionLimit")}</div>
             </>
           )}
         </DropdownMenuContent>
