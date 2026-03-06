@@ -18,22 +18,26 @@ export interface FeedItem {
   comment_count: number;
   created_at: string;
   external_url: string | null;
+  author_trust_level: string | null;
+  watch_authenticated: boolean;
 }
 
 const PAGE_SIZE = 10;
 
-export function useHomeFeed() {
+export function useHomeFeed(maxItems?: number) {
   const { user } = useAuth();
   const [filter, setFilter] = useState<FeedFilter>("friends");
   const [page, setPage] = useState(0);
 
+  const effectiveLimit = maxItems || PAGE_SIZE * (page + 1);
+
   const query = useQuery({
-    queryKey: ["home-feed", user?.id, filter, page],
+    queryKey: ["home-feed", user?.id, filter, page, maxItems],
     queryFn: async () => {
       const { data, error } = await supabase.rpc("get_home_feed", {
         _user_id: user!.id,
         _filter: filter,
-        _limit: PAGE_SIZE * (page + 1),
+        _limit: effectiveLimit,
         _offset: 0,
       });
       if (error) throw error;
@@ -45,7 +49,7 @@ export function useHomeFeed() {
 
   const loadMore = () => setPage((p) => p + 1);
 
-  const hasMore = (query.data?.length || 0) >= PAGE_SIZE * (page + 1);
+  const hasMore = !maxItems && (query.data?.length || 0) >= PAGE_SIZE * (page + 1);
 
   return {
     items: query.data || [],
