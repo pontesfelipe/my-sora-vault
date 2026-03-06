@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Trip } from "@/types/watch";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
