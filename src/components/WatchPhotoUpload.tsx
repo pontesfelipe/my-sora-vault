@@ -145,6 +145,10 @@ export const WatchPhotoUpload = ({ onIdentified, onPhotoUploaded, onContinueToFo
 
   const handleNotMyWatch = async () => {
     if (!identifiedWatch || !preview || !user) return;
+    
+    const newCount = sessionRejectionCount + 1;
+    setSessionRejectionCount(newCount);
+    
     const rejection = { brand: identifiedWatch.brand || "", model: identifiedWatch.model || "" };
     const updatedRejections = [...rejectedSuggestions, rejection];
     setRejectedSuggestions(updatedRejections);
@@ -156,9 +160,26 @@ export const WatchPhotoUpload = ({ onIdentified, onPhotoUploaded, onContinueToFo
       rejected_model: rejection.model,
     }).then(() => {});
 
+    // After 3 rejections, stop retrying and ask for a new photo
+    if (newCount >= MAX_REJECTIONS_PER_PHOTO) {
+      setMaxRetriesReached(true);
+      setIdentifiedWatch(null);
+      toast.warning("We couldn't identify your watch after multiple attempts. Please try with a new photo.");
+      return;
+    }
+
     toast.info("Got it — trying again with a different identification...");
     setIdentifiedWatch(null);
     await identifyFromImage(preview, updatedRejections);
+  };
+
+  const handleRetakePhoto = () => {
+    setPreview(null);
+    setIdentifiedWatch(null);
+    setRejectedSuggestions([]);
+    setSessionRejectionCount(0);
+    setMaxRetriesReached(false);
+    setNotAWatch(false);
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
