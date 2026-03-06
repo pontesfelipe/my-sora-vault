@@ -621,6 +621,28 @@
     "aiSuggestionsRemoved": "AIの提案が削除されました",
     "failedGenerateSuggestions": "提案の生成に失敗しました"
   },
+  "collectionSwitcher": {
+    "selectCollection": "コレクションを選択",
+    "myCollections": "マイコレクション",
+    "createNewCollection": "新しいコレクションを作成",
+    "singleCollectionLimit": "作成できるコレクションは1つだけです。ほかのユーザーに共有してもらってください。",
+    "byOwner": "{{owner}}による"
+  },
+  "createCollectionDialog": {
+    "newCollection": "新しいコレクション",
+    "title": "新しい時計コレクションを作成",
+    "description": "開始するためにコレクション名を入力してください。",
+    "collectionName": "コレクション名",
+    "namePlaceholder": "マイ時計コレクション",
+    "watchType": "時計",
+    "watchTypeDescription": "ムーブメント、ケースサイズ、防水性能の詳細とともに時計コレクションを管理できます",
+    "cancel": "キャンセル",
+    "creating": "作成中...",
+    "create": "コレクションを作成",
+    "nameRequired": "コレクション名は必須です",
+    "createdSuccess": "時計コレクションを作成しました！",
+    "createFailed": "コレクションの作成に失敗しました"
+  },
   "tastePrefs": {
     "title": "AIウィッシュリストジェネレーター",
     "description": "好みを説明するかコレクションから自動生成し、AIに時計を提案してもらいましょう",
