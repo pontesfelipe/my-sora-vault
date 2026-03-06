@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -37,6 +38,7 @@ export const DynamicItemCard = ({
 }: DynamicItemCardProps) => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const { t } = useTranslation();
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const handleCardClick = (e: React.MouseEvent) => {
@@ -51,10 +53,10 @@ export const DynamicItemCard = ({
   const imageUrl = item.ai_image_url || watchHero;
 
   const menuActions = [
-    { label: "Edit", icon: Edit2, onClick: onEdit },
-    { label: "Mark as Sold", icon: DollarSign, onClick: onMarkAsSold, separator: true },
-    { label: "Mark as Traded", icon: ArrowUpDown, onClick: onMarkAsTraded },
-    { label: "Delete", icon: Trash2, onClick: onDelete, destructive: true, separator: true },
+    { label: t("common.edit"), icon: Edit2, onClick: onEdit },
+    { label: t("common.markAsSold"), icon: DollarSign, onClick: onMarkAsSold, separator: true },
+    { label: t("common.markAsTraded"), icon: ArrowUpDown, onClick: onMarkAsTraded },
+    { label: t("common.delete"), icon: Trash2, onClick: onDelete, destructive: true, separator: true },
   ];
 
   const menuButton = (
@@ -124,21 +126,21 @@ export const DynamicItemCard = ({
               <DropdownMenuContent align="end">
                 <DropdownMenuItem onClick={onEdit}>
                   <Edit2 className="w-4 h-4 mr-2" />
-                  Edit
+                  {t("common.edit")}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={onMarkAsSold}>
                   <DollarSign className="w-4 h-4 mr-2" />
-                  Mark as Sold
+                  {t("common.markAsSold")}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={onMarkAsTraded}>
                   <ArrowUpDown className="w-4 h-4 mr-2" />
-                  Mark as Traded
+                  {t("common.markAsTraded")}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={onDelete} className="text-destructive">
                   <Trash2 className="w-4 h-4 mr-2" />
-                  Delete
+                  {t("common.delete")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -149,7 +151,7 @@ export const DynamicItemCard = ({
           <div className="absolute top-2 left-2">
             <Badge className="text-xs bg-accent/90 text-accent-foreground backdrop-blur-sm">
               <ArrowUpDown className="w-3 h-3 mr-1" />
-              Trade
+              {t("common.trade")}
             </Badge>
           </div>
         )}
@@ -157,7 +159,7 @@ export const DynamicItemCard = ({
       
       <CardContent className="space-y-3 p-4">
         <div className="flex items-center gap-2">
-          <span className="text-xs text-muted-foreground">Dial Color:</span>
+          <span className="text-xs text-muted-foreground">{t("common.dialColor")}:</span>
           <Badge variant="outline" className="text-xs font-medium">
             {item.dial_color}
           </Badge>

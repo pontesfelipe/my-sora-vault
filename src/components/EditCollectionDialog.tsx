@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -22,6 +23,7 @@ interface EditCollectionDialogProps {
 }
 
 export const EditCollectionDialog = ({ collectionId, currentName, onSuccess }: EditCollectionDialogProps) => {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState(currentName);
@@ -30,7 +32,7 @@ export const EditCollectionDialog = ({ collectionId, currentName, onSuccess }: E
     e.preventDefault();
     
     if (!name.trim()) {
-      toast.error("Collection name cannot be empty");
+      toast.error(t("common.collectionNameEmpty"));
       return;
     }
 
@@ -44,12 +46,12 @@ export const EditCollectionDialog = ({ collectionId, currentName, onSuccess }: E
 
       if (error) throw error;
 
-      toast.success("Collection name updated!");
+      toast.success(t("common.collectionUpdated"));
       setOpen(false);
       onSuccess();
     } catch (error: any) {
       console.error("Error updating collection:", error);
-      toast.error("Failed to update collection name");
+      toast.error(t("common.collectionUpdateFailed"));
     } finally {
       setLoading(false);
     }
@@ -65,29 +67,29 @@ export const EditCollectionDialog = ({ collectionId, currentName, onSuccess }: E
       <DialogContent>
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>Edit Collection Name</DialogTitle>
+            <DialogTitle>{t("common.editCollection")}</DialogTitle>
             <DialogDescription>
-              Change the name of your collection
+              {t("common.editCollectionDesc")}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Collection Name</Label>
+              <Label htmlFor="name">{t("common.collectionName")}</Label>
               <Input
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="My Collection"
+                placeholder={t("common.collectionName")}
                 required
               />
             </div>
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button type="submit" disabled={loading}>
-              {loading ? "Saving..." : "Save Changes"}
+              {loading ? t("common.saving") : t("common.saveChanges")}
             </Button>
           </DialogFooter>
         </form>
