@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -21,6 +22,7 @@ interface CreateCollectionTypeDialogProps {
 }
 
 export const CreateCollectionTypeDialog = ({ onSuccess }: CreateCollectionTypeDialogProps) => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -28,9 +30,9 @@ export const CreateCollectionTypeDialog = ({ onSuccess }: CreateCollectionTypeDi
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!name.trim() || !user) {
-      toast.error("Collection name is required");
+      toast.error(t("createCollectionDialog.nameRequired"));
       return;
     }
 
@@ -38,11 +40,11 @@ export const CreateCollectionTypeDialog = ({ onSuccess }: CreateCollectionTypeDi
 
     try {
       const { data: collectionData, error: collectionError } = await supabase
-        .from('collections' as any)
+        .from("collections" as any)
         .insert({
           name: name.trim(),
           created_by: user.id,
-          collection_type: 'watches',
+          collection_type: "watches",
         } as any)
         .select()
         .single();
@@ -50,22 +52,22 @@ export const CreateCollectionTypeDialog = ({ onSuccess }: CreateCollectionTypeDi
       if (collectionError) throw collectionError;
 
       const { error: linkError } = await supabase
-        .from('user_collections' as any)
+        .from("user_collections" as any)
         .insert({
           user_id: user.id,
           collection_id: (collectionData as any).id,
-          role: 'owner',
+          role: "owner",
         } as any);
 
       if (linkError) throw linkError;
 
-      toast.success("Watch collection created!");
+      toast.success(t("createCollectionDialog.createdSuccess"));
       setOpen(false);
       setName("");
       onSuccess();
     } catch (error: any) {
       console.error("Error creating collection:", error);
-      toast.error("Failed to create collection");
+      toast.error(t("createCollectionDialog.createFailed"));
     } finally {
       setLoading(false);
     }
@@ -76,26 +78,24 @@ export const CreateCollectionTypeDialog = ({ onSuccess }: CreateCollectionTypeDi
       <DialogTrigger asChild>
         <Button variant="outline" className="gap-2">
           <Plus className="w-4 h-4" />
-          New Collection
+          {t("createCollectionDialog.newCollection")}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>Create New Watch Collection</DialogTitle>
-            <DialogDescription>
-              Give your collection a name to get started.
-            </DialogDescription>
+            <DialogTitle>{t("createCollectionDialog.title")}</DialogTitle>
+            <DialogDescription>{t("createCollectionDialog.description")}</DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-6 py-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Collection Name</Label>
+              <Label htmlFor="name">{t("createCollectionDialog.collectionName")}</Label>
               <Input
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="My Watch Collection"
+                placeholder={t("createCollectionDialog.namePlaceholder")}
                 required
               />
             </div>
@@ -103,18 +103,18 @@ export const CreateCollectionTypeDialog = ({ onSuccess }: CreateCollectionTypeDi
             <div className="flex items-center gap-3 rounded-lg border-2 border-primary bg-popover p-4">
               <Watch className="w-6 h-6 shrink-0" />
               <div className="space-y-1">
-                <p className="font-medium leading-none">Watches</p>
-                <p className="text-sm text-muted-foreground">Track your watch collection with movement, case size, and water resistance details</p>
+                <p className="font-medium leading-none">{t("createCollectionDialog.watchType")}</p>
+                <p className="text-sm text-muted-foreground">{t("createCollectionDialog.watchTypeDescription")}</p>
               </div>
             </div>
           </div>
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-              Cancel
+              {t("createCollectionDialog.cancel")}
             </Button>
             <Button type="submit" disabled={loading}>
-              {loading ? "Creating..." : "Create Collection"}
+              {loading ? t("createCollectionDialog.creating") : t("createCollectionDialog.create")}
             </Button>
           </DialogFooter>
         </form>
