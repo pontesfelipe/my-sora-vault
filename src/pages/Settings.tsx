@@ -28,6 +28,7 @@ import { LoginHistoryCard } from "@/components/LoginHistoryCard";
 import { AccountLinkingCard } from "@/components/AccountLinkingCard";
 import { DefaultCollectionCard } from "@/components/DefaultCollectionCard";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { NotificationSettingsSection } from "@/components/home/NotificationSettingsSection";
 import { useTheme } from "@/contexts/ThemeContext";
 
 const Settings = () => {
@@ -210,6 +211,7 @@ const Settings = () => {
             </CardContent>
           </Card>
 
+          <NotificationSettingsSection />
           <AccountLinkingCard />
           {!isGoogleUser && <TwoFactorAuthCard />}
           <SessionManagementCard />
