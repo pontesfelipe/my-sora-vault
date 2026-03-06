@@ -92,6 +92,7 @@
     "today": "Today",
     "dayCount_one": "{{count}} day",
     "dayCount_other": "{{count}} days",
+    "daysLogged": "{{count}} of {{total}} logged",
     "daysThisWeek_one": "{{count}} day this week",
     "daysThisWeek_other": "{{count}} days this week",
     "noWristCheckThisDay": "No wrist check this day",
