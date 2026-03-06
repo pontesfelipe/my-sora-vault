@@ -11,7 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import { useAuth } from "@/contexts/AuthContext";
-
+import { useTranslation } from "react-i18next";
 
 const wearSchema = z.object({
   watchId: z.string().uuid(),
