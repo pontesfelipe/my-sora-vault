@@ -109,7 +109,9 @@ export const WatchPhotoUpload = ({ onIdentified, onPhotoUploaded, onContinueToFo
   const processImage = async (file: File) => {
     setIdentifiedWatch(null);
     setRejectedSuggestions([]);
-
+    setSessionRejectionCount(0);
+    setMaxRetriesReached(false);
+    setNotAWatch(false);
     const reader = new FileReader();
     reader.readAsDataURL(file);
 
