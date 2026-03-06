@@ -102,8 +102,16 @@ export function HomeFeedSection() {
                    </div>
                   <p className="text-sm text-textSoft line-clamp-2 mb-2">
                     {item.content || item.title}
-                  </p>
-                  {item.image_url && (
+                   </p>
+                   {item.watch_authenticated && (
+                     <div className="flex items-center gap-1 mb-2">
+                       <ShieldCheck className="h-3 w-3 text-accent" />
+                       <span className="text-[10px] font-medium text-accent">
+                         {t("home.authenticated")}
+                       </span>
+                     </div>
+                   )}
+                   {item.image_url && (
                     <div className="rounded-xl overflow-hidden mb-2 max-h-40">
                       <img
                         src={item.image_url}
