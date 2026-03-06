@@ -68,6 +68,7 @@ const sportTypes = [
 ];
 
 export const SportTimeline = ({ sports, limit, onUpdate }: SportTimelineProps) => {
+  const { t } = useTranslation();
   const [selectedYear, setSelectedYear] = useState<string>("all");
   const [selectedSportType, setSelectedSportType] = useState<string>("all");
   

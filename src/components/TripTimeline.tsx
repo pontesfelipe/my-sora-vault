@@ -40,6 +40,7 @@ interface TripTimelineProps {
 }
 
 export const TripTimeline = ({ trips, limit, type, watches, onUpdate }: TripTimelineProps) => {
+  const { t } = useTranslation();
   const [selectedYear, setSelectedYear] = useState<string>("all");
   
   // Get available years from trips
