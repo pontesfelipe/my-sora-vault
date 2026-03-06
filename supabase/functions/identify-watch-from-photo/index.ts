@@ -132,6 +132,10 @@ serve(async (req) => {
               parameters: {
                 type: 'object',
                 properties: {
+                  is_watch: {
+                    type: 'boolean',
+                    description: 'Whether the image actually contains a watch/timepiece. Set to false if no watch is visible.'
+                  },
                   brand: {
                     type: 'string',
                     description: 'The watch brand name (e.g., Rolex, Omega, Seiko)'
