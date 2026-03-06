@@ -2,7 +2,6 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import { Capacitor } from '@capacitor/core';
-import { Preferences } from '@capacitor/preferences';
 
 import en from './locales/en.json';
 import es from './locales/es.json';
@@ -22,21 +21,32 @@ export const languages = [
 
 const LANG_KEY = 'i18nextLng';
 
-// On native platforms, sync Capacitor Preferences → localStorage before i18n init
-async function syncNativeLanguage() {
-  if (Capacitor.isNativePlatform()) {
-    try {
-      const { value } = await Preferences.get({ key: LANG_KEY });
-      if (value) {
-        localStorage.setItem(LANG_KEY, value);
-      }
-    } catch {
-      // ignore — fall through to normal detection
-    }
+// Helper to get Preferences plugin lazily (avoids top-level import issues)
+async function getNativePreferences() {
+  if (!Capacitor.isNativePlatform()) return null;
+  try {
+    const { Preferences } = await import('@capacitor/preferences');
+    return Preferences;
+  } catch {
+    return null;
   }
 }
 
-// Eagerly sync (best-effort before i18n init)
+// Sync native stored language to localStorage before i18n uses it
+async function syncNativeLanguage() {
+  const prefs = await getNativePreferences();
+  if (!prefs) return;
+  try {
+    const { value } = await prefs.get({ key: LANG_KEY });
+    if (value) {
+      localStorage.setItem(LANG_KEY, value);
+    }
+  } catch {
+    // ignore
+  }
+}
+
+// Best-effort sync before init (won't block)
 syncNativeLanguage();
 
 i18n
@@ -63,10 +73,11 @@ i18n
     },
   });
 
-// Persist language changes to Capacitor Preferences on native
-i18n.on('languageChanged', (lng) => {
-  if (Capacitor.isNativePlatform()) {
-    Preferences.set({ key: LANG_KEY, value: lng }).catch(() => {});
+// Persist language changes to native storage
+i18n.on('languageChanged', async (lng) => {
+  const prefs = await getNativePreferences();
+  if (prefs) {
+    prefs.set({ key: LANG_KEY, value: lng }).catch(() => {});
   }
 });
 
