@@ -4,6 +4,7 @@ import { Eye, Clock, Pencil, ArrowLeftRight, Trash2 } from "lucide-react";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { triggerHaptic } from "@/utils/haptics";
+import { useTranslation } from "react-i18next";
 
 interface WatchContextMenuProps {
   open: boolean;
@@ -28,6 +29,7 @@ export function WatchContextMenu({
   onDelete,
 }: WatchContextMenuProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const actions = [
     {
@@ -39,7 +41,7 @@ export function WatchContextMenu({
       },
     },
     {
-      label: "Log Wear",
+      label: t("log.logWristCheck"),
       icon: Clock,
       onClick: () => {
         onOpenChange(false);

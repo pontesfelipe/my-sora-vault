@@ -11,7 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import { useAuth } from "@/contexts/AuthContext";
-
+import { useTranslation } from "react-i18next";
 
 const wearSchema = z.object({
   watchId: z.string().uuid(),
@@ -33,6 +33,7 @@ export const AddWearDialog = ({ watchId, onSuccess }: { watchId: string; onSucce
   const [sportLocation, setSportLocation] = useState("");
   const { toast } = useToast();
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -286,7 +287,7 @@ export const AddWearDialog = ({ watchId, onSuccess }: { watchId: string; onSucce
     <>
       <Button onClick={() => setOpen(true)} variant="outline" size="sm" className="gap-2">
         <Calendar className="w-4 h-4" />
-        Log Wear
+        {t("log.logWristCheck")}
       </Button>
       <ResponsiveDialog open={open} onOpenChange={setOpen} title="Add Wear Entry" className="max-w-md">
         <form onSubmit={handleSubmit} className="space-y-4">
