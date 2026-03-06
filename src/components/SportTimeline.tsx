@@ -434,15 +434,15 @@ export const SportTimeline = ({ sports, limit, onUpdate }: SportTimelineProps) =
       <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Sport Activity?</AlertDialogTitle>
+            <AlertDialogTitle>{t("common.deleteConfirmTitle", { item: "Sport Activity" })}</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete this sport activity.
+              {t("common.deleteConfirmDescription", { item: "sport activity" })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} disabled={loading}>
-              {loading ? "Deleting..." : "Delete"}
+              {loading ? t("common.deleting") : t("common.delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -452,11 +452,11 @@ export const SportTimeline = ({ sports, limit, onUpdate }: SportTimelineProps) =
       <Dialog open={!!editItem} onOpenChange={(open) => !open && setEditItem(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Sport Activity</DialogTitle>
+            <DialogTitle>{t("common.edit")} Sport Activity</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleUpdate} className="space-y-4">
             <div>
-              <Label htmlFor="edit-activity-date">Date</Label>
+              <Label htmlFor="edit-activity-date">{t("common.date")}</Label>
               <Input
                 id="edit-activity-date"
                 type="date"
@@ -484,7 +484,7 @@ export const SportTimeline = ({ sports, limit, onUpdate }: SportTimelineProps) =
               </Select>
             </div>
             <div>
-              <Label htmlFor="edit-location">Location (Optional)</Label>
+              <Label htmlFor="edit-location">{t("common.location")} ({t("common.notesOptional").split("(")[1].replace(")", "")})</Label>
               <Input
                 id="edit-location"
                 value={formData.location}
@@ -505,21 +505,21 @@ export const SportTimeline = ({ sports, limit, onUpdate }: SportTimelineProps) =
             </div>
             {editItem?.linkedWatches && editItem.linkedWatches.length > 0 && (
               <div className="p-3 bg-muted/50 rounded-md">
-                <Label className="text-sm text-muted-foreground">Linked Watches (from wear logs)</Label>
+                <Label className="text-sm text-muted-foreground">{t("common.linkedWatches")}</Label>
                 <div className="mt-2 space-y-1">
                   {editItem.linkedWatches.map((lw) => (
                     <p key={lw.watchId} className="text-sm">
-                      {lw.brand} {lw.model} • {lw.days} {lw.days === 1 ? 'day' : 'days'}
+                      {lw.brand} {lw.model} • {lw.days} {lw.days === 1 ? t("common.day") : t("common.days")}
                     </p>
                   ))}
                 </div>
                 <p className="text-xs text-muted-foreground mt-2">
-                  To change linked watches, edit the wear logs directly.
+                  {t("common.editLinkedWatchesHint")}
                 </p>
               </div>
             )}
             <div>
-              <Label htmlFor="edit-notes">Notes (Optional)</Label>
+              <Label htmlFor="edit-notes">{t("common.notesOptional")}</Label>
               <Textarea
                 id="edit-notes"
                 value={formData.notes}
@@ -531,10 +531,10 @@ export const SportTimeline = ({ sports, limit, onUpdate }: SportTimelineProps) =
             </div>
             <div className="flex gap-2">
               <Button type="submit" disabled={loading}>
-                {loading ? "Saving..." : "Save Changes"}
+                {loading ? t("common.saving") : t("common.saveChanges")}
               </Button>
               <Button type="button" variant="outline" onClick={() => setEditItem(null)}>
-                Cancel
+                {t("common.cancel")}
               </Button>
             </div>
           </form>
