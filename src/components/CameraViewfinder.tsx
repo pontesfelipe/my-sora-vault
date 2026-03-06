@@ -75,7 +75,7 @@ export function CameraViewfinder({ open, onClose, onCapture, onFallbackToUpload 
       } else if (errorName === "NotFoundError") {
         setError("No camera was found on this device.");
       } else {
-        setError("Could not open the guided camera. Use retry or the iPhone camera fallback.");
+        setError("Could not open the camera. Use retry or upload a photo instead.");
       }
     } finally {
       setIsStarting(false);
