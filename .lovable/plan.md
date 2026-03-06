@@ -1,87 +1,91 @@
 
 
-## Home Page Redesign: Social Feed + Platform Analytics
+# Implementation Plan — Home Page Prompts 1–4
 
-### Overview
-Redesign the Home page to add a **Social Feed module** and a **Most Worn This Week (platform-wide)** section while keeping the existing Your Week and Wrist Check features. The Feed page (currently at `/feed`) remains for full forum + messages; the Home page gets a lightweight social feed preview.
+This is a large, multi-phase implementation. I recommend executing them sequentially across multiple messages to ensure stability. Here is the full plan.
 
-### Architecture
+---
 
-```text
-Home Page Layout (top to bottom):
-┌─────────────────────────┐
-│ Greeting + Date         │
-│ [Wrist Check] button    │
-├─────────────────────────┤
-│ YOUR WEEK (WearCalendar)│
-├─────────────────────────┤
-│ MOST WORN THIS WEEK     │
-│ (platform + friends)    │
-│ Horizontal scroll cards │
-├─────────────────────────┤
-│ SOCIAL FEED             │
-│ Filter chips: Friends | │
-│ Trending | News |       │
-│ Articles | Videos       │
-│ Vertical card list      │
-│ [Load More] button      │
-├─────────────────────────┤
-│ [Sponsored slot]        │
-└─────────────────────────┘
-```
+## Phase 1: "Your Week" Module Refactor (Prompt 1)
 
-### Implementation Plan
+**Goal**: Simplify Home page to focus on personal weekly wear tracking.
 
-#### 1. Database: Platform-wide "Most Worn This Week" query
-- Create a new **backend function** (`get_platform_most_worn_this_week`) that aggregates `wear_entries` across all users (or friends) for the current week, returning top watches with brand/model/image/count. This avoids exposing other users' data via RLS -- a security-definer function returns only aggregated, anonymized results.
-- Create a new **backend function** (`get_friends_most_worn_this_week`) that filters to the user's friends list only.
+### Changes:
+1. **`src/pages/Home.tsx`** — Remove `<MostWornThisWeekSection>`, `<HomeFeedSection>`, and the sponsored placeholder. Restructure layout to: Greeting → Week Strip → Wrist Check CTA → Your Most Worn This Week (filtered to current week only, not all-time). Add empty state for no wears this week.
 
-#### 2. Database: Social Feed content
-- Create a new table **`editorial_content`** for platform editorial/news/articles/videos (admin-managed), with columns: `id`, `title`, `summary`, `url`, `image_url`, `content_type` (news/article/video), `published_at`, `created_by`, `created_at`. RLS: public SELECT for authenticated users, admin-only INSERT/UPDATE/DELETE.
-- Create a new backend function **`get_home_feed`** that unions:
-  - Friends' recent forum posts (from `user_posts` joined with `friendships`)
-  - Comments on the current user's posts
-  - Likes on the current user's posts
-  - Trending posts (most liked/commented platform-wide, last 7 days)
-  - Editorial content from `editorial_content`
-  - Returns a unified feed with `feed_type` label (friends/trending/editorial)
+2. **`src/components/WearCalendar.tsx`** — Add swipe gesture navigation (Framer Motion `drag="x"` on the week strip) to move between weeks. Show circular watch thumbnails in day cells instead of just accent-filled circles. Tapping an empty day navigates to `/log` with that date pre-selected. Summary line: "X of 7 days logged this week".
 
-#### 3. New hook: `useHomeFeed`
-- Calls `get_home_feed` RPC with filter param (friends/trending/news/articles/videos/all)
-- Pagination: fetch N items, "Load More" button
-- React Query caching with 2min stale time
+3. **`src/pages/Home.tsx` `getMostWorn`** — Filter `wearEntries` to only the current week (using `startOfWeek`/`endOfWeek`) instead of all-time.
 
-#### 4. New hook: `usePlatformMostWorn`
-- Calls `get_platform_most_worn_this_week` and `get_friends_most_worn_this_week`
-- Returns combined data with tabs/toggle for "Platform" vs "Friends"
+4. **i18n** — Add keys: `home.noWearsThisWeek`, `home.daysLogged`, etc. to all 6 locale files.
 
-#### 5. New component: `HomeFeedSection`
-- Filter chips at top (Friends default, Trending, News, Articles, Videos)
-- Compact vertical card list with: author avatar, text preview, optional image, like/comment counts
-- Cards labeled with subtle chip: "Friend", "Trending", "Editorial"
-- "Load More" button after initial 10 items (infinite scroll on mobile via intersection observer)
-- Tap opens detail (navigates to post or external URL)
+---
 
-#### 6. New component: `MostWornThisWeekSection`
-- Horizontal scrollable cards (similar to existing Most Worn but sourced from platform data)
-- Toggle between "Platform" and "Friends" via chips
-- Collapsible on mobile with "See more" if list is long
+## Phase 2: Social Feed Preview (Prompt 2)
 
-#### 7. Update `Home.tsx`
-- Keep existing: greeting, Wrist Check CTA, WearCalendar
-- Rename existing "Most Worn" to "Your Most Worn" (personal)
-- Add `MostWornThisWeekSection` (platform-wide)
-- Add `HomeFeedSection`
-- Keep sponsored slot placeholder
+**Goal**: Add a condensed 5-item social feed preview below "Your Week".
 
-#### 8. i18n
-- Add all new keys to all 6 locale files (EN, ES, FR, PT, JA, ZH)
+### Changes:
+1. **New component: `src/components/home/SocialFeedPreview.tsx`** — Filter chips (Friends, Trending, News, Articles, Videos), max 5 items, divider-separated cards, "See all in Feed →" link at bottom. Reuses `useHomeFeed` with a `maxItems` parameter.
 
-#### 9. Change Control Log
-- Version 1.20, category: New Feature
+2. **`src/hooks/useHomeFeed.ts`** — Add optional `maxItems` parameter that overrides `PAGE_SIZE`.
 
-### Technical Notes
-- The `get_home_feed` function uses `SECURITY DEFINER` to safely join across users while respecting privacy -- only returns public post data and friend activity
-- Editorial content is admin-managed via the existing Admin page (new tab)
-- No ads implemented yet; sponsored slot remains reserved
+3. **`src/pages/Home.tsx`** — Add `<SocialFeedPreview />` below the Most Worn section.
+
+4. **i18n** — Add keys for "What's Happening", "See all in Feed", "Nothing here yet" to all 6 locales.
+
+---
+
+## Phase 3: Mobile Push Notifications (Prompt 3)
+
+**Goal**: Background refresh and push notifications for native apps only.
+
+### Database:
+- Create `push_tokens` table: `id`, `user_id`, `token`, `platform`, `created_at`, `updated_at` with RLS (users manage own tokens).
+- Create `notification_preferences` table: `id`, `user_id`, `likes_enabled`, `trades_enabled`, `friends_enabled` (all default true) with RLS.
+
+### New files:
+- **`src/utils/pushNotifications.ts`** — Register for push, store token in DB, handle incoming notifications with navigation routing.
+- **`src/utils/backgroundRefresh.ts`** — Periodic feed/notification count fetch (Capacitor Background Runner).
+- **`src/hooks/usePushNotifications.ts`** — Init hook gated behind `Capacitor.isNativePlatform()`, called in `App.tsx`.
+
+### Edge Functions:
+- **`supabase/functions/send-push-notification/index.ts`** — Lookup push tokens, check preferences, send via FCM/APNs.
+
+### UI:
+- **`src/pages/Settings.tsx`** — Add "Notifications" section with toggle switches for Likes, Trade Requests, Friend Requests (mobile only).
+- **`src/components/BottomNavigation.tsx`** — Extend badge count to include trade + friend request counts via `useSocialNotifications`.
+
+### Dependencies:
+- Install `@capacitor/push-notifications` and optionally `@capacitor/background-runner`.
+
+### Note:
+Push notification sending requires FCM/APNs server keys. The edge function will be scaffolded but will need API keys configured as secrets before it can send actual pushes.
+
+---
+
+## Phase 4: Trust & Safety Badges (Prompt 4)
+
+**Goal**: Surface trust signals on feed cards.
+
+### Changes:
+1. **`src/hooks/useHomeFeed.ts`** — Extend `FeedItem` interface with `author_trust_level?: string` and `watch_authenticated?: boolean`.
+
+2. **Database** — Update `get_home_feed` RPC to join `user_trust_levels` and return trust level with each feed item.
+
+3. **`src/components/home/SocialFeedPreview.tsx`** (and `HomeFeedSection.tsx`) — Next to author username, render `<TrustLevelBadge>` if trust level exists. Show "Authenticated" badge on watch-referenced cards. Show "Protected by TLV Safe Trade" banner on trade-type items.
+
+4. **i18n** — Add keys for "Authenticated", "Protected by TLV Safe Trade" to all 6 locales.
+
+---
+
+## Change Control Log
+
+A single entry at version **1.230** (or incremented per phase) will be logged for each phase, category "New Feature" / "Enhancement".
+
+---
+
+## Recommended Execution Order
+
+Due to the scope, I recommend implementing **Phase 1 first**, verifying it works, then proceeding to Phase 2, etc. Shall I begin with Phase 1?
 
