@@ -15,6 +15,7 @@ const inputSchema = z.object({
     brand: z.string(),
     model: z.string(),
   })).optional().default([]),
+  validate_only: z.boolean().optional().default(false),
 });
 
 const isLikelyBase64 = (value: string) => {
