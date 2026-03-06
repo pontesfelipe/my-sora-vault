@@ -191,7 +191,7 @@ serve(async (req) => {
                     description: 'Additional observations, distinguishing features, or uncertainties about the identification'
                   }
                 },
-                required: ['brand', 'model', 'dial_color', 'type', 'confidence', 'complications'],
+                required: ['is_watch', 'brand', 'model', 'dial_color', 'type', 'confidence', 'complications'],
                 additionalProperties: false
               }
             }
