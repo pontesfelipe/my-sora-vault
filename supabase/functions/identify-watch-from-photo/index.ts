@@ -55,7 +55,7 @@ serve(async (req) => {
       );
     }
     
-    const { image, excluded_suggestions } = parseResult.data;
+    const { image, excluded_suggestions, validate_only } = parseResult.data;
     const normalizedImage = normalizeImageForGateway(image);
     if (!(normalizedImage.startsWith('data:image/') || normalizedImage.startsWith('http://') || normalizedImage.startsWith('https://'))) {
       return new Response(
