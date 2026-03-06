@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -11,11 +11,14 @@ import {
   endOfWeek,
   isWithinInterval,
   addDays,
+  addWeeks,
+  subWeeks,
   isSameWeek,
 } from "date-fns";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, type PanInfo } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 
 interface WearCalendarProps {
   watches: any[];
@@ -29,7 +32,9 @@ export const WearCalendar = ({ watches, wearEntries, onWatchTap }: WearCalendarP
   const [selectedWeekDate, setSelectedWeekDate] = useState<Date>(new Date());
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [calendarOpen, setCalendarOpen] = useState(false);
+  const [swipeDirection, setSwipeDirection] = useState(0);
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const isCurrentWeek = isSameWeek(selectedWeekDate, new Date(), { weekStartsOn: 1 });
 
@@ -64,6 +69,10 @@ export const WearCalendar = ({ watches, wearEntries, onWatchTap }: WearCalendarP
       const dateKey = format(date, "yyyy-MM-dd");
       const dayEntries = weekEntries.filter((e: any) => e.wear_date === dateKey);
       const dayWatchIds = [...new Set(dayEntries.map((e: any) => e.watch_id))];
+      // Get first watch image for thumbnail
+      const firstWatch = dayWatchIds.length > 0
+        ? watches.find((w: any) => w.id === dayWatchIds[0])
+        : null;
       return {
         dayKey: DAY_KEYS[i],
         date: format(date, "d"),
@@ -71,8 +80,11 @@ export const WearCalendar = ({ watches, wearEntries, onWatchTap }: WearCalendarP
         hasEntry: dayEntries.length > 0,
         isToday: dateKey === format(new Date(), "yyyy-MM-dd"),
         watchIds: dayWatchIds,
+        firstWatchImage: firstWatch?.ai_image_url || null,
       };
     });
+
+    const daysLogged = daysOfWeek.filter((d) => d.hasEntry).length;
 
     return {
       totalDays: weekEntries.reduce((s: number, e: any) => s + e.days, 0),
@@ -80,6 +92,7 @@ export const WearCalendar = ({ watches, wearEntries, onWatchTap }: WearCalendarP
       daysOfWeek,
       weekStart,
       weekEnd,
+      daysLogged,
     };
   }, [watches, wearEntries, selectedWeekDate]);
 
@@ -106,8 +119,26 @@ export const WearCalendar = ({ watches, wearEntries, onWatchTap }: WearCalendarP
     setCalendarOpen(false);
   };
 
-  const handleDayTap = (dateKey: string) => {
+  const handleDayTap = (dateKey: string, hasEntry: boolean) => {
+    if (!hasEntry) {
+      // Navigate to log page with date pre-selected
+      navigate(`/log?date=${dateKey}`);
+      return;
+    }
     setSelectedDay((prev) => (prev === dateKey ? null : dateKey));
+  };
+
+  const handleSwipeEnd = (_: any, info: PanInfo) => {
+    const threshold = 50;
+    if (info.offset.x < -threshold) {
+      setSelectedWeekDate((d) => addWeeks(d, 1));
+      setSelectedDay(null);
+      setSwipeDirection(1);
+    } else if (info.offset.x > threshold) {
+      setSelectedWeekDate((d) => subWeeks(d, 1));
+      setSelectedDay(null);
+      setSwipeDirection(-1);
+    }
   };
 
   return (
@@ -133,7 +164,7 @@ export const WearCalendar = ({ watches, wearEntries, onWatchTap }: WearCalendarP
 
         <div className="flex items-center gap-2">
           <span className="text-xs text-textMuted">
-            {t("calendar.dayCount", { count: weekData.totalDays })}
+            {t("calendar.daysLogged", { count: weekData.daysLogged, total: 7 })}
           </span>
           <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
             <PopoverTrigger asChild>
@@ -171,30 +202,59 @@ export const WearCalendar = ({ watches, wearEntries, onWatchTap }: WearCalendarP
         </div>
       </div>
 
-      {/* Week strip */}
-      <div className="flex justify-between">
-        {weekData.daysOfWeek.map((day, i) => (
-          <button
-            key={i}
-            onClick={() => handleDayTap(day.dateKey)}
-            className="flex flex-col items-center gap-1 group"
+      {/* Swipeable Week strip */}
+      <motion.div
+        drag="x"
+        dragConstraints={{ left: 0, right: 0 }}
+        dragElastic={0.2}
+        onDragEnd={handleSwipeEnd}
+        className="touch-pan-y"
+      >
+        <AnimatePresence mode="wait" custom={swipeDirection}>
+          <motion.div
+            key={selectedWeekDate.toISOString()}
+            initial={{ opacity: 0, x: swipeDirection * 100 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -swipeDirection * 100 }}
+            transition={{ duration: 0.2 }}
+            className="flex justify-between"
           >
-            <span className="text-[10px] text-textMuted font-medium">{t(`calendar.${day.dayKey}`)}</span>
-            <div
-              className={cn(
-                "h-8 w-8 rounded-full flex items-center justify-center text-xs font-medium transition-all",
-                day.isToday && "ring-2 ring-accent ring-offset-2 ring-offset-background",
-                day.hasEntry
-                  ? "bg-accent text-accent-foreground"
-                  : "bg-surfaceMuted text-textMuted",
-                selectedDay === day.dateKey && "ring-2 ring-primary ring-offset-1 ring-offset-background scale-110"
-              )}
-            >
-              {day.date}
-            </div>
-          </button>
-        ))}
-      </div>
+            {weekData.daysOfWeek.map((day, i) => (
+              <button
+                key={i}
+                onClick={() => handleDayTap(day.dateKey, day.hasEntry)}
+                className="flex flex-col items-center gap-1 group"
+              >
+                <span className="text-[10px] text-textMuted font-medium">{t(`calendar.${day.dayKey}`)}</span>
+                <div
+                  className={cn(
+                    "h-9 w-9 rounded-full flex items-center justify-center text-xs font-medium transition-all overflow-hidden",
+                    day.isToday && "ring-2 ring-accent ring-offset-2 ring-offset-background",
+                    selectedDay === day.dateKey && "ring-2 ring-primary ring-offset-1 ring-offset-background scale-110"
+                  )}
+                >
+                  {day.hasEntry && day.firstWatchImage ? (
+                    <img
+                      src={day.firstWatchImage}
+                      alt=""
+                      className="h-full w-full object-cover rounded-full"
+                    />
+                  ) : (
+                    <div className={cn(
+                      "h-full w-full flex items-center justify-center rounded-full",
+                      day.hasEntry
+                        ? "bg-accent text-accent-foreground"
+                        : "bg-surfaceMuted text-textMuted"
+                    )}>
+                      {day.date}
+                    </div>
+                  )}
+                </div>
+              </button>
+            ))}
+          </motion.div>
+        </AnimatePresence>
+      </motion.div>
 
       {/* Selected day detail */}
       <AnimatePresence mode="wait">

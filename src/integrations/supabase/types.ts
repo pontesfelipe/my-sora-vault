@@ -2096,6 +2096,7 @@ export type Database = {
         Returns: {
           author_avatar_url: string
           author_id: string
+          author_trust_level: string
           author_username: string
           comment_count: number
           content: string
@@ -2106,6 +2107,7 @@ export type Database = {
           image_url: string
           like_count: number
           title: string
+          watch_authenticated: boolean
         }[]
       }
       get_platform_most_worn_this_week: {

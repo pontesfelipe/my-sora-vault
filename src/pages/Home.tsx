@@ -1,18 +1,17 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, Watch, ChevronRight } from "lucide-react";
+import { Plus, Watch } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useWatchData } from "@/hooks/useWatchData";
 import { useCollection } from "@/contexts/CollectionContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { format } from "date-fns";
+import { format, startOfWeek, endOfWeek, isWithinInterval, parseISO } from "date-fns";
 import { enUS, es, fr, pt, ja, zhCN, type Locale } from "date-fns/locale";
 import { motion } from "framer-motion";
 import { PageTransition } from "@/components/PageTransition";
 import { QuickLogSheet } from "@/components/QuickLogSheet";
 import { WearCalendar } from "@/components/WearCalendar";
-import { MostWornThisWeekSection } from "@/components/MostWornThisWeekSection";
-import { HomeFeedSection } from "@/components/HomeFeedSection";
+import { SocialFeedPreview } from "@/components/home/SocialFeedPreview";
 import { useTranslation } from "react-i18next";
 
 const Home = () => {
@@ -33,6 +32,35 @@ const Home = () => {
     setQuickLogWatch(watch);
     setQuickLogOpen(true);
   };
+
+  // Filter most worn to current week only
+  const weekMostWorn = useMemo(() => {
+    const now = new Date();
+    const weekStart = startOfWeek(now, { weekStartsOn: 1 });
+    const weekEnd = endOfWeek(now, { weekStartsOn: 1 });
+
+    const weekEntries = wearEntries.filter((e: any) => {
+      try {
+        const d = parseISO(e.wear_date);
+        return isWithinInterval(d, { start: weekStart, end: weekEnd });
+      } catch {
+        return false;
+      }
+    });
+
+    const counts: Record<string, number> = {};
+    weekEntries.forEach((e: any) => {
+      counts[e.watch_id] = (counts[e.watch_id] || 0) + e.days;
+    });
+
+    return Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([id, count]) => ({
+        watch: watches.find((w: any) => w.id === id),
+        count,
+      }))
+      .filter((item) => item.watch);
+  }, [watches, wearEntries]);
 
   if (loading) {
     return (
@@ -62,6 +90,13 @@ const Home = () => {
           </p>
         </div>
 
+        {/* Wear Calendar (Your Week) */}
+        <WearCalendar
+          watches={watches}
+          wearEntries={wearEntries}
+          onWatchTap={handleWatchCardTap}
+        />
+
         {/* Quick Log CTA */}
         <motion.div whileTap={{ scale: 0.98 }}>
           <Button
@@ -74,23 +109,11 @@ const Home = () => {
           </Button>
         </motion.div>
 
-        {/* Wear Calendar */}
-        <section>
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-textMuted mb-3">
-            {t("home.wearCalendar")}
-          </h2>
-          <WearCalendar
-            watches={watches}
-            wearEntries={wearEntries}
-            onWatchTap={handleWatchCardTap}
-          />
-        </section>
-
-        {/* Your Most Worn (personal) */}
+        {/* Your Most Worn This Week */}
         <section>
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-semibold uppercase tracking-wider text-textMuted">
-              {t("home.yourMostWorn")}
+              {t("home.yourMostWornThisWeek")}
             </h2>
             <button
               onClick={() => navigate("/profile")}
@@ -100,10 +123,14 @@ const Home = () => {
             </button>
           </div>
 
-          <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-hide">
-            {getMostWorn(watches, wearEntries)
-              .slice(0, 6)
-              .map(({ watch, count }) => (
+          {weekMostWorn.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-borderSubtle p-6 text-center">
+              <Watch className="h-8 w-8 text-textMuted mx-auto mb-2" />
+              <p className="text-sm text-textMuted">{t("home.noWearsThisWeek")}</p>
+            </div>
+          ) : (
+            <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-hide">
+              {weekMostWorn.slice(0, 6).map(({ watch, count }) => (
                 <motion.div
                   key={watch.id}
                   className="shrink-0 w-28 cursor-pointer"
@@ -128,19 +155,12 @@ const Home = () => {
                   <p className="text-[10px] text-accent font-medium">{t("home.days", { count })}</p>
                 </motion.div>
               ))}
-          </div>
+            </div>
+          )}
         </section>
 
-        {/* Most Worn This Week (platform/friends) */}
-        <MostWornThisWeekSection />
-
-        {/* Social Feed */}
-        <HomeFeedSection />
-
-        {/* Reserved for future sponsored content */}
-        <section className="opacity-0 pointer-events-none h-0">
-          <div data-slot="sponsored-content" />
-        </section>
+        {/* Social Feed Preview */}
+        <SocialFeedPreview />
       </div>
 
       <QuickLogSheet
@@ -152,23 +172,5 @@ const Home = () => {
     </PageTransition>
   );
 };
-
-function getMostWorn(
-  watches: any[],
-  wearEntries: any[]
-): { watch: any; count: number }[] {
-  const counts: Record<string, number> = {};
-  wearEntries.forEach((e) => {
-    counts[e.watch_id] = (counts[e.watch_id] || 0) + e.days;
-  });
-
-  return Object.entries(counts)
-    .sort((a, b) => b[1] - a[1])
-    .map(([id, count]) => ({
-      watch: watches.find((w) => w.id === id),
-      count,
-    }))
-    .filter((item) => item.watch);
-}
 
 export default Home;
