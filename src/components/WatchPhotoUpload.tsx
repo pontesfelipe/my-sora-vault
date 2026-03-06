@@ -335,7 +335,7 @@ export const WatchPhotoUpload = ({ onIdentified, onPhotoUploaded, onContinueToFo
       onCapture={handleCameraCapture}
       onFallbackToUpload={() => {
         setCameraOpen(false);
-        captureInputRef.current?.click();
+        uploadInputRef.current?.click();
       }}
     />
     </>
