@@ -235,10 +235,12 @@ const VaultPal = () => {
   // On desktop: standard calc with top header only
   return (
     <div
-      className={`flex ${isMobile ? 'fixed inset-0 z-40' : 'max-h-[calc(100vh-4rem)]'}`}
+      className={`flex ${isMobile ? 'fixed inset-0 z-40 overflow-hidden bg-background' : 'max-h-[calc(100vh-4rem)]'}`}
       style={isMobile ? { 
         top: 'calc(3.5rem + env(safe-area-inset-top))',
-        bottom: 'calc(4rem + env(safe-area-inset-bottom))'
+        bottom: 'calc(4rem + env(safe-area-inset-bottom))',
+        left: 0,
+        right: 0,
       } : { 
         height: 'calc(100vh - 4rem)' 
       }}
