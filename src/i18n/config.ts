@@ -81,4 +81,25 @@ i18n.on('languageChanged', async (lng) => {
   }
 });
 
+/**
+ * Sync language from the database (global across devices).
+ * Call after the user is authenticated.
+ */
+export async function syncLanguageFromDB(userId: string) {
+  try {
+    const { supabase } = await import('@/integrations/supabase/client');
+    const { data } = await supabase
+      .from('user_preferences')
+      .select('preferred_language')
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (data?.preferred_language && data.preferred_language !== i18n.language) {
+      await i18n.changeLanguage(data.preferred_language);
+    }
+  } catch {
+    // ignore – local preference is used as fallback
+  }
+}
+
 export default i18n;

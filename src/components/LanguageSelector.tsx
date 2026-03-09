@@ -9,12 +9,22 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { languages } from "@/i18n/config";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function LanguageSelector() {
   const { t, i18n } = useTranslation();
+  const { user } = useAuth();
 
-  const handleLanguageChange = (value: string) => {
+  const handleLanguageChange = async (value: string) => {
     i18n.changeLanguage(value);
+    // Persist to database for cross-device sync
+    if (user) {
+      await supabase
+        .from("user_preferences")
+        .upsert({ user_id: user.id, preferred_language: value }, { onConflict: "user_id" })
+        .select();
+    }
   };
 
   const currentLang = languages.find((l) => l.code === i18n.language) || languages[0];

@@ -1423,6 +1423,7 @@ export type Database = {
           default_collection_id: string | null
           id: string
           last_selected_collection_id: string | null
+          preferred_language: string | null
           taste_description: string | null
           trade_match_scope: string | null
           updated_at: string
@@ -1433,6 +1434,7 @@ export type Database = {
           default_collection_id?: string | null
           id?: string
           last_selected_collection_id?: string | null
+          preferred_language?: string | null
           taste_description?: string | null
           trade_match_scope?: string | null
           updated_at?: string
@@ -1443,6 +1445,7 @@ export type Database = {
           default_collection_id?: string | null
           id?: string
           last_selected_collection_id?: string | null
+          preferred_language?: string | null
           taste_description?: string | null
           trade_match_scope?: string | null
           updated_at?: string
