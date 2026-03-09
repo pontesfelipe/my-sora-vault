@@ -231,10 +231,13 @@ const VaultPal = () => {
     `Which ${itemLabel} have I not worn recently?`,
   ];
 
-  // On mobile: use dvh for proper viewport height minus bottom nav (~4.5rem) and top header (~3.5rem)
-  // On desktop: standard calc
+  // On mobile: account for top header (3.5rem + safe-area-inset-top) + bottom nav (5rem + safe-area-inset-bottom)
+  // On desktop: standard calc with top header only
   return (
-    <div className={`flex ${isMobile ? 'h-[calc(100dvh-4rem)] pb-safe' : 'h-[calc(100vh-4rem)] max-h-[calc(100vh-4rem)]'}`}>
+    <div
+      className={`flex ${isMobile ? 'pb-safe' : 'max-h-[calc(100vh-4rem)]'}`}
+      style={isMobile ? { height: 'calc(100dvh - 3.5rem - 5rem - env(safe-area-inset-top) - env(safe-area-inset-bottom))' } : { height: 'calc(100vh - 4rem)' }}
+    >
       {/* Conversation History Sidebar - Desktop */}
       {!isMobile && (
         <div className="w-64 shrink-0 border-r border-borderSubtle bg-surfaceMuted flex flex-col">
@@ -403,9 +406,9 @@ const VaultPal = () => {
           )}
         </div>
 
-        {/* Mobile History Overlay - Full screen with proper positioning */}
+        {/* Mobile History Overlay - Full screen with safe area */}
         {isMobile && showHistory && (
-          <div className="absolute inset-0 z-50 bg-background flex flex-col">
+          <div className="fixed inset-0 z-50 bg-background flex flex-col pt-[env(safe-area-inset-top)]">
             <div className="p-3 border-b border-borderSubtle space-y-2">
               <div className="flex items-center justify-between">
                 <h3 className="font-medium text-sm">Chat History</h3>
