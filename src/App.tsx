@@ -27,6 +27,7 @@ const Settings = lazy(() => import("./pages/Settings"));
 const FAQ = lazy(() => import("./pages/FAQ"));
 const About = lazy(() => import("./pages/About"));
 const VaultPal = lazy(() => import("./pages/VaultPal"));
+const Canvas = lazy(() => import("./pages/Dashboard"));
 const TradeRules = lazy(() => import("./pages/TradeRules"));
 const UserProfile = lazy(() => import("./pages/UserProfile"));
 const NotFound = lazy(() => import("./pages/NotFound"));
