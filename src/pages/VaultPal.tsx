@@ -236,7 +236,7 @@ const VaultPal = () => {
   return (
     <div
       className={`flex ${isMobile ? '-mx-4 -mt-4 -mb-20' : 'max-h-[calc(100vh-4rem)]'}`}
-      style={isMobile ? { height: 'calc(100dvh - 3.5rem - env(safe-area-inset-top))' } : { height: 'calc(100vh - 4rem)' }}
+      style={isMobile ? { height: 'calc(100dvh - 7.5rem - env(safe-area-inset-top) - env(safe-area-inset-bottom))' } : { height: 'calc(100vh - 4rem)' }}
     >
       {/* Conversation History Sidebar - Desktop */}
       {!isMobile && (
