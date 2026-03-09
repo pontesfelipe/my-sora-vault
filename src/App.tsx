@@ -28,6 +28,7 @@ const FAQ = lazy(() => import("./pages/FAQ"));
 const About = lazy(() => import("./pages/About"));
 const VaultPal = lazy(() => import("./pages/VaultPal"));
 const TradeRules = lazy(() => import("./pages/TradeRules"));
+const UserProfile = lazy(() => import("./pages/UserProfile"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
@@ -113,6 +114,7 @@ function AnimatedRoutes() {
             <Route path="/faq" element={<ProtectedRoute><FAQ /></ProtectedRoute>} />
             <Route path="/about" element={<ProtectedRoute><About /></ProtectedRoute>} />
             <Route path="/trade-rules" element={<ProtectedRoute><AppLayout><TradeRules /></AppLayout></ProtectedRoute>} />
+            <Route path="/user/:id" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
             
             {/* Legacy redirects */}
             <Route path="/collection" element={<Navigate to="/profile" replace />} />

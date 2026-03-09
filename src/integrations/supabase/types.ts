@@ -1422,6 +1422,7 @@ export type Database = {
           created_at: string
           default_collection_id: string | null
           id: string
+          is_collection_public: boolean
           last_selected_collection_id: string | null
           preferred_language: string | null
           taste_description: string | null
@@ -1433,6 +1434,7 @@ export type Database = {
           created_at?: string
           default_collection_id?: string | null
           id?: string
+          is_collection_public?: boolean
           last_selected_collection_id?: string | null
           preferred_language?: string | null
           taste_description?: string | null
@@ -1444,6 +1446,7 @@ export type Database = {
           created_at?: string
           default_collection_id?: string | null
           id?: string
+          is_collection_public?: boolean
           last_selected_collection_id?: string | null
           preferred_language?: string | null
           taste_description?: string | null

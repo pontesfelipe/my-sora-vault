@@ -128,7 +128,7 @@ export function GlobalSearch() {
     if (result.type === "watch") {
       navigate(`/watch/${result.id}`);
     } else if (result.type === "user") {
-      navigate(`/feed`);
+      navigate(`/user/${result.id}`);
     } else if (result.type === "tag") {
       navigate(`/log`);
     }
