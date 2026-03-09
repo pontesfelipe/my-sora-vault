@@ -88,17 +88,22 @@ i18n.on('languageChanged', async (lng) => {
 export async function syncLanguageFromDB(userId: string) {
   try {
     const { supabase } = await import('@/integrations/supabase/client');
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('user_preferences')
       .select('preferred_language')
       .eq('user_id', userId)
       .maybeSingle();
 
+    if (error) {
+      console.error('Failed to fetch language preference:', error);
+      return;
+    }
+
     if (data?.preferred_language && data.preferred_language !== i18n.language) {
       await i18n.changeLanguage(data.preferred_language);
     }
-  } catch {
-    // ignore – local preference is used as fallback
+  } catch (err) {
+    console.error('Error syncing language from DB:', err);
   }
 }
 

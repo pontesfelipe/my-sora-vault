@@ -20,10 +20,12 @@ export function LanguageSelector() {
     i18n.changeLanguage(value);
     // Persist to database for cross-device sync
     if (user) {
-      await supabase
+      const { error } = await supabase
         .from("user_preferences")
-        .upsert({ user_id: user.id, preferred_language: value }, { onConflict: "user_id" })
-        .select();
+        .upsert({ user_id: user.id, preferred_language: value }, { onConflict: "user_id" });
+      if (error) {
+        console.error("Failed to save language preference:", error);
+      }
     }
   };
 
