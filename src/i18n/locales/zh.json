@@ -125,7 +125,20 @@
     "mostDepreciated": "折旧最多",
     "bestValueRetention": "最佳保值",
     "appreciatingItems": "{{count}}{{type}}目前价值高于购买价格",
-    "na": "无"
+    "na": "无",
+    "noWidgetsTitle": "未启用任何小组件",
+    "noWidgetsDesc": "使用自定义按钮将小组件添加到您的Canvas。",
+    "customize": "自定义",
+    "customizeCanvas": "自定义Canvas",
+    "customizeDesc": "选择要在Canvas仪表盘上显示的小组件。",
+    "widgetCollectionStats": "收藏统计",
+    "widgetCollectionStatsDesc": "总数、最常使用、趋势等关键指标",
+    "widgetUsageTrends": "使用趋势",
+    "widgetUsageTrendsDesc": "30天和90天的趋势物品",
+    "widgetUsageChart": "使用图表",
+    "widgetUsageChartDesc": "每个物品使用频率的可视化分析",
+    "widgetDepreciation": "价值与折旧",
+    "widgetDepreciationDesc": "跟踪收藏价值、建议零售价与市场价格及增值情况"
   },
   "quickLog": {
     "title": "快速记录",

@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
-import { Settings2, Plus, X, GripVertical } from "lucide-react";
+import { Settings2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import {
@@ -13,7 +12,7 @@ import {
 } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 export interface WidgetConfig {
   collection_stats: boolean;
@@ -29,23 +28,18 @@ const DEFAULT_WIDGETS: WidgetConfig = {
   depreciation: true,
 };
 
-const WIDGET_META: Record<keyof WidgetConfig, { label: string; description: string }> = {
-  collection_stats: {
-    label: "Collection Stats",
-    description: "Key metrics like total items, most worn, trending, and more",
-  },
-  usage_trends: {
-    label: "Usage Trends",
-    description: "Trending items over 30 and 90 day periods",
-  },
-  usage_chart: {
-    label: "Usage Chart",
-    description: "Visual breakdown of how often each item is used",
-  },
-  depreciation: {
-    label: "Value & Depreciation",
-    description: "Track collection value, MSRP vs market price, and appreciation",
-  },
+const WIDGET_KEYS: Array<keyof WidgetConfig> = [
+  "collection_stats",
+  "usage_trends",
+  "usage_chart",
+  "depreciation",
+];
+
+const WIDGET_I18N: Record<keyof WidgetConfig, { label: string; desc: string }> = {
+  collection_stats: { label: "dashboard.widgetCollectionStats", desc: "dashboard.widgetCollectionStatsDesc" },
+  usage_trends: { label: "dashboard.widgetUsageTrends", desc: "dashboard.widgetUsageTrendsDesc" },
+  usage_chart: { label: "dashboard.widgetUsageChart", desc: "dashboard.widgetUsageChartDesc" },
+  depreciation: { label: "dashboard.widgetDepreciation", desc: "dashboard.widgetDepreciationDesc" },
 };
 
 interface CanvasWidgetManagerProps {
@@ -55,6 +49,7 @@ interface CanvasWidgetManagerProps {
 
 export function CanvasWidgetManager({ widgets, onWidgetsChange }: CanvasWidgetManagerProps) {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
 
   const handleToggle = async (key: keyof WidgetConfig, checked: boolean) => {
@@ -78,31 +73,31 @@ export function CanvasWidgetManager({ widgets, onWidgetsChange }: CanvasWidgetMa
       <SheetTrigger asChild>
         <Button variant="outline" size="sm" className="gap-2">
           <Settings2 className="h-4 w-4" />
-          <span className="hidden sm:inline">Customize</span>
+          <span className="hidden sm:inline">{t("dashboard.customize")}</span>
           <span className="text-xs bg-accent/20 text-accent px-1.5 py-0.5 rounded-full">
-            {activeCount}/{Object.keys(WIDGET_META).length}
+            {activeCount}/{WIDGET_KEYS.length}
           </span>
         </Button>
       </SheetTrigger>
       <SheetContent side="right" className="w-80">
         <SheetHeader>
-          <SheetTitle>Customize Canvas</SheetTitle>
+          <SheetTitle>{t("dashboard.customizeCanvas")}</SheetTitle>
         </SheetHeader>
         <div className="mt-6 space-y-4">
           <p className="text-sm text-muted-foreground">
-            Choose which widgets to display on your Canvas dashboard.
+            {t("dashboard.customizeDesc")}
           </p>
-          {(Object.keys(WIDGET_META) as Array<keyof WidgetConfig>).map((key) => (
+          {WIDGET_KEYS.map((key) => (
             <div
               key={key}
               className="flex items-start justify-between gap-3 p-3 rounded-lg border border-borderSubtle bg-surface"
             >
               <div className="space-y-0.5 flex-1">
                 <Label htmlFor={`widget-${key}`} className="font-medium text-sm">
-                  {WIDGET_META[key].label}
+                  {t(WIDGET_I18N[key].label)}
                 </Label>
                 <p className="text-xs text-muted-foreground">
-                  {WIDGET_META[key].description}
+                  {t(WIDGET_I18N[key].desc)}
                 </p>
               </div>
               <Switch
