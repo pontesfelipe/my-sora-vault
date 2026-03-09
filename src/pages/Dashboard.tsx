@@ -81,9 +81,9 @@ const Dashboard = () => {
       {noWidgetsEnabled && (
         <Card className="p-8 text-center border-dashed border-borderSubtle">
           <LayoutGrid className="h-10 w-10 text-textMuted mx-auto mb-3" />
-          <h3 className="text-base font-medium text-textMain mb-1">No widgets enabled</h3>
+          <h3 className="text-base font-medium text-textMain mb-1">{t("dashboard.noWidgetsTitle")}</h3>
           <p className="text-sm text-textMuted">
-            Use the Customize button to add widgets to your Canvas.
+            {t("dashboard.noWidgetsDesc")}
           </p>
         </Card>
       )}
