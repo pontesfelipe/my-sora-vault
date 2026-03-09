@@ -235,8 +235,13 @@ const VaultPal = () => {
   // On desktop: standard calc with top header only
   return (
     <div
-      className={`flex ${isMobile ? '-mx-4 -mt-4 -mb-20 w-[calc(100%+2rem)] overflow-hidden' : 'max-h-[calc(100vh-4rem)]'}`}
-      style={isMobile ? { height: 'calc(100dvh - 7.5rem - env(safe-area-inset-top) - env(safe-area-inset-bottom))' } : { height: 'calc(100vh - 4rem)' }}
+      className={`flex ${isMobile ? 'fixed inset-0 z-40' : 'max-h-[calc(100vh-4rem)]'}`}
+      style={isMobile ? { 
+        top: 'calc(3.5rem + env(safe-area-inset-top))',
+        bottom: 'calc(4rem + env(safe-area-inset-bottom))'
+      } : { 
+        height: 'calc(100vh - 4rem)' 
+      }}
     >
       {/* Conversation History Sidebar - Desktop */}
       {!isMobile && (
