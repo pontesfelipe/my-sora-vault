@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { syncLanguageFromDB } from "@/i18n/config";
 import { useNavigate } from "react-router-dom";
 
 interface AuthContextType {
@@ -30,6 +31,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (session?.user) {
           setTimeout(() => {
             checkAdminStatus(session.user.id);
+            syncLanguageFromDB(session.user.id);
           }, 0);
         } else {
           setIsAdmin(false);
@@ -44,6 +46,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       if (session?.user) {
         checkAdminStatus(session.user.id);
+        syncLanguageFromDB(session.user.id);
       }
       setLoading(false);
     });
