@@ -76,11 +76,11 @@ export const CollectionSwitcher = () => {
   const currentRole = currentCollection?.role || "viewer";
 
   const triggerButton = (
-    <Button variant="outline" className="gap-2">
-      <Watch className="w-4 h-4" />
-      {currentCollection?.name || t("collectionSwitcher.selectCollection")}
+    <Button variant="outline" className="gap-1.5 max-w-[200px] overflow-hidden">
+      <Watch className="w-4 h-4 shrink-0" />
+      <span className="truncate">{currentCollection?.name || t("collectionSwitcher.selectCollection")}</span>
       {currentCollection && (
-        <Badge variant={getRoleBadgeVariant(currentRole)} className="gap-1">
+        <Badge variant={getRoleBadgeVariant(currentRole)} className="gap-1 shrink-0">
           {getRoleIcon(currentRole)}
           {getRoleLabel(currentRole)}
         </Badge>

@@ -235,10 +235,12 @@ const VaultPal = () => {
   // On desktop: standard calc with top header only
   return (
     <div
-      className={`flex ${isMobile ? 'fixed inset-0 z-40' : 'max-h-[calc(100vh-4rem)]'}`}
+      className={`flex ${isMobile ? 'fixed inset-0 z-40 overflow-hidden bg-background' : 'max-h-[calc(100vh-4rem)]'}`}
       style={isMobile ? { 
         top: 'calc(3.5rem + env(safe-area-inset-top))',
-        bottom: 'calc(4rem + env(safe-area-inset-bottom))'
+        bottom: 'calc(4rem + env(safe-area-inset-bottom))',
+        left: 0,
+        right: 0,
       } : { 
         height: 'calc(100vh - 4rem)' 
       }}
@@ -310,8 +312,8 @@ const VaultPal = () => {
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Header - Compact on mobile */}
-        <div className={`shrink-0 border-b border-borderSubtle bg-surface ${isMobile ? 'px-3 py-2' : 'px-4 py-4'}`}>
-          <div className={`flex items-center justify-between gap-2 ${isMobile ? '' : 'mb-4'}`}>
+        <div className={`shrink-0 border-b border-borderSubtle bg-surface ${isMobile ? 'px-3 py-2' : 'px-4 py-4'} overflow-hidden`}>
+          <div className={`flex items-center justify-between gap-2 ${isMobile ? '' : 'mb-4'} w-full overflow-hidden`}>
             <div className="flex items-center gap-2 min-w-0">
               {isMobile && (
                 <Button
@@ -332,7 +334,7 @@ const VaultPal = () => {
                 {!isMobile && <p className="text-xs text-textMuted">Your personal collection expert</p>}
               </div>
             </div>
-            <div className="flex items-center gap-1.5 shrink-0">
+            <div className="flex items-center gap-1.5 shrink-0 min-w-0 overflow-hidden">
               {isMobile && (
                 <Button
                   variant="ghost"
