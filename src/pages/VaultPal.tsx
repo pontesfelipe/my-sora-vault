@@ -485,17 +485,17 @@ const VaultPal = () => {
         )}
 
         {/* Chat Messages Area */}
-        <ScrollArea className={`flex-1 ${isMobile ? 'px-3' : 'px-4'}`} ref={scrollRef}>
-          <div className={`${isMobile ? 'py-3 space-y-3' : 'py-4 space-y-4'} max-w-3xl mx-auto`}>
+        <ScrollArea className={`flex-1 ${isMobile ? 'px-4' : 'px-4'}`} ref={scrollRef}>
+          <div className={`${isMobile ? 'py-3 space-y-3' : 'py-4 space-y-4'} max-w-3xl mx-auto w-full`}>
             {messages.length === 0 ? (
-              <div className={`flex flex-col items-center justify-center ${isMobile ? 'py-6' : 'py-12'} text-center`}>
+              <div className={`flex flex-col items-center justify-center ${isMobile ? 'py-6' : 'py-12'} text-center w-full`}>
                 <div className={`${isMobile ? 'p-3' : 'p-4'} rounded-2xl bg-accent/10 mb-3`}>
                   <Bot className={`${isMobile ? 'w-7 h-7' : 'w-10 h-10'} text-accent`} />
                 </div>
-                <h2 className={`${isMobile ? 'text-base' : 'text-lg'} font-medium text-textMain mb-1.5`}>
+                <h2 className={`${isMobile ? 'text-base' : 'text-lg'} font-medium text-textMain mb-1.5 px-2`}>
                   Welcome to My Vault Assistant
                 </h2>
-                <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-textMuted mb-4 max-w-md px-2`}>
+                <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-textMuted mb-4 max-w-md px-4`}>
                   I know everything about your {itemLabel.toLowerCase()}, 
                   wear patterns, and preferences. Ask me anything!
                 </p>
