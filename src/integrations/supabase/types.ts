@@ -1419,6 +1419,7 @@ export type Database = {
       }
       user_preferences: {
         Row: {
+          canvas_widgets: Json
           created_at: string
           default_collection_id: string | null
           id: string
@@ -1431,6 +1432,7 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          canvas_widgets?: Json
           created_at?: string
           default_collection_id?: string | null
           id?: string
@@ -1443,6 +1445,7 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          canvas_widgets?: Json
           created_at?: string
           default_collection_id?: string | null
           id?: string

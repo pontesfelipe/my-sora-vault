@@ -1,4 +1,4 @@
-import { Home, Clock, Users, User, Menu } from "lucide-react";
+import { Home, Clock, Users, User, Menu, BarChart3 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -14,6 +14,7 @@ export function BottomNavigation() {
 
   const navItems = [
     { title: t("nav.home"), url: "/", icon: Home },
+    { title: t("nav.canvas"), url: "/canvas", icon: BarChart3 },
     { title: t("nav.log"), url: "/log", icon: Clock },
     { title: t("nav.feed"), url: "/feed", icon: Users },
     { title: t("nav.profile"), url: "/profile", icon: User },

@@ -27,6 +27,7 @@ const Settings = lazy(() => import("./pages/Settings"));
 const FAQ = lazy(() => import("./pages/FAQ"));
 const About = lazy(() => import("./pages/About"));
 const VaultPal = lazy(() => import("./pages/VaultPal"));
+const Canvas = lazy(() => import("./pages/Dashboard"));
 const TradeRules = lazy(() => import("./pages/TradeRules"));
 const UserProfile = lazy(() => import("./pages/UserProfile"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -106,6 +107,7 @@ function AnimatedRoutes() {
             <Route path="/profile" element={<ProtectedRoute><AppLayout><Profile /></AppLayout></ProtectedRoute>} />
             
             {/* Utility pages */}
+            <Route path="/canvas" element={<ProtectedRoute><AppLayout><Canvas /></AppLayout></ProtectedRoute>} />
             <Route path="/vault-pal" element={<ProtectedRoute><AppLayout><VaultPal /></AppLayout></ProtectedRoute>} />
             <Route path="/watch/:id" element={<ProtectedRoute><WatchDetail /></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
@@ -118,7 +120,7 @@ function AnimatedRoutes() {
             
             {/* Legacy redirects */}
             <Route path="/collection" element={<Navigate to="/profile" replace />} />
-            <Route path="/dashboard" element={<Navigate to="/" replace />} />
+            <Route path="/dashboard" element={<Navigate to="/canvas" replace />} />
             <Route path="/social" element={<Navigate to="/feed" replace />} />
             <Route path="/messages" element={<Navigate to="/feed?tab=messages" replace />} />
             <Route path="/forum" element={<Navigate to="/feed?tab=forum" replace />} />
