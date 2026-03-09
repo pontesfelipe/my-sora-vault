@@ -1,4 +1,4 @@
-import { Home, Clock, Users, User, Watch, BookHeart, Shield, Settings, HelpCircle, Info, Lightbulb, Bot, ClipboardList } from "lucide-react";
+import { Home, Clock, Users, User, Watch, BookHeart, Shield, Settings, HelpCircle, Info, Lightbulb, Bot, ClipboardList, BarChart3 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -27,6 +27,7 @@ export function AppNavigation() {
 
   const mainNavItems = [
     { title: t("nav.home"), url: "/", icon: Home },
+    { title: t("nav.canvas"), url: "/canvas", icon: BarChart3 },
     { title: t("nav.log"), url: "/log", icon: Clock },
     { title: t("nav.feed"), url: "/feed", icon: Users },
     { title: t("nav.profile"), url: "/profile", icon: User },
