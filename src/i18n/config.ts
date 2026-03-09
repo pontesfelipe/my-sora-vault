@@ -87,12 +87,6 @@ i18n.on('languageChanged', async (lng) => {
  */
 export async function syncLanguageFromDB(userId: string) {
   try {
-    const { createClient } = await import('@supabase/supabase-js');
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-    const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-    if (!supabaseUrl || !supabaseKey) return;
-
-    // Use the existing client to avoid circular imports
     const { supabase } = await import('@/integrations/supabase/client');
     const { data } = await supabase
       .from('user_preferences')
