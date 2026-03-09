@@ -231,12 +231,12 @@ const VaultPal = () => {
     `Which ${itemLabel} have I not worn recently?`,
   ];
 
-  // On mobile: account for top header (3.5rem + safe-area-inset-top) + bottom nav (5rem + safe-area-inset-bottom)
+  // On mobile: use negative margins to counteract AppLayout padding, fill available space
   // On desktop: standard calc with top header only
   return (
     <div
-      className={`flex ${isMobile ? 'pb-safe' : 'max-h-[calc(100vh-4rem)]'}`}
-      style={isMobile ? { height: 'calc(100dvh - 3.5rem - 5rem - env(safe-area-inset-top) - env(safe-area-inset-bottom))' } : { height: 'calc(100vh - 4rem)' }}
+      className={`flex ${isMobile ? '-mx-4 -mt-4 -mb-20' : 'max-h-[calc(100vh-4rem)]'}`}
+      style={isMobile ? { height: 'calc(100dvh - 3.5rem - env(safe-area-inset-top))' } : { height: 'calc(100vh - 4rem)' }}
     >
       {/* Conversation History Sidebar - Desktop */}
       {!isMobile && (
