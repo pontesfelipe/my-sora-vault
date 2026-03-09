@@ -24,7 +24,7 @@ export function AppLayout({ children }: AppLayoutProps) {
           </div>
           
           {/* Mobile header with search */}
-          <div className="sticky top-0 z-10 flex md:hidden items-center gap-3 h-14 border-b border-borderSubtle bg-background/95 backdrop-blur-lg px-4">
+          <div className="sticky top-0 z-10 flex md:hidden items-center gap-3 min-h-14 border-b border-borderSubtle bg-background/95 backdrop-blur-lg px-4 pt-[env(safe-area-inset-top)]">
             <GlobalSearch />
           </div>
           
