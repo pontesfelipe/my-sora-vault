@@ -126,7 +126,20 @@
     "mostDepreciated": "Most Depreciated",
     "bestValueRetention": "Best Value Retention",
     "appreciatingItems": "{{count}} {{type}} currently worth more than purchase price",
-    "na": "N/A"
+    "na": "N/A",
+    "noWidgetsTitle": "No widgets enabled",
+    "noWidgetsDesc": "Use the Customize button to add widgets to your Canvas.",
+    "customize": "Customize",
+    "customizeCanvas": "Customize Canvas",
+    "customizeDesc": "Choose which widgets to display on your Canvas dashboard.",
+    "widgetCollectionStats": "Collection Stats",
+    "widgetCollectionStatsDesc": "Key metrics like total items, most worn, trending, and more",
+    "widgetUsageTrends": "Usage Trends",
+    "widgetUsageTrendsDesc": "Trending items over 30 and 90 day periods",
+    "widgetUsageChart": "Usage Chart",
+    "widgetUsageChartDesc": "Visual breakdown of how often each item is used",
+    "widgetDepreciation": "Value & Depreciation",
+    "widgetDepreciationDesc": "Track collection value, MSRP vs market price, and appreciation"
   },
   "quickLog": {
     "title": "Quick Log",

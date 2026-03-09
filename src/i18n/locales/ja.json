@@ -125,7 +125,20 @@
     "mostDepreciated": "最も減価",
     "bestValueRetention": "最高の価値保持",
     "appreciatingItems": "{{count}}{{type}}が購入価格を上回っています",
-    "na": "該当なし"
+    "na": "該当なし",
+    "noWidgetsTitle": "ウィジェットが有効になっていません",
+    "noWidgetsDesc": "カスタマイズボタンを使ってCanvasにウィジェットを追加しましょう。",
+    "customize": "カスタマイズ",
+    "customizeCanvas": "Canvasのカスタマイズ",
+    "customizeDesc": "Canvasダッシュボードに表示するウィジェットを選択します。",
+    "widgetCollectionStats": "コレクション統計",
+    "widgetCollectionStatsDesc": "合計アイテム数、最も使用、トレンドなどの主要指標",
+    "widgetUsageTrends": "使用トレンド",
+    "widgetUsageTrendsDesc": "30日間および90日間のトレンドアイテム",
+    "widgetUsageChart": "使用チャート",
+    "widgetUsageChartDesc": "各アイテムの使用頻度の視覚的な内訳",
+    "widgetDepreciation": "価値と減価",
+    "widgetDepreciationDesc": "コレクション価値、MSRP vs 市場価格、価値上昇の追跡"
   },
   "quickLog": {
     "title": "クイックログ",

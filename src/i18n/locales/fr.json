@@ -125,7 +125,20 @@
     "mostDepreciated": "Plus dépréciée",
     "bestValueRetention": "Meilleure rétention de valeur",
     "appreciatingItems": "{{count}} {{type}} valent actuellement plus que le prix d'achat",
-    "na": "N/D"
+    "na": "N/D",
+    "noWidgetsTitle": "Aucun widget activé",
+    "noWidgetsDesc": "Utilisez le bouton Personnaliser pour ajouter des widgets à votre Canvas.",
+    "customize": "Personnaliser",
+    "customizeCanvas": "Personnaliser le Canvas",
+    "customizeDesc": "Choisissez les widgets à afficher sur votre tableau de bord Canvas.",
+    "widgetCollectionStats": "Statistiques de collection",
+    "widgetCollectionStatsDesc": "Métriques clés : total d'articles, plus porté, tendances, etc.",
+    "widgetUsageTrends": "Tendances d'utilisation",
+    "widgetUsageTrendsDesc": "Articles en tendance sur des périodes de 30 et 90 jours",
+    "widgetUsageChart": "Graphique d'utilisation",
+    "widgetUsageChartDesc": "Répartition visuelle de la fréquence d'utilisation de chaque article",
+    "widgetDepreciation": "Valeur et dépréciation",
+    "widgetDepreciationDesc": "Suivi de la valeur, MSRP vs prix du marché et appréciation"
   },
   "quickLog": {
     "title": "Enregistrement rapide",
