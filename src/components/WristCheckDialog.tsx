@@ -28,6 +28,7 @@ export function WristCheckDialog() {
   const { watches, refetch } = useWatchData(selectedCollectionId);
   const isOnline = useOnlineStatus();
   const { t } = useTranslation();
+  const { tags: userTags, assignTagToWatch, getWatchTagIds } = useUserTags();
 
   useEffect(() => {
     if (isOnline) {
