@@ -189,6 +189,7 @@ const Settings = () => {
           <ProfileSettingsCard />
           <PrivacySettingsCard />
           <DefaultCollectionCard />
+          <TagManagerCard />
           <LanguageSelector />
 
           <Card>
