@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, Watch } from "lucide-react";
+import { useWristCheck } from "@/contexts/WristCheckContext";
 import { Button } from "@/components/ui/button";
 import { useWatchData } from "@/hooks/useWatchData";
 import { useCollection } from "@/contexts/CollectionContext";
