@@ -122,8 +122,7 @@ export const WearCalendar = ({ watches, wearEntries, onWatchTap }: WearCalendarP
 
   const handleDayTap = (dateKey: string, hasEntry: boolean) => {
     if (!hasEntry) {
-      // Navigate to log page with date pre-selected
-      navigate(`/log?date=${dateKey}`);
+      openWristCheck();
       return;
     }
     setSelectedDay((prev) => (prev === dateKey ? null : dateKey));
