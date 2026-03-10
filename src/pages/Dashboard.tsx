@@ -106,7 +106,7 @@ const Dashboard = () => {
               variant="compact"
             />
             <StatsCard
-              title={t("dashboard.totalDays", { verb: config.usageVerbPast.charAt(0).toUpperCase() + config.usageVerbPast.slice(1) })}
+              title={t("dashboard.totalDays", { verb: tUsageVerbPast.charAt(0).toUpperCase() + tUsageVerbPast.slice(1) })}
               value={stats.totalDaysWorn}
               icon={Calendar}
               variant="compact"
