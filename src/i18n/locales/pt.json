@@ -140,6 +140,56 @@
     "widgetDepreciation": "Valor e depreciação",
     "widgetDepreciationDesc": "Acompanhe o valor, MSRP vs preço de mercado e valorização"
   },
+  "collectionConfig": {
+    "pluralLabel": "Relógios",
+    "singularLabel": "Relógio",
+    "usageVerbPast": "usado",
+    "primaryColorLabel": "Cor do Mostrador",
+    "typeLabel": "Tipo"
+  },
+  "depreciationCard": {
+    "pricingComparison": "Comparação de Preços",
+    "msrp": "MSRP",
+    "pricePaid": "Preço Pago",
+    "marketValue": "Valor de Mercado",
+    "fromMSRP": "Do MSRP",
+    "fromPricePaid": "Do Preço Pago"
+  },
+  "depreciationChart": {
+    "valueComparison": "Comparação de Valor",
+    "investmentVsMarket": "Investimento vs Valor de Mercado",
+    "noResaleData": "Sem dados de revenda disponíveis. Adicione preços médios de revenda aos seus relógios para ver a análise de valor.",
+    "filterBy": "Filtrar por...",
+    "allCollection": "Toda a Coleção",
+    "byBrand": "Por Marca",
+    "byWatch": "Por Relógio",
+    "selectWatch": "Selecionar relógio...",
+    "currentValueLoss": "Valor Atual (Perda)",
+    "currentValueGain": "Valor Atual (Ganho)",
+    "invested": "Investido",
+    "currentValue": "Valor Atual"
+  },
+  "usageChart": {
+    "seasonalTrends": "Tendências Sazonais",
+    "seasons": {
+      "winter": "Inverno",
+      "spring": "Primavera",
+      "summer": "Verão",
+      "fall": "Outono"
+    },
+    "daysShort": "d",
+    "avgPerDay": "Méd: ${{amount}}/dia",
+    "topWatch": "Relógio principal",
+    "styles": "Estilos",
+    "colors": "Cores",
+    "bestValue": "Melhor Valor",
+    "needsMoreWear": "Precisa Mais Uso",
+    "showLess": "Mostrar menos",
+    "showAll": "Mostrar todos ({{count}})",
+    "day": "dia",
+    "days": "dias",
+    "total": "total"
+  },
   "quickLog": {
     "title": "Registro rápido",
     "logToday": "Registrar hoje",

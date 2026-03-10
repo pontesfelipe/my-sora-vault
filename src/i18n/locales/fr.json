@@ -140,6 +140,56 @@
     "widgetDepreciation": "Valeur et dépréciation",
     "widgetDepreciationDesc": "Suivi de la valeur, MSRP vs prix du marché et appréciation"
   },
+  "collectionConfig": {
+    "pluralLabel": "Montres",
+    "singularLabel": "Montre",
+    "usageVerbPast": "porté",
+    "primaryColorLabel": "Couleur du Cadran",
+    "typeLabel": "Type"
+  },
+  "depreciationCard": {
+    "pricingComparison": "Comparaison des Prix",
+    "msrp": "MSRP",
+    "pricePaid": "Prix Payé",
+    "marketValue": "Valeur du Marché",
+    "fromMSRP": "Depuis le MSRP",
+    "fromPricePaid": "Depuis le Prix Payé"
+  },
+  "depreciationChart": {
+    "valueComparison": "Comparaison de Valeur",
+    "investmentVsMarket": "Investissement vs Valeur du Marché",
+    "noResaleData": "Aucune donnée de revente disponible. Ajoutez les prix moyens de revente à vos montres pour voir l'analyse de valeur.",
+    "filterBy": "Filtrer par...",
+    "allCollection": "Toute la Collection",
+    "byBrand": "Par Marque",
+    "byWatch": "Par Montre",
+    "selectWatch": "Sélectionner une montre...",
+    "currentValueLoss": "Valeur Actuelle (Perte)",
+    "currentValueGain": "Valeur Actuelle (Gain)",
+    "invested": "Investi",
+    "currentValue": "Valeur Actuelle"
+  },
+  "usageChart": {
+    "seasonalTrends": "Tendances Saisonnières",
+    "seasons": {
+      "winter": "Hiver",
+      "spring": "Printemps",
+      "summer": "Été",
+      "fall": "Automne"
+    },
+    "daysShort": "j",
+    "avgPerDay": "Moy: ${{amount}}/jour",
+    "topWatch": "Montre principale",
+    "styles": "Styles",
+    "colors": "Couleurs",
+    "bestValue": "Meilleure Valeur",
+    "needsMoreWear": "Nécessite Plus d'Utilisation",
+    "showLess": "Afficher moins",
+    "showAll": "Afficher tout ({{count}})",
+    "day": "jour",
+    "days": "jours",
+    "total": "total"
+  },
   "quickLog": {
     "title": "Enregistrement rapide",
     "logToday": "Enregistrer aujourd'hui",

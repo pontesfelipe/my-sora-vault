@@ -140,6 +140,56 @@
     "widgetDepreciation": "价值与折旧",
     "widgetDepreciationDesc": "跟踪收藏价值、建议零售价与市场价格及增值情况"
   },
+  "collectionConfig": {
+    "pluralLabel": "手表",
+    "singularLabel": "手表",
+    "usageVerbPast": "佩戴",
+    "primaryColorLabel": "表盘颜色",
+    "typeLabel": "类型"
+  },
+  "depreciationCard": {
+    "pricingComparison": "价格比较",
+    "msrp": "建议零售价",
+    "pricePaid": "购买价格",
+    "marketValue": "市场价值",
+    "fromMSRP": "与建议零售价相比",
+    "fromPricePaid": "与购买价格相比"
+  },
+  "depreciationChart": {
+    "valueComparison": "价值比较",
+    "investmentVsMarket": "投资 vs 市场价值",
+    "noResaleData": "没有转售数据。请为您的手表添加平均转售价格以查看价值分析。",
+    "filterBy": "筛选...",
+    "allCollection": "全部收藏",
+    "byBrand": "按品牌",
+    "byWatch": "按手表",
+    "selectWatch": "选择手表...",
+    "currentValueLoss": "当前价值（亏损）",
+    "currentValueGain": "当前价值（盈利）",
+    "invested": "投资",
+    "currentValue": "当前价值"
+  },
+  "usageChart": {
+    "seasonalTrends": "季节趋势",
+    "seasons": {
+      "winter": "冬季",
+      "spring": "春季",
+      "summer": "夏季",
+      "fall": "秋季"
+    },
+    "daysShort": "天",
+    "avgPerDay": "平均: ${{amount}}/天",
+    "topWatch": "热门手表",
+    "styles": "风格",
+    "colors": "颜色",
+    "bestValue": "最佳性价比",
+    "needsMoreWear": "需要更多佩戴",
+    "showLess": "收起",
+    "showAll": "显示全部 ({{count}})",
+    "day": "天",
+    "days": "天",
+    "total": "总计"
+  },
   "quickLog": {
     "title": "快速记录",
     "logToday": "记录今天",

@@ -140,6 +140,56 @@
     "widgetDepreciation": "価値と減価",
     "widgetDepreciationDesc": "コレクション価値、MSRP vs 市場価格、価値上昇の追跡"
   },
+  "collectionConfig": {
+    "pluralLabel": "時計",
+    "singularLabel": "時計",
+    "usageVerbPast": "着用された",
+    "primaryColorLabel": "文字盤の色",
+    "typeLabel": "タイプ"
+  },
+  "depreciationCard": {
+    "pricingComparison": "価格比較",
+    "msrp": "定価",
+    "pricePaid": "購入価格",
+    "marketValue": "市場価値",
+    "fromMSRP": "定価から",
+    "fromPricePaid": "購入価格から"
+  },
+  "depreciationChart": {
+    "valueComparison": "価値比較",
+    "investmentVsMarket": "投資 vs 市場価値",
+    "noResaleData": "リセールデータがありません。価値分析を表示するには、時計に平均リセール価格を追加してください。",
+    "filterBy": "絞り込み...",
+    "allCollection": "全コレクション",
+    "byBrand": "ブランド別",
+    "byWatch": "時計別",
+    "selectWatch": "時計を選択...",
+    "currentValueLoss": "現在の価値（損失）",
+    "currentValueGain": "現在の価値（利益）",
+    "invested": "投資額",
+    "currentValue": "現在の価値"
+  },
+  "usageChart": {
+    "seasonalTrends": "季節のトレンド",
+    "seasons": {
+      "winter": "冬",
+      "spring": "春",
+      "summer": "夏",
+      "fall": "秋"
+    },
+    "daysShort": "日",
+    "avgPerDay": "平均: ${{amount}}/日",
+    "topWatch": "トップ時計",
+    "styles": "スタイル",
+    "colors": "色",
+    "bestValue": "ベストバリュー",
+    "needsMoreWear": "もっと着用が必要",
+    "showLess": "少なく表示",
+    "showAll": "すべて表示 ({{count}})",
+    "day": "日",
+    "days": "日間",
+    "total": "合計"
+  },
   "quickLog": {
     "title": "クイックログ",
     "logToday": "今日を記録",
