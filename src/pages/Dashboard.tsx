@@ -154,7 +154,7 @@ const Dashboard = () => {
             <StatsCard
               title={t("dashboard.trendingDown90d")}
               value={stats.trendingDownWatch ? `${stats.trendingDownWatch.brand} ${stats.trendingDownWatch.model}` : t("dashboard.na")}
-              subtitle={stats.trendingDownCount ? `${stats.trendingDownCount} ${config.pluralLabel.toLowerCase()} ↓` : undefined}
+              subtitle={stats.trendingDownCount ? `${stats.trendingDownCount} ${tPluralLabel.toLowerCase()} ↓` : undefined}
               icon={TrendingDown}
               variant="compact"
               itemId={stats.trendingDownWatch?.id}
