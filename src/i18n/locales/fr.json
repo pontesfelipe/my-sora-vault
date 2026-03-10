@@ -383,6 +383,14 @@
     "monthlyLimitDesc": "Vous avez utilisé toutes les suggestions IA ce mois-ci. Réinitialisation le mois prochain.",
     "failedGenerateSuggestions": "Échec de la génération des suggestions"
   },
+  "pastWatches": {
+    "sold": "vendues",
+    "traded": "échangées",
+    "totalValue": "Valeur Totale",
+    "avg": "Moy",
+    "days": "jours",
+    "mostUsed": "Plus {{verb}}"
+  },
   "settings": {
     "title": "Paramètres",
     "accountInfo": "Informations du compte",

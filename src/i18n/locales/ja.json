@@ -383,6 +383,14 @@
     "monthlyLimitDesc": "今月のAIウィッシュリスト提案をすべて使い切りました。来月にリセットされます。",
     "failedGenerateSuggestions": "提案の生成に失敗しました"
   },
+  "pastWatches": {
+    "sold": "売却",
+    "traded": "交換",
+    "totalValue": "合計価値",
+    "avg": "平均",
+    "days": "日間",
+    "mostUsed": "最も{{verb}}"
+  },
   "settings": {
     "title": "設定",
     "accountInfo": "アカウント情報",
