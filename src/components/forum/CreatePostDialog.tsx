@@ -106,7 +106,7 @@ export function CreatePostDialog({ onSubmit }: CreatePostDialogProps) {
               id="content"
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="Share your thoughts, questions, or discoveries..."
+              placeholder={t("createPost.contentPlaceholder")}
               rows={4}
             />
           </div>
