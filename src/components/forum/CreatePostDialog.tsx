@@ -72,7 +72,7 @@ export function CreatePostDialog({ onSubmit }: CreatePostDialogProps) {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Create a new post</DialogTitle>
+          <DialogTitle>{t("createPost.title")}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
