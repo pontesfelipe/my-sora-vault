@@ -96,7 +96,7 @@ export function CreatePostDialog({ onSubmit }: CreatePostDialogProps) {
               id="title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="What's on your mind?"
+              placeholder={t("createPost.titlePlaceholder")}
               required
             />
           </div>
