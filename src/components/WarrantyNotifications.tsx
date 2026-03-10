@@ -14,6 +14,7 @@ import { getCollectionConfig, CollectionType } from "@/types/collection";
 import { useTranslation } from "react-i18next";
 
 export const WarrantyNotifications = () => {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const { selectedCollectionId, currentCollectionType, currentCollectionConfig } = useCollection();

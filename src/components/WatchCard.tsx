@@ -49,6 +49,7 @@ interface WatchCardProps {
 
 export const WatchCard = ({ watch, totalDays, onDelete }: WatchCardProps) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { toast } = useToast();
   const { isAdmin } = useAuth();
   const { requestVerification, isVerified } = usePasscode();
