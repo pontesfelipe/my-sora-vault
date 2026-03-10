@@ -28,7 +28,7 @@ export function WristCheckProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <WristCheckContext.Provider value={{ isOpen, openWristCheck, closeWristCheck }}>
+    <WristCheckContext.Provider value={{ isOpen, preSelectedWatchId, openWristCheck, closeWristCheck }}>
       {children}
     </WristCheckContext.Provider>
   );
