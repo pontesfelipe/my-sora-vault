@@ -399,7 +399,10 @@ const Collection = () => {
           {/* Action buttons */}
           <div className="flex flex-wrap gap-2 justify-between items-center">
             <div className="flex gap-2">
-              <QuickAddWearDialog watches={watches} onSuccess={refetch} />
+              <Button onClick={openWristCheck} variant="outline" size="sm" className="gap-2">
+                <Search className="w-4 h-4" />
+                {t("home.wristCheck")}
+              </Button>
               <AddWatchDialog onSuccess={refetch} />
             </div>
             <div className="flex flex-wrap gap-2">
