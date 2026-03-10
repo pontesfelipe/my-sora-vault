@@ -144,6 +144,9 @@
     "pluralLabel": "時計",
     "singularLabel": "時計",
     "usageVerbPast": "着用された",
+    "usageVerb": "着用した",
+    "usageNoun": "着用記録",
+    "usageNounPlural": "着用記録",
     "primaryColorLabel": "文字盤の色",
     "typeLabel": "タイプ"
   },

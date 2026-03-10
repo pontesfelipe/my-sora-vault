@@ -144,6 +144,9 @@
     "pluralLabel": "手表",
     "singularLabel": "手表",
     "usageVerbPast": "佩戴",
+    "usageVerb": "佩戴了",
+    "usageNoun": "佩戴记录",
+    "usageNounPlural": "佩戴记录",
     "primaryColorLabel": "表盘颜色",
     "typeLabel": "类型"
   },

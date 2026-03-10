@@ -144,6 +144,9 @@
     "pluralLabel": "Montres",
     "singularLabel": "Montre",
     "usageVerbPast": "porté",
+    "usageVerb": "porté",
+    "usageNoun": "Contrôle du Poignet",
+    "usageNounPlural": "Contrôles du Poignet",
     "primaryColorLabel": "Couleur du Cadran",
     "typeLabel": "Type"
   },

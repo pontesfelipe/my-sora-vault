@@ -145,6 +145,9 @@
     "pluralLabel": "Watches",
     "singularLabel": "Watch",
     "usageVerbPast": "worn",
+    "usageVerb": "wore",
+    "usageNoun": "Wrist Check",
+    "usageNounPlural": "Wrist Checks",
     "primaryColorLabel": "Dial Color",
     "typeLabel": "Type"
   },

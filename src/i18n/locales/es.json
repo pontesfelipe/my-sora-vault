@@ -144,6 +144,9 @@
     "pluralLabel": "Relojes",
     "singularLabel": "Reloj",
     "usageVerbPast": "usado",
+    "usageVerb": "usó",
+    "usageNoun": "Registro de Uso",
+    "usageNounPlural": "Registros de Uso",
     "primaryColorLabel": "Color de Esfera",
     "typeLabel": "Tipo"
   },
