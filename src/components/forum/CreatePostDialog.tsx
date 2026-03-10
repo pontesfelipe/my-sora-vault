@@ -91,7 +91,7 @@ export function CreatePostDialog({ onSubmit }: CreatePostDialogProps) {
             </Select>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="title">Title</Label>
+            <Label htmlFor="title">{t("createPost.titleLabel")}</Label>
             <Input
               id="title"
               value={title}
