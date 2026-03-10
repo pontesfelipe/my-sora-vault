@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from "react";
+
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,6 +12,7 @@ import { ArrowLeft, Calendar, DollarSign, Eye, EyeOff, Trash2, Info, Pencil } fr
 import { PinchZoomImage } from "@/components/PinchZoomImage";
 import watchHero from "@/assets/watch-hero.jpg";
 import { AddWearDialog } from "@/components/AddWearDialog";
+import { useWristCheck } from "@/contexts/WristCheckContext";
 import { EditWatchDialog } from "@/components/EditWatchDialog";
 import { EditWearEntryDialog } from "@/components/EditWearEntryDialog";
 import { useToast } from "@/hooks/use-toast";
@@ -82,6 +84,7 @@ const WatchDetail = () => {
   const { toast } = useToast();
   const { isAdmin } = useAuth();
   const { requestVerification, isVerified } = usePasscode();
+  const { openWristCheck } = useWristCheck();
   const [watch, setWatch] = useState<Watch | null>(null);
   const [watchSpecs, setWatchSpecs] = useState<WatchSpecs | null>(null);
   const [wearEntries, setWearEntries] = useState<WearEntry[]>([]);
@@ -658,7 +661,10 @@ const WatchDetail = () => {
             <Card className="border-border bg-card p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-semibold text-foreground">{t("watchDetail.wearHistory")}</h2>
-                <AddWearDialog watchId={watch.id} onSuccess={fetchData} />
+                <Button onClick={openWristCheck} variant="outline" size="sm" className="gap-2">
+                  <Calendar className="w-4 h-4" />
+                  {t("home.wristCheck")}
+                </Button>
               </div>
 
                {wearEntries.length === 0 ? (
