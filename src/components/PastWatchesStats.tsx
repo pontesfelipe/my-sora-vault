@@ -80,7 +80,7 @@ export const PastWatchesStats = ({ pastWatches, wearEntries }: PastWatchesStatsP
       <Card className="p-4 bg-surfaceMuted/50 border-borderSubtle">
         <div className="flex items-center gap-2 mb-2">
           <DollarSign className="w-4 h-4 text-textMuted" />
-          <span className="text-xs text-textMuted">Total Value</span>
+          <span className="text-xs text-textMuted">{t("pastWatches.totalValue")}</span>
         </div>
         <p className="text-2xl font-bold text-textMain">{formatCurrency(totalValue)}</p>
         <p className="text-xs text-textMuted mt-1">
