@@ -1,11 +1,10 @@
-import { Home, Clock, Users, User, Watch, BookHeart, Shield, Settings, HelpCircle, Info, Lightbulb, Bot, ClipboardList, BarChart3 } from "lucide-react";
+import { Home, Users, User, Watch, BookHeart, Shield, Settings, HelpCircle, Info, Lightbulb, Bot, ClipboardList, BarChart3 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { SubmitFeedbackDialog } from "@/components/SubmitFeedbackDialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSocialNotifications } from "@/hooks/useSocialNotifications";
-import { useWristCheck } from "@/contexts/WristCheckContext";
 import {
   Sidebar,
   SidebarContent,
