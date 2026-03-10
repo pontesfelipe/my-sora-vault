@@ -12,6 +12,7 @@ import { ArrowLeft, Calendar, DollarSign, Eye, EyeOff, Trash2, Info, Pencil } fr
 import { PinchZoomImage } from "@/components/PinchZoomImage";
 import watchHero from "@/assets/watch-hero.jpg";
 import { AddWearDialog } from "@/components/AddWearDialog";
+import { useWristCheck } from "@/contexts/WristCheckContext";
 import { EditWatchDialog } from "@/components/EditWatchDialog";
 import { EditWearEntryDialog } from "@/components/EditWearEntryDialog";
 import { useToast } from "@/hooks/use-toast";
