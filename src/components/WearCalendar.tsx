@@ -35,7 +35,7 @@ export const WearCalendar = ({ watches, wearEntries, onWatchTap }: WearCalendarP
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [swipeDirection, setSwipeDirection] = useState(0);
   const { t } = useTranslation();
-  const navigate = useNavigate();
+  const { openWristCheck } = useWristCheck();
 
   const isCurrentWeek = isSameWeek(selectedWeekDate, new Date(), { weekStartsOn: 1 });
 
