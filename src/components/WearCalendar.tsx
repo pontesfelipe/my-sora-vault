@@ -19,7 +19,7 @@ import { motion, AnimatePresence, type PanInfo } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 import { useWristCheck } from "@/contexts/WristCheckContext";
-import { useNavigate } from "react-router-dom";
+
 
 interface WearCalendarProps {
   watches: any[];
