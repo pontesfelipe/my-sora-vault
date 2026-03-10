@@ -84,6 +84,7 @@ const WatchDetail = () => {
   const { toast } = useToast();
   const { isAdmin } = useAuth();
   const { requestVerification, isVerified } = usePasscode();
+  const { openWristCheck } = useWristCheck();
   const [watch, setWatch] = useState<Watch | null>(null);
   const [watchSpecs, setWatchSpecs] = useState<WatchSpecs | null>(null);
   const [wearEntries, setWearEntries] = useState<WearEntry[]>([]);
