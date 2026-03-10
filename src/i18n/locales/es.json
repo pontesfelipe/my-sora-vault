@@ -926,5 +926,20 @@
     "searching": "Buscando...",
     "noResults": "Sin resultados para \"{{query}}\"",
     "logAsWristCheck": "Registrar \"{{query}}\" como wrist check"
+  },
+  "createPost": {
+    "button": "Crear Publicación",
+    "title": "Crear una nueva publicación",
+    "category": "Categoría",
+    "selectCategory": "Selecciona una categoría",
+    "titleLabel": "Título",
+    "titlePlaceholder": "¿Qué tienes en mente?",
+    "contentLabel": "Contenido",
+    "contentPlaceholder": "Comparte tus pensamientos, preguntas o descubrimientos...",
+    "imageOptional": "Imagen (opcional)",
+    "addImage": "Agregar Imagen",
+    "cancel": "Cancelar",
+    "post": "Publicar",
+    "posting": "Publicando..."
   }
 }

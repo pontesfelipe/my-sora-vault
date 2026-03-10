@@ -926,5 +926,20 @@
     "searching": "搜索中...",
     "noResults": "没有找到「{{query}}」的结果",
     "logAsWristCheck": "将「{{query}}」记录为腕表打卡"
+  },
+  "createPost": {
+    "button": "创建帖子",
+    "title": "创建新帖子",
+    "category": "分类",
+    "selectCategory": "选择分类",
+    "titleLabel": "标题",
+    "titlePlaceholder": "你在想什么？",
+    "contentLabel": "内容",
+    "contentPlaceholder": "分享你的想法、问题或发现...",
+    "imageOptional": "图片（可选）",
+    "addImage": "添加图片",
+    "cancel": "取消",
+    "post": "发布",
+    "posting": "发布中..."
   }
 }
