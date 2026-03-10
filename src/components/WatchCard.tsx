@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Watch as WatchIcon, Calendar, Eye, EyeOff, Trash2, RefreshCw, Info } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useTranslation } from "react-i18next";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
 import { usePasscode } from "@/contexts/PasscodeContext";
