@@ -23,6 +23,7 @@ const Home = () => {
   const [quickLogWatch, setQuickLogWatch] = useState<any>(null);
   const [quickLogOpen, setQuickLogOpen] = useState(false);
   const { t, i18n } = useTranslation();
+  const { openWristCheck } = useWristCheck();
 
   const dateLocale = useMemo(() => {
     const localeMap: Record<string, Locale> = { en: enUS, es, fr, pt, ja, zh: zhCN };
