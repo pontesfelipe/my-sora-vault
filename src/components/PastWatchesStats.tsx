@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { TrendingUp, DollarSign, Calendar, Watch } from "lucide-react";
 import { useCollection } from "@/contexts/CollectionContext";
+import { useTranslation } from "react-i18next";
 
 interface PastItem {
   id: string;

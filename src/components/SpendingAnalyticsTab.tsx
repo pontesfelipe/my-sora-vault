@@ -5,6 +5,7 @@ import { DollarSign, TrendingUp, Calendar, ChevronRight } from "lucide-react";
 import { format } from "date-fns";
 import { formatPurchaseDateForDisplay, parsePurchaseDate } from "@/lib/date";
 import { useCollection } from "@/contexts/CollectionContext";
+import { useTranslation } from "react-i18next";
 
 interface Item {
   id: string;

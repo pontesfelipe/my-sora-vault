@@ -11,6 +11,7 @@ import { useCollection } from "@/contexts/CollectionContext";
 import { differenceInDays, format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import { getCollectionConfig, CollectionType } from "@/types/collection";
+import { useTranslation } from "react-i18next";
 
 export const WarrantyNotifications = () => {
   const [open, setOpen] = useState(false);
