@@ -266,6 +266,29 @@ const Dashboard = () => {
           <DepreciationChart watches={watches} />
         </div>
       )}
+
+      {/* Tag-based Widgets */}
+      {tagStats.filter(ts => widgets[`tag_${ts.tag.id}`]).length > 0 && (
+        <div className="space-y-3">
+          <h2 className="text-lg font-semibold text-textMain flex items-center gap-2">
+            <Tag className="h-4 w-4" /> Tag Insights
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+            {tagStats
+              .filter(ts => widgets[`tag_${ts.tag.id}`])
+              .map(ts => (
+                <StatsCard
+                  key={ts.tag.id}
+                  title={ts.tag.name}
+                  value={`${ts.watchCount} item${ts.watchCount !== 1 ? 's' : ''}`}
+                  subtitle={`${ts.wearCount} day${ts.wearCount !== 1 ? 's' : ''} worn`}
+                  icon={Tag}
+                  variant="compact"
+                />
+              ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

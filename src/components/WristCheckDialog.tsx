@@ -19,10 +19,7 @@ import { useTranslation } from "react-i18next";
 import { AddWatchDialog } from "@/components/AddWatchDialog";
 import { ResponsiveDialog } from "@/components/ResponsiveDialog";
 
-const SUGGESTED_TAGS = [
-  "Daily", "Office", "Casual", "Formal", "Trip", "Event",
-  "Sport", "Date Night", "Weekend", "Special Occasion",
-];
+import { useUserTags } from "@/hooks/useUserTags";
 
 export function WristCheckDialog() {
   const { isOpen, preSelectedWatchId, closeWristCheck } = useWristCheck();
