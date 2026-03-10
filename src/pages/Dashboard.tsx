@@ -85,7 +85,10 @@ const Dashboard = () => {
         <div className="flex items-center gap-3">
           <CanvasWidgetManager widgets={widgets} onWidgetsChange={setWidgets} />
           <CollectionSwitcher />
-          <QuickAddWearDialog watches={watches} onSuccess={refetch} />
+          <Button onClick={openWristCheck} variant="outline" size="sm" className="gap-2">
+            <Plus className="h-4 w-4" />
+            {t("home.wristCheck")}
+          </Button>
         </div>
       </div>
 
