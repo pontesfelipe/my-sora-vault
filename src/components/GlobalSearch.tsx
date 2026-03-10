@@ -9,6 +9,7 @@ import { useWatchData } from "@/hooks/useWatchData";
 import { useCollection } from "@/contexts/CollectionContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
+import { useWristCheck } from "@/contexts/WristCheckContext";
 
 interface SearchResult {
   type: "watch" | "user" | "tag";
