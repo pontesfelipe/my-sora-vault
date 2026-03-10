@@ -10,7 +10,7 @@ import { WatchCaseGrid } from "@/components/WatchCaseGrid";
 import { PastWatchCard } from "@/components/PastWatchCard";
 import { PastWatchesStats } from "@/components/PastWatchesStats";
 import { AddWatchDialog } from "@/components/AddWatchDialog";
-import { QuickAddWearDialog } from "@/components/QuickAddWearDialog";
+import { useWristCheck } from "@/contexts/WristCheckContext";
 import { EditCollectionDialog } from "@/components/EditCollectionDialog";
 import { CreateFirstCollectionDialog } from "@/components/CreateFirstCollectionDialog";
 import { CollectionSwitcher } from "@/components/CollectionSwitcher";
