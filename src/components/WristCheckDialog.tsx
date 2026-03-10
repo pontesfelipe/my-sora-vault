@@ -25,7 +25,7 @@ const SUGGESTED_TAGS = [
 ];
 
 export function WristCheckDialog() {
-  const { isOpen, closeWristCheck } = useWristCheck();
+  const { isOpen, preSelectedWatchId, closeWristCheck } = useWristCheck();
   const { user } = useAuth();
   const { selectedCollectionId } = useCollection();
   const { watches, refetch } = useWatchData(selectedCollectionId);
