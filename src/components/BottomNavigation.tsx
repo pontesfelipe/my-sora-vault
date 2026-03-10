@@ -1,4 +1,4 @@
-import { Home, Clock, Users, User, Menu, BarChart3 } from "lucide-react";
+import { Home, Users, User, Menu, BarChart3 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -6,7 +6,6 @@ import { triggerHaptic } from "@/utils/haptics";
 import { useSocialNotifications } from "@/hooks/useSocialNotifications";
 import { Badge } from "@/components/ui/badge";
 import { MobileMenuDrawer } from "@/components/MobileMenuDrawer";
-import { useWristCheck } from "@/contexts/WristCheckContext";
 
 export function BottomNavigation() {
   const location = useLocation();
