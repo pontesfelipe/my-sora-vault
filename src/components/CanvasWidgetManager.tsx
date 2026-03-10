@@ -33,7 +33,7 @@ const DEFAULT_WIDGETS: WidgetConfig = {
   depreciation: true,
 };
 
-const BUILT_IN_KEYS: Array<keyof WidgetConfig> = [
+const BUILT_IN_KEYS: string[] = [
   "collection_stats",
   "usage_trends",
   "usage_chart",
