@@ -31,6 +31,7 @@ export function GlobalSearch() {
   const { selectedCollectionId } = useCollection();
   const { watches } = useWatchData(selectedCollectionId);
   const { t } = useTranslation();
+  const { openWristCheck } = useWristCheck();
 
   // Close on click outside
   useEffect(() => {
