@@ -101,7 +101,7 @@ export function CreatePostDialog({ onSubmit }: CreatePostDialogProps) {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="content">Content</Label>
+            <Label htmlFor="content">{t("createPost.contentLabel")}</Label>
             <Textarea
               id="content"
               value={content}
