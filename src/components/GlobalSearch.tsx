@@ -132,14 +132,14 @@ export function GlobalSearch() {
     } else if (result.type === "user") {
       navigate(`/user/${result.id}`);
     } else if (result.type === "tag") {
-      navigate(`/log`);
+      openWristCheck();
     }
     setIsOpen(false);
     setQuery("");
   };
 
   const handleQuickLog = () => {
-    navigate("/log");
+    openWristCheck();
     setIsOpen(false);
     setQuery("");
   };
