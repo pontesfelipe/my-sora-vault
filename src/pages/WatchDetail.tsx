@@ -287,10 +287,10 @@ const WatchDetail = () => {
               <p className="text-xl text-muted-foreground">{watch.model}</p>
             </div>
             <div className="flex gap-2 items-start">
-              <Button variant="outline" size="icon" onClick={() => openWristCheck(watch.id)} aria-label={t("common.edit")}>
+              <Button variant="outline" size="sm" className="gap-2" onClick={() => openWristCheck(watch.id)}>
                 <Pencil className="w-4 h-4" />
+                {t("home.wristCheck")}
               </Button>
-              <EditWatchDialog watch={watch} onSuccess={fetchData} />
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button variant="destructive" size="icon" aria-label={t("watchDetail.deleteWatch")}>
