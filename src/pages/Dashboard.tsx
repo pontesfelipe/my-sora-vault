@@ -28,6 +28,13 @@ const Dashboard = () => {
   const stats = useStatsCalculations(watches, wearEntries, trips, waterUsages);
   const config = currentCollectionConfig;
 
+  // Translated collection config labels
+  const tPluralLabel = t("collectionConfig.pluralLabel");
+  const tSingularLabel = t("collectionConfig.singularLabel");
+  const tUsageVerbPast = t("collectionConfig.usageVerbPast");
+  const tPrimaryColorLabel = t("collectionConfig.primaryColorLabel");
+  const tTypeLabel = t("collectionConfig.typeLabel");
+
   if (watchLoading || tripLoading || waterLoading || widgetsLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
