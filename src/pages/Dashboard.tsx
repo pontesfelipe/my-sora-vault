@@ -69,7 +69,10 @@ const Dashboard = () => {
           </div>
         </div>
         <div className="mt-4 flex justify-center">
-          <QuickAddWearDialog watches={watches} onSuccess={refetch} />
+          <Button onClick={openWristCheck} variant="outline" size="sm" className="gap-2">
+            <Plus className="h-4 w-4" />
+            {t("home.wristCheck")}
+          </Button>
         </div>
       </div>
 
