@@ -84,7 +84,7 @@ export const PastWatchesStats = ({ pastWatches, wearEntries }: PastWatchesStatsP
         </div>
         <p className="text-2xl font-bold text-textMain">{formatCurrency(totalValue)}</p>
         <p className="text-xs text-textMuted mt-1">
-          Avg: {formatCurrency(totalPastItems > 0 ? totalValue / totalPastItems : 0)}
+          {t("pastWatches.avg")}: {formatCurrency(totalPastItems > 0 ? totalValue / totalPastItems : 0)}
         </p>
       </Card>
 
