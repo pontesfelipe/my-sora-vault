@@ -145,6 +145,9 @@
     "pluralLabel": "Watches",
     "singularLabel": "Watch",
     "usageVerbPast": "worn",
+    "usageVerb": "wore",
+    "usageNoun": "Wrist Check",
+    "usageNounPlural": "Wrist Checks",
     "primaryColorLabel": "Dial Color",
     "typeLabel": "Type"
   },
@@ -380,6 +383,14 @@
     "monthlyLimitTitle": "Monthly Limit Reached",
     "monthlyLimitDesc": "You've used all AI wishlist suggestions this month. Resets next month.",
     "failedGenerateSuggestions": "Failed to generate suggestions"
+  },
+  "pastWatches": {
+    "sold": "sold",
+    "traded": "traded",
+    "totalValue": "Total Value",
+    "avg": "Avg",
+    "days": "days",
+    "mostUsed": "Most {{verb}}"
   },
   "settings": {
     "title": "Settings",

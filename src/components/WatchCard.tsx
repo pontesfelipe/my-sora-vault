@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Watch as WatchIcon, Calendar, Eye, EyeOff, Trash2, RefreshCw, Info } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useTranslation } from "react-i18next";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
 import { usePasscode } from "@/contexts/PasscodeContext";
@@ -48,11 +49,12 @@ interface WatchCardProps {
 
 export const WatchCard = ({ watch, totalDays, onDelete }: WatchCardProps) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { toast } = useToast();
   const { isAdmin } = useAuth();
   const { requestVerification, isVerified } = usePasscode();
   const { currentCollectionConfig, currentCollectionType } = useCollection();
-  const singularLabel = currentCollectionConfig.singularLabel;
+  const singularLabel = t("collectionConfig.singularLabel");
   const [showCost, setShowCost] = useState(isAdmin);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isFetchingPrice, setIsFetchingPrice] = useState(false);
@@ -219,7 +221,7 @@ export const WatchCard = ({ watch, totalDays, onDelete }: WatchCardProps) => {
 
         <div className="space-y-2 sm:space-y-3 mb-3 sm:mb-4">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-textMuted">{currentCollectionConfig.primaryColorLabel}</span>
+            <span className="text-textMuted">{t("collectionConfig.primaryColorLabel")}</span>
             <span className="font-medium text-textMain">{watch.dial_color}</span>
           </div>
 

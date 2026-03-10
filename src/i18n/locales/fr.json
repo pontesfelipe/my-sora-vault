@@ -144,6 +144,9 @@
     "pluralLabel": "Montres",
     "singularLabel": "Montre",
     "usageVerbPast": "porté",
+    "usageVerb": "porté",
+    "usageNoun": "Contrôle du Poignet",
+    "usageNounPlural": "Contrôles du Poignet",
     "primaryColorLabel": "Couleur du Cadran",
     "typeLabel": "Type"
   },
@@ -379,6 +382,14 @@
     "monthlyLimitTitle": "Limite mensuelle atteinte",
     "monthlyLimitDesc": "Vous avez utilisé toutes les suggestions IA ce mois-ci. Réinitialisation le mois prochain.",
     "failedGenerateSuggestions": "Échec de la génération des suggestions"
+  },
+  "pastWatches": {
+    "sold": "vendues",
+    "traded": "échangées",
+    "totalValue": "Valeur Totale",
+    "avg": "Moy",
+    "days": "jours",
+    "mostUsed": "Plus {{verb}}"
   },
   "settings": {
     "title": "Paramètres",

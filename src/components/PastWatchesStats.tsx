@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { TrendingUp, DollarSign, Calendar, Watch } from "lucide-react";
 import { useCollection } from "@/contexts/CollectionContext";
+import { useTranslation } from "react-i18next";
 
 interface PastItem {
   id: string;
@@ -27,7 +28,8 @@ interface PastWatchesStatsProps {
 
 export const PastWatchesStats = ({ pastWatches, wearEntries }: PastWatchesStatsProps) => {
   const { currentCollectionConfig, currentCollectionType } = useCollection();
-  const itemLabel = currentCollectionConfig.singularLabel.toLowerCase();
+  const { t } = useTranslation();
+  const itemLabel = t("collectionConfig.singularLabel").toLowerCase();
   
   const totalPastItems = pastWatches.length;
   const soldCount = pastWatches.filter(w => w.status === 'sold').length;
@@ -72,36 +74,36 @@ export const PastWatchesStats = ({ pastWatches, wearEntries }: PastWatchesStatsP
         </div>
         <p className="text-2xl font-bold text-textMain">{totalPastItems}</p>
         <p className="text-xs text-textMuted mt-1">
-          {soldCount} sold · {tradedCount} traded
+          {soldCount} {t("pastWatches.sold")} · {tradedCount} {t("pastWatches.traded")}
         </p>
       </Card>
 
       <Card className="p-4 bg-surfaceMuted/50 border-borderSubtle">
         <div className="flex items-center gap-2 mb-2">
           <DollarSign className="w-4 h-4 text-textMuted" />
-          <span className="text-xs text-textMuted">Total Value</span>
+          <span className="text-xs text-textMuted">{t("pastWatches.totalValue")}</span>
         </div>
         <p className="text-2xl font-bold text-textMain">{formatCurrency(totalValue)}</p>
         <p className="text-xs text-textMuted mt-1">
-          Avg: {formatCurrency(totalPastItems > 0 ? totalValue / totalPastItems : 0)}
+          {t("pastWatches.avg")}: {formatCurrency(totalPastItems > 0 ? totalValue / totalPastItems : 0)}
         </p>
       </Card>
 
       <Card className="p-4 bg-surfaceMuted/50 border-borderSubtle">
         <div className="flex items-center gap-2 mb-2">
           <Calendar className="w-4 h-4 text-textMuted" />
-          <span className="text-xs text-textMuted">{currentCollectionConfig.usageNoun.charAt(0).toUpperCase() + currentCollectionConfig.usageNoun.slice(1)} Days</span>
+          <span className="text-xs text-textMuted">{t("collectionConfig.usageNoun")} {t("pastWatches.days")}</span>
         </div>
         <p className="text-2xl font-bold text-textMain">{totalWearDays}</p>
         <p className="text-xs text-textMuted mt-1">
-          Avg: {avgDaysPerItem} days/{itemLabel}
+          {t("pastWatches.avg")}: {avgDaysPerItem} {t("pastWatches.days")}/{itemLabel}
         </p>
       </Card>
 
       <Card className="p-4 bg-surfaceMuted/50 border-borderSubtle">
         <div className="flex items-center gap-2 mb-2">
           <TrendingUp className="w-4 h-4 text-textMuted" />
-          <span className="text-xs text-textMuted">Most {currentCollectionConfig.usageVerbPast.charAt(0).toUpperCase() + currentCollectionConfig.usageVerbPast.slice(1)}</span>
+          <span className="text-xs text-textMuted">{t("pastWatches.mostUsed", { verb: t("collectionConfig.usageVerbPast") })}</span>
         </div>
         {mostUsedItem ? (
           <>

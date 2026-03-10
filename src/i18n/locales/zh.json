@@ -144,6 +144,9 @@
     "pluralLabel": "手表",
     "singularLabel": "手表",
     "usageVerbPast": "佩戴",
+    "usageVerb": "佩戴了",
+    "usageNoun": "佩戴记录",
+    "usageNounPlural": "佩戴记录",
     "primaryColorLabel": "表盘颜色",
     "typeLabel": "类型"
   },
@@ -379,6 +382,14 @@
     "monthlyLimitTitle": "已达月度限制",
     "monthlyLimitDesc": "您已用完本月所有AI心愿单建议。下月将重置。",
     "failedGenerateSuggestions": "生成建议失败"
+  },
+  "pastWatches": {
+    "sold": "已售",
+    "traded": "已换",
+    "totalValue": "总价值",
+    "avg": "平均",
+    "days": "天",
+    "mostUsed": "最常{{verb}}"
   },
   "settings": {
     "title": "设置",

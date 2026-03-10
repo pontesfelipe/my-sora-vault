@@ -319,19 +319,19 @@ export const QuickAddWearDialog = ({ watches, onSuccess, collectionType: propTyp
       <DialogTrigger asChild>
         <Button className="gap-2">
           <Plus className="w-4 h-4" />
-          {t("quickAddWear.logUsage", { noun: config.usageNoun.charAt(0).toUpperCase() + config.usageNoun.slice(1) })}
+          {t("collectionConfig.usageNoun")}
         </Button>
       </DialogTrigger>
       <DialogContent className="bg-card border-border max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-foreground">{t("quickAddWear.quickAddTitle", { noun: config.usageNoun.charAt(0).toUpperCase() + config.usageNoun.slice(1) })}</DialogTitle>
+          <DialogTitle className="text-foreground">{t("quickAddWear.quickAddTitle", { noun: t("collectionConfig.usageNoun") })}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="watch">{t("quickAddWear.selectItem", { item: config.singularLabel })}</Label>
+            <Label htmlFor="watch">{t("quickAddWear.selectItem", { item: t("collectionConfig.singularLabel") })}</Label>
             <Select value={selectedWatchId} onValueChange={setSelectedWatchId} required>
               <SelectTrigger className="bg-background border-border">
-                <SelectValue placeholder={t("quickAddWear.chooseItem", { item: config.singularLabel.toLowerCase() })} />
+                <SelectValue placeholder={t("quickAddWear.chooseItem", { item: t("collectionConfig.singularLabel").toLowerCase() })} />
               </SelectTrigger>
               <SelectContent className="bg-popover border-border max-h-[300px]">
                 {sortedWatches.map((watch) => (
@@ -357,7 +357,7 @@ export const QuickAddWearDialog = ({ watches, onSuccess, collectionType: propTyp
           </div>
 
           <div className="space-y-2">
-            <Label>{t("quickAddWear.duration", { noun: config.usageNoun.charAt(0).toUpperCase() + config.usageNoun.slice(1) })}</Label>
+            <Label>{t("quickAddWear.duration", { noun: t("collectionConfig.usageNoun") })}</Label>
             <div className="flex gap-4 flex-wrap">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input

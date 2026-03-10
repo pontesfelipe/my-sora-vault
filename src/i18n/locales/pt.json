@@ -144,6 +144,9 @@
     "pluralLabel": "Relógios",
     "singularLabel": "Relógio",
     "usageVerbPast": "usado",
+    "usageVerb": "usou",
+    "usageNoun": "Registro de Uso",
+    "usageNounPlural": "Registros de Uso",
     "primaryColorLabel": "Cor do Mostrador",
     "typeLabel": "Tipo"
   },
@@ -379,6 +382,14 @@
     "monthlyLimitTitle": "Limite mensal atingido",
     "monthlyLimitDesc": "Você usou todas as sugestões de IA da lista de desejos neste mês. Reinicia no próximo mês.",
     "failedGenerateSuggestions": "Falha ao gerar sugestões"
+  },
+  "pastWatches": {
+    "sold": "vendidos",
+    "traded": "trocados",
+    "totalValue": "Valor Total",
+    "avg": "Méd",
+    "days": "dias",
+    "mostUsed": "Mais {{verb}}"
   },
   "settings": {
     "title": "Configurações",

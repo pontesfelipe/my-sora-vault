@@ -11,8 +11,10 @@ import { useCollection } from "@/contexts/CollectionContext";
 import { differenceInDays, format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import { getCollectionConfig, CollectionType } from "@/types/collection";
+import { useTranslation } from "react-i18next";
 
 export const WarrantyNotifications = () => {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const { selectedCollectionId, currentCollectionType, currentCollectionConfig } = useCollection();
@@ -51,8 +53,8 @@ export const WarrantyNotifications = () => {
     return null;
   }
 
-  const singularLabel = config.singularLabel.toLowerCase();
-  const pluralLabel = config.pluralLabel.toLowerCase();
+  const singularLabel = t("collectionConfig.singularLabel").toLowerCase();
+  const pluralLabel = t("collectionConfig.pluralLabel").toLowerCase();
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
