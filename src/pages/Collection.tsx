@@ -50,6 +50,7 @@ import {
 
 const Collection = () => {
   const { t } = useTranslation();
+  const { openWristCheck } = useWristCheck();
   const { selectedCollectionId, currentCollection, currentCollectionType, currentCollectionConfig, collections, collectionsLoading, refetchCollections } = useCollection();
   const { watches, wearEntries, loading, refetch } = useWatchData(selectedCollectionId);
   const { pastWatches, wearEntries: pastWearEntries, loading: pastLoading, refetch: refetchPast } = usePastWatchData();
