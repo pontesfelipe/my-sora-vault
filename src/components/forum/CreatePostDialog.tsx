@@ -111,7 +111,7 @@ export function CreatePostDialog({ onSubmit }: CreatePostDialogProps) {
             />
           </div>
           <div className="space-y-2">
-            <Label>Image (optional)</Label>
+            <Label>{t("createPost.imageOptional")}</Label>
             <input
               ref={fileInputRef}
               type="file"
