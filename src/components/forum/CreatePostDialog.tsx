@@ -79,7 +79,7 @@ export function CreatePostDialog({ onSubmit }: CreatePostDialogProps) {
             <Label htmlFor="category">{t("createPost.category")}</Label>
             <Select value={category} onValueChange={setCategory}>
               <SelectTrigger>
-                <SelectValue placeholder="Select a category" />
+                <SelectValue placeholder={t("createPost.selectCategory")} />
               </SelectTrigger>
               <SelectContent>
                 {FORUM_CATEGORIES.map((cat) => (
