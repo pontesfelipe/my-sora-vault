@@ -661,7 +661,10 @@ const WatchDetail = () => {
             <Card className="border-border bg-card p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-semibold text-foreground">{t("watchDetail.wearHistory")}</h2>
-                <AddWearDialog watchId={watch.id} onSuccess={fetchData} />
+                <Button onClick={openWristCheck} variant="outline" size="sm" className="gap-2">
+                  <Calendar className="w-4 h-4" />
+                  {t("home.wristCheck")}
+                </Button>
               </div>
 
                {wearEntries.length === 0 ? (
