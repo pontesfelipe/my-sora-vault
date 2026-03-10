@@ -141,6 +141,56 @@
     "widgetDepreciation": "Value & Depreciation",
     "widgetDepreciationDesc": "Track collection value, MSRP vs market price, and appreciation"
   },
+  "collectionConfig": {
+    "pluralLabel": "Watches",
+    "singularLabel": "Watch",
+    "usageVerbPast": "worn",
+    "primaryColorLabel": "Dial Color",
+    "typeLabel": "Type"
+  },
+  "depreciationCard": {
+    "pricingComparison": "Pricing Comparison",
+    "msrp": "MSRP",
+    "pricePaid": "Price Paid",
+    "marketValue": "Market Value",
+    "fromMSRP": "From MSRP",
+    "fromPricePaid": "From Price Paid"
+  },
+  "depreciationChart": {
+    "valueComparison": "Value Comparison",
+    "investmentVsMarket": "Investment vs Market Value",
+    "noResaleData": "No resale data available. Add average resale prices to your watches to see value analysis.",
+    "filterBy": "Filter by...",
+    "allCollection": "All Collection",
+    "byBrand": "By Brand",
+    "byWatch": "By Watch",
+    "selectWatch": "Select watch...",
+    "currentValueLoss": "Current Value (Loss)",
+    "currentValueGain": "Current Value (Gain)",
+    "invested": "Invested",
+    "currentValue": "Current Value"
+  },
+  "usageChart": {
+    "seasonalTrends": "Seasonal Trends",
+    "seasons": {
+      "winter": "Winter",
+      "spring": "Spring",
+      "summer": "Summer",
+      "fall": "Fall"
+    },
+    "daysShort": "d",
+    "avgPerDay": "Avg: ${{amount}}/day",
+    "topWatch": "Top watch",
+    "styles": "Styles",
+    "colors": "Colors",
+    "bestValue": "Best Value",
+    "needsMoreWear": "Needs More Wear",
+    "showLess": "Show less",
+    "showAll": "Show all ({{count}})",
+    "day": "day",
+    "days": "days",
+    "total": "total"
+  },
   "quickLog": {
     "title": "Quick Log",
     "logToday": "Log Today",

@@ -28,6 +28,13 @@ const Dashboard = () => {
   const stats = useStatsCalculations(watches, wearEntries, trips, waterUsages);
   const config = currentCollectionConfig;
 
+  // Translated collection config labels
+  const tPluralLabel = t("collectionConfig.pluralLabel");
+  const tSingularLabel = t("collectionConfig.singularLabel");
+  const tUsageVerbPast = t("collectionConfig.usageVerbPast");
+  const tPrimaryColorLabel = t("collectionConfig.primaryColorLabel");
+  const tTypeLabel = t("collectionConfig.typeLabel");
+
   if (watchLoading || tripLoading || waterLoading || widgetsLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -41,7 +48,7 @@ const Dashboard = () => {
 
   const subtitle = currentCollection
     ? t("dashboard.overview", { name: currentCollection.name })
-    : t("dashboard.overviewGeneric", { type: config.pluralLabel.toLowerCase() });
+    : t("dashboard.overviewGeneric", { type: tPluralLabel.toLowerCase() });
 
   const noWidgetsEnabled = !widgets.collection_stats && !widgets.usage_trends && !widgets.usage_chart && !widgets.depreciation;
 
@@ -93,32 +100,32 @@ const Dashboard = () => {
         <div className="space-y-3">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
             <StatsCard
-              title={t("dashboard.totalItems", { type: config.pluralLabel })}
+              title={t("dashboard.totalItems", { type: tPluralLabel })}
               value={stats.totalWatches}
               icon={Watch}
               variant="compact"
             />
             <StatsCard
-              title={t("dashboard.totalDays", { verb: config.usageVerbPast.charAt(0).toUpperCase() + config.usageVerbPast.slice(1) })}
+              title={t("dashboard.totalDays", { verb: tUsageVerbPast.charAt(0).toUpperCase() + tUsageVerbPast.slice(1) })}
               value={stats.totalDaysWorn}
               icon={Calendar}
               variant="compact"
             />
             <StatsCard
-              title={t("dashboard.mostUsedItem", { verb: config.usageVerbPast.charAt(0).toUpperCase() + config.usageVerbPast.slice(1), type: config.singularLabel })}
+              title={t("dashboard.mostUsedItem", { verb: tUsageVerbPast.charAt(0).toUpperCase() + tUsageVerbPast.slice(1), type: tSingularLabel })}
               value={stats.mostWornWatch ? `${stats.mostWornWatch.brand} ${stats.mostWornWatch.model}` : t("dashboard.na")}
               icon={TrendingUp}
               variant="compact"
               itemId={stats.mostWornWatch?.id}
             />
             <StatsCard
-              title={t("dashboard.avgDaysPerItem", { type: config.singularLabel })}
+              title={t("dashboard.avgDaysPerItem", { type: tSingularLabel })}
               value={stats.avgDaysPerWatch}
               icon={Target}
               variant="compact"
             />
             <StatsCard
-              title={t("dashboard.mostUsedColor", { verb: config.usageVerbPast.charAt(0).toUpperCase() + config.usageVerbPast.slice(1), color: config.primaryColorLabel })}
+              title={t("dashboard.mostUsedColor", { verb: tUsageVerbPast.charAt(0).toUpperCase() + tUsageVerbPast.slice(1), color: tPrimaryColorLabel })}
               value={stats.mostWornDialColor || t("dashboard.na")}
               icon={Palette}
               variant="compact"
@@ -132,7 +139,7 @@ const Dashboard = () => {
         <div className="space-y-3">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
             <StatsCard
-              title={t("dashboard.mostUsedType", { verb: config.usageVerbPast.charAt(0).toUpperCase() + config.usageVerbPast.slice(1), type: config.typeLabel })}
+              title={t("dashboard.mostUsedType", { verb: tUsageVerbPast.charAt(0).toUpperCase() + tUsageVerbPast.slice(1), type: tTypeLabel })}
               value={stats.mostWornStyle || t("dashboard.na")}
               icon={Shirt}
               variant="compact"
@@ -147,13 +154,13 @@ const Dashboard = () => {
             <StatsCard
               title={t("dashboard.trendingDown90d")}
               value={stats.trendingDownWatch ? `${stats.trendingDownWatch.brand} ${stats.trendingDownWatch.model}` : t("dashboard.na")}
-              subtitle={stats.trendingDownCount ? `${stats.trendingDownCount} ${config.pluralLabel.toLowerCase()} ↓` : undefined}
+              subtitle={stats.trendingDownCount ? `${stats.trendingDownCount} ${tPluralLabel.toLowerCase()} ↓` : undefined}
               icon={TrendingDown}
               variant="compact"
               itemId={stats.trendingDownWatch?.id}
             />
             <StatsCard
-              title={t("dashboard.topTripItem", { type: config.singularLabel })}
+              title={t("dashboard.topTripItem", { type: tSingularLabel })}
               value={stats.topTripWatch ? `${stats.topTripWatch.brand} ${stats.topTripWatch.model}` : t("dashboard.na")}
               icon={Plane}
               variant="compact"
@@ -228,7 +235,7 @@ const Dashboard = () => {
                 <p className="text-sm text-muted-foreground">
                   {t("dashboard.appreciatingItems", {
                     count: stats.appreciatingWatchesCount,
-                    type: stats.appreciatingWatchesCount > 1 ? config.pluralLabel.toLowerCase() : config.singularLabel.toLowerCase(),
+                    type: stats.appreciatingWatchesCount > 1 ? tPluralLabel.toLowerCase() : tSingularLabel.toLowerCase(),
                   })}
                 </p>
               </div>

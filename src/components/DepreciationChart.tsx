@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from "recharts";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 
 interface Watch {
   brand: string;
@@ -16,6 +17,7 @@ interface DepreciationChartProps {
 }
 
 export const DepreciationChart = ({ watches }: DepreciationChartProps) => {
+  const { t } = useTranslation();
   const [filterType, setFilterType] = useState<string>("all");
   const [selectedWatch, setSelectedWatch] = useState<string>("");
   const [comparisonMode, setComparisonMode] = useState<"price_paid" | "msrp">("price_paid");
@@ -24,7 +26,6 @@ export const DepreciationChart = ({ watches }: DepreciationChartProps) => {
     (w) => w.average_resale_price != null && w.average_resale_price > 0
   );
 
-  // Get unique brands and individual watches
   const brands = useMemo(() => {
     const uniqueBrands = Array.from(new Set(watchesWithResale.map(w => w.brand)));
     return uniqueBrands.sort();
@@ -39,7 +40,6 @@ export const DepreciationChart = ({ watches }: DepreciationChartProps) => {
     }));
   }, [watchesWithResale]);
 
-  // Calculate chart data based on filter
   const chartData = useMemo(() => {
     const getInvestedValue = (watch: Watch) => {
       if (comparisonMode === "msrp") {
@@ -49,14 +49,9 @@ export const DepreciationChart = ({ watches }: DepreciationChartProps) => {
     };
 
     if (filterType === "brand") {
-      // Group by brand and sum values
       const brandGroups = watchesWithResale.reduce((acc, watch) => {
         if (!acc[watch.brand]) {
-          acc[watch.brand] = {
-            invested: 0,
-            current: 0,
-            count: 0
-          };
+          acc[watch.brand] = { invested: 0, current: 0, count: 0 };
         }
         acc[watch.brand].invested += getInvestedValue(watch);
         acc[watch.brand].current += watch.average_resale_price || 0;
@@ -68,14 +63,13 @@ export const DepreciationChart = ({ watches }: DepreciationChartProps) => {
         .map(([brand, data]) => ({
           name: brand,
           brand,
-          model: `${data.count} watches`,
+          model: `${data.count} ${t("collectionConfig.pluralLabel").toLowerCase()}`,
           invested: data.invested,
           current: data.current,
           change: data.current - data.invested,
         }))
         .sort((a, b) => b.change - a.change);
     } else if (filterType === "watch" && selectedWatch) {
-      // Show single selected watch
       const watch = watchesWithResale.find(w => `${w.brand}-${w.model}` === selectedWatch);
       if (!watch) return [];
       
@@ -89,10 +83,8 @@ export const DepreciationChart = ({ watches }: DepreciationChartProps) => {
         change: (watch.average_resale_price || 0) - invested,
       }];
     } else {
-      // Show all watches with abbreviated names
       return watchesWithResale
         .map((watch) => {
-          // Create abbreviated name (first 3 letters of brand + first 3 of model)
           const abbrevBrand = watch.brand.substring(0, 3).toUpperCase();
           const abbrevModel = watch.model.split(' ')[0].substring(0, 4);
           const invested = getInvestedValue(watch);
@@ -107,17 +99,17 @@ export const DepreciationChart = ({ watches }: DepreciationChartProps) => {
         })
         .sort((a, b) => b.change - a.change);
     }
-  }, [watchesWithResale, filterType, selectedWatch, comparisonMode]);
+  }, [watchesWithResale, filterType, selectedWatch, comparisonMode, t]);
 
   if (chartData.length === 0) {
     return (
       <Card className="border-border bg-card">
         <CardHeader>
-          <CardTitle className="text-xl">Value Comparison</CardTitle>
+          <CardTitle className="text-xl">{t("depreciationChart.valueComparison")}</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground text-center py-8">
-            No resale data available. Add average resale prices to your watches to see value analysis.
+            {t("depreciationChart.noResaleData")}
           </p>
         </CardContent>
       </Card>
@@ -136,15 +128,15 @@ export const DepreciationChart = ({ watches }: DepreciationChartProps) => {
   return (
     <Card className="border-border bg-card">
       <CardHeader>
-        <CardTitle className="text-xl">Investment vs Market Value</CardTitle>
+        <CardTitle className="text-xl">{t("depreciationChart.investmentVsMarket")}</CardTitle>
         <div className="flex gap-2 mt-4 flex-wrap">
           <Select value={comparisonMode} onValueChange={(v) => setComparisonMode(v as "price_paid" | "msrp")}>
             <SelectTrigger className="w-[160px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="price_paid">Price Paid</SelectItem>
-              <SelectItem value="msrp">MSRP</SelectItem>
+              <SelectItem value="price_paid">{t("depreciationCard.pricePaid")}</SelectItem>
+              <SelectItem value="msrp">{t("depreciationCard.msrp")}</SelectItem>
             </SelectContent>
           </Select>
           
@@ -153,19 +145,19 @@ export const DepreciationChart = ({ watches }: DepreciationChartProps) => {
             setSelectedWatch("");
           }}>
             <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filter by..." />
+              <SelectValue placeholder={t("depreciationChart.filterBy")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Collection</SelectItem>
-              <SelectItem value="brand">By Brand</SelectItem>
-              <SelectItem value="watch">By Watch</SelectItem>
+              <SelectItem value="all">{t("depreciationChart.allCollection")}</SelectItem>
+              <SelectItem value="brand">{t("depreciationChart.byBrand")}</SelectItem>
+              <SelectItem value="watch">{t("depreciationChart.byWatch")}</SelectItem>
             </SelectContent>
           </Select>
           
           {filterType === "watch" && (
             <Select value={selectedWatch} onValueChange={setSelectedWatch}>
               <SelectTrigger className="w-[250px]">
-                <SelectValue placeholder="Select watch..." />
+                <SelectValue placeholder={t("depreciationChart.selectWatch")} />
               </SelectTrigger>
               <SelectContent>
                 {individualWatches.map(watch => (
@@ -213,22 +205,22 @@ export const DepreciationChart = ({ watches }: DepreciationChartProps) => {
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 bg-primary"></div>
                     <span className="text-sm text-muted-foreground">
-                      {comparisonMode === "msrp" ? "MSRP" : "Price Paid"}
+                      {comparisonMode === "msrp" ? t("depreciationCard.msrp") : t("depreciationCard.pricePaid")}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 bg-[#ef4444]"></div>
-                    <span className="text-sm text-muted-foreground">Current Value (Loss)</span>
+                    <span className="text-sm text-muted-foreground">{t("depreciationChart.currentValueLoss")}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 bg-[#22c55e]"></div>
-                    <span className="text-sm text-muted-foreground">Current Value (Gain)</span>
+                    <span className="text-sm text-muted-foreground">{t("depreciationChart.currentValueGain")}</span>
                   </div>
                 </div>
               )}
             />
-            <Bar dataKey="invested" fill="hsl(var(--primary))" name="Invested" radius={[8, 8, 0, 0]} />
-            <Bar dataKey="current" name="Current Value" radius={[8, 8, 0, 0]}>
+            <Bar dataKey="invested" fill="hsl(var(--primary))" name={t("depreciationChart.invested")} radius={[8, 8, 0, 0]} />
+            <Bar dataKey="current" name={t("depreciationChart.currentValue")} radius={[8, 8, 0, 0]}>
               {chartData.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
