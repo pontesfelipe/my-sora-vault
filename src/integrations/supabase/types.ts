@@ -1495,6 +1495,36 @@ export type Database = {
         }
         Relationships: []
       }
+      user_tags: {
+        Row: {
+          color: string | null
+          created_at: string
+          id: string
+          name: string
+          sort_order: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          sort_order?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          sort_order?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_trust_levels: {
         Row: {
           assigned_by: string | null
@@ -1672,6 +1702,42 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "watch_specs_watch_id_fkey"
+            columns: ["watch_id"]
+            isOneToOne: false
+            referencedRelation: "watches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      watch_tags: {
+        Row: {
+          created_at: string
+          id: string
+          tag_id: string
+          watch_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          tag_id: string
+          watch_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          tag_id?: string
+          watch_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "watch_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "user_tags"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "watch_tags_watch_id_fkey"
             columns: ["watch_id"]
             isOneToOne: false
             referencedRelation: "watches"

@@ -1,4 +1,4 @@
-import { Watch, Calendar, TrendingUp, Target, Palette, Flame, Plane, Droplets, TrendingDown, DollarSign, Shirt, Plus } from "lucide-react";
+import { Watch, Calendar, TrendingUp, Target, Palette, Flame, Plane, Droplets, TrendingDown, DollarSign, Shirt, Plus, Tag } from "lucide-react";
 import { StatsCard } from "@/components/StatsCard";
 import { UsageChart } from "@/components/UsageChart";
 import { DepreciationCard } from "@/components/DepreciationCard";
@@ -17,6 +17,8 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LayoutGrid } from "lucide-react";
 import { useWristCheck } from "@/contexts/WristCheckContext";
+import { useUserTags } from "@/hooks/useUserTags";
+import { useMemo } from "react";
 
 const Dashboard = () => {
   const { selectedCollectionId, currentCollection, currentCollectionConfig } = useCollection();
@@ -26,8 +28,20 @@ const Dashboard = () => {
   const { t } = useTranslation();
   const [widgets, setWidgets, widgetsLoading] = useCanvasWidgets();
   const { openWristCheck } = useWristCheck();
-
+  const { tags, watchTags, getWatchesForTag } = useUserTags();
   const stats = useStatsCalculations(watches, wearEntries, trips, waterUsages);
+
+  // Compute tag-based stats
+  const tagStats = useMemo(() => {
+    const collectionWatchIds = new Set(watches.map(w => w.id));
+    return tags.map(tag => {
+      const tagWatchIds = getWatchesForTag(tag.id).filter(id => collectionWatchIds.has(id));
+      const watchCount = tagWatchIds.length;
+      const wearCount = wearEntries.filter(we => tagWatchIds.includes(we.watch_id)).reduce((sum, we) => sum + (we.days || 1), 0);
+      return { tag, watchCount, wearCount };
+    });
+  }, [tags, watchTags, watches, wearEntries, getWatchesForTag]);
+
   const config = currentCollectionConfig;
 
   // Translated collection config labels
@@ -52,7 +66,7 @@ const Dashboard = () => {
     ? t("dashboard.overview", { name: currentCollection.name })
     : t("dashboard.overviewGeneric", { type: tPluralLabel.toLowerCase() });
 
-  const noWidgetsEnabled = !widgets.collection_stats && !widgets.usage_trends && !widgets.usage_chart && !widgets.depreciation;
+  const noWidgetsEnabled = !widgets.collection_stats && !widgets.usage_trends && !widgets.usage_chart && !widgets.depreciation && !tags.some(tag => widgets[`tag_${tag.id}`]);
 
   return (
     <div className="space-y-6">
@@ -250,6 +264,29 @@ const Dashboard = () => {
             )}
           </div>
           <DepreciationChart watches={watches} />
+        </div>
+      )}
+
+      {/* Tag-based Widgets */}
+      {tagStats.filter(ts => widgets[`tag_${ts.tag.id}`]).length > 0 && (
+        <div className="space-y-3">
+          <h2 className="text-lg font-semibold text-textMain flex items-center gap-2">
+            <Tag className="h-4 w-4" /> Tag Insights
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+            {tagStats
+              .filter(ts => widgets[`tag_${ts.tag.id}`])
+              .map(ts => (
+                <StatsCard
+                  key={ts.tag.id}
+                  title={ts.tag.name}
+                  value={`${ts.watchCount} item${ts.watchCount !== 1 ? 's' : ''}`}
+                  subtitle={`${ts.wearCount} day${ts.wearCount !== 1 ? 's' : ''} worn`}
+                  icon={Tag}
+                  variant="compact"
+                />
+              ))}
+          </div>
         </div>
       )}
     </div>
