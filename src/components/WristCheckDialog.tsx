@@ -611,20 +611,24 @@ export function WristCheckDialog() {
             <label className="text-sm font-medium text-textMain mb-2 block">
               <Tag className="h-3.5 w-3.5 inline mr-1" />{t("log.tags")}
             </label>
-            <div className="flex flex-wrap gap-2 mb-2">
-              {SUGGESTED_TAGS.map((tag) => (
-                <Badge key={tag} variant={tags.includes(tag) ? "default" : "outline"}
-                  className={`cursor-pointer transition-colors py-2 px-4 ${tags.includes(tag) ? "bg-accent text-accent-foreground" : "hover:bg-surfaceMuted"}`}
-                  onClick={() => toggleTag(tag)}>{tag}</Badge>
-              ))}
-            </div>
+            {userTags.length > 0 ? (
+              <div className="flex flex-wrap gap-2 mb-2">
+                {userTags.map((ut) => (
+                  <Badge key={ut.id} variant={tags.includes(ut.name) ? "default" : "outline"}
+                    className={`cursor-pointer transition-colors py-2 px-4 ${tags.includes(ut.name) ? "bg-accent text-accent-foreground" : "hover:bg-surfaceMuted"}`}
+                    onClick={() => toggleTag(ut.name)}>{ut.name}</Badge>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-muted-foreground mb-2">No tags created yet. Create tags in Settings or Canvas.</p>
+            )}
             <div className="flex gap-2">
               <Input placeholder={t("log.addCustomTag")} value={customTag} onChange={(e) => setCustomTag(e.target.value)} onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addCustomTag())} className="text-sm" />
               {customTag && <Button size="sm" variant="outline" onClick={addCustomTag}><Plus className="h-4 w-4" /></Button>}
             </div>
-            {tags.filter((t) => !SUGGESTED_TAGS.includes(t)).length > 0 && (
+            {tags.filter((tg) => !userTags.some(ut => ut.name === tg)).length > 0 && (
               <div className="flex flex-wrap gap-1.5 mt-2">
-                {tags.filter((t) => !SUGGESTED_TAGS.includes(t)).map((tag) => (
+                {tags.filter((tg) => !userTags.some(ut => ut.name === tg)).map((tag) => (
                   <Badge key={tag} className="gap-1 bg-accent text-accent-foreground">{tag}<X className="h-3 w-3 cursor-pointer" onClick={() => toggleTag(tag)} /></Badge>
                 ))}
               </div>
