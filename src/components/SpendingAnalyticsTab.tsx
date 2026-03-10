@@ -22,8 +22,9 @@ interface SpendingAnalyticsTabProps {
 export function SpendingAnalyticsTab({ watches }: SpendingAnalyticsTabProps) {
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const { currentCollectionConfig } = useCollection();
-  const itemLabel = currentCollectionConfig.singularLabel.toLowerCase();
-  const itemsLabel = currentCollectionConfig.pluralLabel.toLowerCase();
+  const { t } = useTranslation();
+  const itemLabel = t("collectionConfig.singularLabel").toLowerCase();
+  const itemsLabel = t("collectionConfig.pluralLabel").toLowerCase();
 
   // Calculate total spending
   const totalSpent = watches.reduce((sum, item) => sum + item.cost, 0);

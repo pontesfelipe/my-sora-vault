@@ -357,7 +357,7 @@ export const QuickAddWearDialog = ({ watches, onSuccess, collectionType: propTyp
           </div>
 
           <div className="space-y-2">
-            <Label>{t("quickAddWear.duration", { noun: config.usageNoun.charAt(0).toUpperCase() + config.usageNoun.slice(1) })}</Label>
+            <Label>{t("quickAddWear.duration", { noun: t("collectionConfig.usageNoun") })}</Label>
             <div className="flex gap-4 flex-wrap">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input

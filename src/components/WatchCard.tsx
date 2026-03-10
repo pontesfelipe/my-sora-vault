@@ -219,7 +219,7 @@ export const WatchCard = ({ watch, totalDays, onDelete }: WatchCardProps) => {
 
         <div className="space-y-2 sm:space-y-3 mb-3 sm:mb-4">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-textMuted">{currentCollectionConfig.primaryColorLabel}</span>
+            <span className="text-textMuted">{t("collectionConfig.primaryColorLabel")}</span>
             <span className="font-medium text-textMain">{watch.dial_color}</span>
           </div>
 

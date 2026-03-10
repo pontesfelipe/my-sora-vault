@@ -102,7 +102,7 @@ export const PastWatchesStats = ({ pastWatches, wearEntries }: PastWatchesStatsP
       <Card className="p-4 bg-surfaceMuted/50 border-borderSubtle">
         <div className="flex items-center gap-2 mb-2">
           <TrendingUp className="w-4 h-4 text-textMuted" />
-          <span className="text-xs text-textMuted">Most {currentCollectionConfig.usageVerbPast.charAt(0).toUpperCase() + currentCollectionConfig.usageVerbPast.slice(1)}</span>
+          <span className="text-xs text-textMuted">{t("pastWatches.mostUsed", { verb: t("collectionConfig.usageVerbPast") })}</span>
         </div>
         {mostUsedItem ? (
           <>

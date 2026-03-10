@@ -51,8 +51,8 @@ export const WarrantyNotifications = () => {
     return null;
   }
 
-  const singularLabel = config.singularLabel.toLowerCase();
-  const pluralLabel = config.pluralLabel.toLowerCase();
+  const singularLabel = t("collectionConfig.singularLabel").toLowerCase();
+  const pluralLabel = t("collectionConfig.pluralLabel").toLowerCase();
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
