@@ -145,6 +145,7 @@ export function CreatePostDialog({ onSubmit }: CreatePostDialogProps) {
               >
                 <Image className="h-4 w-4" />
                  {t("createPost.addImage")}
+              </Button>
             )}
           </div>
           <div className="flex justify-end gap-2">
