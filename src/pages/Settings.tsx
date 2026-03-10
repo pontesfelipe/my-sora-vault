@@ -28,6 +28,7 @@ import { LoginHistoryCard } from "@/components/LoginHistoryCard";
 import { AccountLinkingCard } from "@/components/AccountLinkingCard";
 import { DefaultCollectionCard } from "@/components/DefaultCollectionCard";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { TagManagerCard } from "@/components/TagManagerCard";
 import { NotificationSettingsSection } from "@/components/home/NotificationSettingsSection";
 import { PrivacySettingsCard } from "@/components/PrivacySettingsCard";
 import { useTheme } from "@/contexts/ThemeContext";
