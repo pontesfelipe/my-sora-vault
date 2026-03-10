@@ -11,8 +11,7 @@ import {
 import { usePasscode } from "@/contexts/PasscodeContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-
-const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+import { useTranslation } from "react-i18next";
 
 interface Watch {
   id: string;
@@ -36,36 +35,37 @@ interface UsageChartProps {
 }
 
 const WATCH_COLORS = [
-  "hsl(38, 92%, 50%)",   // Primary gold
-  "hsl(200, 80%, 50%)",  // Blue
-  "hsl(150, 70%, 45%)",  // Green
-  "hsl(280, 70%, 50%)",  // Purple
-  "hsl(20, 90%, 55%)",   // Orange
-  "hsl(340, 80%, 50%)",  // Pink
-  "hsl(180, 70%, 45%)",  // Cyan
-  "hsl(60, 80%, 50%)",   // Yellow
-  "hsl(120, 60%, 45%)",  // Lime
-  "hsl(260, 70%, 55%)",  // Indigo
-  "hsl(30, 85%, 55%)",   // Coral
-  "hsl(190, 75%, 45%)",  // Teal
-  "hsl(350, 75%, 50%)",  // Red
-  "hsl(160, 65%, 45%)",  // Turquoise
-  "hsl(290, 65%, 50%)",  // Violet
-  "hsl(50, 90%, 50%)",   // Gold
-  "hsl(210, 70%, 50%)",  // Sky
+  "hsl(38, 92%, 50%)",
+  "hsl(200, 80%, 50%)",
+  "hsl(150, 70%, 45%)",
+  "hsl(280, 70%, 50%)",
+  "hsl(20, 90%, 55%)",
+  "hsl(340, 80%, 50%)",
+  "hsl(180, 70%, 45%)",
+  "hsl(60, 80%, 50%)",
+  "hsl(120, 60%, 45%)",
+  "hsl(260, 70%, 55%)",
+  "hsl(30, 85%, 55%)",
+  "hsl(190, 75%, 45%)",
+  "hsl(350, 75%, 50%)",
+  "hsl(160, 65%, 45%)",
+  "hsl(290, 65%, 50%)",
+  "hsl(50, 90%, 50%)",
+  "hsl(210, 70%, 50%)",
 ];
 
-type Season = "Winter" | "Spring" | "Summer" | "Fall";
+type SeasonKey = "winter" | "spring" | "summer" | "fall";
 
-const getSeasonFromMonth = (monthIndex: number): Season => {
-  if (monthIndex === 11 || monthIndex === 0 || monthIndex === 1) return "Winter";
-  if (monthIndex >= 2 && monthIndex <= 4) return "Spring";
-  if (monthIndex >= 5 && monthIndex <= 7) return "Summer";
-  return "Fall";
+const getSeasonFromMonth = (monthIndex: number): SeasonKey => {
+  if (monthIndex === 11 || monthIndex === 0 || monthIndex === 1) return "winter";
+  if (monthIndex >= 2 && monthIndex <= 4) return "spring";
+  if (monthIndex >= 5 && monthIndex <= 7) return "summer";
+  return "fall";
 };
 
 export const UsageChart = ({ watches, wearEntries, onDataChange }: UsageChartProps) => {
   const { isAdmin } = useAuth();
+  const { t } = useTranslation();
   const [showAllBestValue, setShowAllBestValue] = useState(false);
   const [showAllNeedsWear, setShowAllNeedsWear] = useState(false);
   const [showCost, setShowCost] = useState(isAdmin);
@@ -85,14 +85,12 @@ export const UsageChart = ({ watches, wearEntries, onDataChange }: UsageChartPro
     }
   };
 
-  // Auto-show cost if already verified or if admin
   useEffect(() => {
     if (isVerified || isAdmin) {
       setShowCost(true);
     }
   }, [isVerified, isAdmin]);
 
-  // Calculate monthly breakdown by watch
   const monthlyBreakdown = Array(12).fill(0).map(() => ({})) as Array<Record<string, number>>;
   const watchTotals = new Map<string, number>();
   
@@ -108,18 +106,17 @@ export const UsageChart = ({ watches, wearEntries, onDataChange }: UsageChartPro
     }
   });
 
-  // Calculate seasonal trends with detailed breakdowns
-  const seasonalData: Record<Season, { 
+  const seasonalData: Record<SeasonKey, { 
     days: number; 
     cost: number; 
     watches: Map<string, number>;
     styles: Map<string, number>;
     colors: Map<string, number>;
   }> = {
-    Winter: { days: 0, cost: 0, watches: new Map(), styles: new Map(), colors: new Map() },
-    Spring: { days: 0, cost: 0, watches: new Map(), styles: new Map(), colors: new Map() },
-    Summer: { days: 0, cost: 0, watches: new Map(), styles: new Map(), colors: new Map() },
-    Fall: { days: 0, cost: 0, watches: new Map(), styles: new Map(), colors: new Map() },
+    winter: { days: 0, cost: 0, watches: new Map(), styles: new Map(), colors: new Map() },
+    spring: { days: 0, cost: 0, watches: new Map(), styles: new Map(), colors: new Map() },
+    summer: { days: 0, cost: 0, watches: new Map(), styles: new Map(), colors: new Map() },
+    fall: { days: 0, cost: 0, watches: new Map(), styles: new Map(), colors: new Map() },
   };
 
   wearEntries.forEach(entry => {
@@ -140,7 +137,6 @@ export const UsageChart = ({ watches, wearEntries, onDataChange }: UsageChartPro
     }
   });
 
-  // Calculate cost per use for each watch
   const watchCostPerUse = watches
     .map(watch => {
       const total = watchTotals.get(watch.id) || 0;
@@ -159,16 +155,15 @@ export const UsageChart = ({ watches, wearEntries, onDataChange }: UsageChartPro
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
         {/* Seasonal Trends */}
         <Card className="border-border bg-card p-4 sm:p-6">
-          <h3 className="text-base sm:text-lg font-semibold text-foreground mb-3 sm:mb-4">Seasonal Trends</h3>
+          <h3 className="text-base sm:text-lg font-semibold text-foreground mb-3 sm:mb-4">{t("usageChart.seasonalTrends")}</h3>
           <div className="space-y-6">
-            {(Object.entries(seasonalData) as [Season, typeof seasonalData[Season]][])
+            {(Object.entries(seasonalData) as [SeasonKey, typeof seasonalData[SeasonKey]][])
               .sort((a, b) => b[1].days - a[1].days)
               .map(([season, data]) => {
                 const maxSeasonDays = Math.max(...Object.values(seasonalData).map(s => s.days));
                 const percentage = (data.days / maxSeasonDays) * 100;
                 const avgCostPerDay = data.days > 0 ? data.cost / data.days : 0;
                 
-                // Get top watch, style, and color for this season
                 const topWatch = Array.from(data.watches.entries()).sort((a, b) => b[1] - a[1])[0];
                 const topStyle = Array.from(data.styles.entries()).sort((a, b) => b[1] - a[1])[0];
                 const topColor = Array.from(data.colors.entries()).sort((a, b) => b[1] - a[1])[0];
@@ -179,10 +174,10 @@ export const UsageChart = ({ watches, wearEntries, onDataChange }: UsageChartPro
                       <TooltipTrigger asChild>
                         <div className="space-y-2 cursor-pointer">
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-foreground font-medium">{season}</span>
+                            <span className="text-foreground font-medium">{t(`usageChart.seasons.${season}`)}</span>
                             <div className="flex items-center gap-2">
-                              <span className="text-muted-foreground">{data.days.toFixed(1)}d</span>
-                              {season === Object.entries(seasonalData).sort((a, b) => b[1].days - a[1].days)[0][0] ? (
+                              <span className="text-muted-foreground">{data.days.toFixed(1)}{t("usageChart.daysShort")}</span>
+                              {season === (Object.entries(seasonalData) as [SeasonKey, typeof seasonalData[SeasonKey]][]).sort((a, b) => b[1].days - a[1].days)[0][0] ? (
                                 <TrendingUp className="w-4 h-4 text-primary" />
                               ) : (
                                 <TrendingDown className="w-4 h-4 text-muted-foreground" />
@@ -211,38 +206,38 @@ export const UsageChart = ({ watches, wearEntries, onDataChange }: UsageChartPro
                       </TooltipTrigger>
                       <TooltipContent className="max-w-xs bg-card border-2 border-border z-50">
                         <div className="space-y-3 p-2">
-                          <p className="font-bold text-foreground">{season}</p>
+                          <p className="font-bold text-foreground">{t(`usageChart.seasons.${season}`)}</p>
                           <div className="space-y-2">
                             {showCost && (
-                              <p className="text-xs text-muted-foreground">Avg: ${avgCostPerDay.toFixed(0)}/day</p>
+                              <p className="text-xs text-muted-foreground">{t("usageChart.avgPerDay", { amount: avgCostPerDay.toFixed(0) })}</p>
                             )}
                             {topWatch && (
                               <div className="text-xs">
-                                <span className="text-muted-foreground">Top watch:</span>
+                                <span className="text-muted-foreground">{t("usageChart.topWatch")}:</span>
                                 <span className="ml-1 text-foreground font-medium">{topWatch[0]}</span>
-                                <span className="ml-1 text-muted-foreground">({topWatch[1].toFixed(1)}d)</span>
+                                <span className="ml-1 text-muted-foreground">({topWatch[1].toFixed(1)}{t("usageChart.daysShort")})</span>
                               </div>
                             )}
                             {data.styles.size > 0 && (
                               <div className="text-xs">
-                                <span className="text-muted-foreground">Styles:</span>
+                                <span className="text-muted-foreground">{t("usageChart.styles")}:</span>
                                 {Array.from(data.styles.entries())
                                   .sort((a, b) => b[1] - a[1])
                                   .map(([style, days]) => (
                                     <div key={style} className="ml-2">
-                                      {style}: {days.toFixed(1)}d
+                                      {style}: {days.toFixed(1)}{t("usageChart.daysShort")}
                                     </div>
                                   ))}
                               </div>
                             )}
                             {data.colors.size > 0 && (
                               <div className="text-xs">
-                                <span className="text-muted-foreground">Colors:</span>
+                                <span className="text-muted-foreground">{t("usageChart.colors")}:</span>
                                 {Array.from(data.colors.entries())
                                   .sort((a, b) => b[1] - a[1])
                                   .map(([color, days]) => (
                                     <div key={color} className="ml-2">
-                                      {color}: {days.toFixed(1)}d
+                                      {color}: {days.toFixed(1)}{t("usageChart.daysShort")}
                                     </div>
                                   ))}
                               </div>
@@ -263,7 +258,7 @@ export const UsageChart = ({ watches, wearEntries, onDataChange }: UsageChartPro
             <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
               <h3 className="text-base sm:text-lg font-semibold text-foreground flex items-center gap-1.5 sm:gap-2 truncate">
                 <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0" />
-                <span className="truncate">Best Value</span>
+                <span className="truncate">{t("usageChart.bestValue")}</span>
               </h3>
               <Button
                 variant="ghost"
@@ -283,7 +278,7 @@ export const UsageChart = ({ watches, wearEntries, onDataChange }: UsageChartPro
                 onClick={() => setShowAllBestValue(!showAllBestValue)}
                 className="text-xs text-primary hover:underline"
               >
-                {showAllBestValue ? 'Show less' : `Show all (${watchCostPerUse.length})`}
+                {showAllBestValue ? t("usageChart.showLess") : t("usageChart.showAll", { count: watchCostPerUse.length })}
               </button>
             )}
           </div>
@@ -296,16 +291,16 @@ export const UsageChart = ({ watches, wearEntries, onDataChange }: UsageChartPro
                   </span>
                   {showCost ? (
                     <Badge variant="secondary" className="text-xs shrink-0">
-                      ${watch.costPerUse.toFixed(0)}/day
+                      ${watch.costPerUse.toFixed(0)}/{t("usageChart.day")}
                     </Badge>
                   ) : (
                     <Badge variant="secondary" className="text-xs shrink-0">
-                      ••••/day
+                      ••••/{t("usageChart.day")}
                     </Badge>
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  {watch.total} days{showCost && ` • $${watch.cost.toLocaleString()} total`}
+                  {watch.total} {t("usageChart.days")}{showCost && ` • $${watch.cost.toLocaleString()} ${t("usageChart.total")}`}
                 </p>
               </div>
             ))}
@@ -317,14 +312,14 @@ export const UsageChart = ({ watches, wearEntries, onDataChange }: UsageChartPro
           <div className="flex items-center justify-between mb-3 sm:mb-4 gap-2">
             <h3 className="text-base sm:text-lg font-semibold text-foreground flex items-center gap-1.5 sm:gap-2 truncate">
               <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-destructive flex-shrink-0" />
-              <span className="truncate">Needs More Wear</span>
+              <span className="truncate">{t("usageChart.needsMoreWear")}</span>
             </h3>
             {watchCostPerUse.length > 5 && (
               <button
                 onClick={() => setShowAllNeedsWear(!showAllNeedsWear)}
                 className="text-xs text-primary hover:underline"
               >
-                {showAllNeedsWear ? 'Show less' : `Show all (${watchCostPerUse.length})`}
+                {showAllNeedsWear ? t("usageChart.showLess") : t("usageChart.showAll", { count: watchCostPerUse.length })}
               </button>
             )}
           </div>
@@ -337,16 +332,16 @@ export const UsageChart = ({ watches, wearEntries, onDataChange }: UsageChartPro
                   </span>
                   {showCost ? (
                     <Badge variant="destructive" className="text-xs shrink-0">
-                      ${watch.costPerUse.toFixed(0)}/day
+                      ${watch.costPerUse.toFixed(0)}/{t("usageChart.day")}
                     </Badge>
                   ) : (
                     <Badge variant="destructive" className="text-xs shrink-0">
-                      ••••/day
+                      ••••/{t("usageChart.day")}
                     </Badge>
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  {watch.total} days{showCost && ` • $${watch.cost.toLocaleString()} total`}
+                  {watch.total} {t("usageChart.days")}{showCost && ` • $${watch.cost.toLocaleString()} ${t("usageChart.total")}`}
                 </p>
               </div>
             ))}

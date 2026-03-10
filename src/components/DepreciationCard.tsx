@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingDown, TrendingUp, DollarSign } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface DepreciationCardProps {
   totalMSRP: number;
@@ -16,6 +17,7 @@ export const DepreciationCard = ({
   depreciation,
   depreciationPercent,
 }: DepreciationCardProps) => {
+  const { t } = useTranslation();
   const isAppreciation = depreciation < 0;
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -31,25 +33,25 @@ export const DepreciationCard = ({
       <CardHeader>
         <CardTitle className="text-xl flex items-center gap-2">
           <DollarSign className="w-5 h-5 text-primary" />
-          Pricing Comparison
+          {t("depreciationCard.pricingComparison")}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-3 gap-4">
           <div>
-            <p className="text-sm text-muted-foreground mb-1">MSRP</p>
+            <p className="text-sm text-muted-foreground mb-1">{t("depreciationCard.msrp")}</p>
             <p className="text-xl font-bold text-foreground">
-              {totalMSRP > 0 ? formatCurrency(totalMSRP) : "N/A"}
+              {totalMSRP > 0 ? formatCurrency(totalMSRP) : t("dashboard.na")}
             </p>
           </div>
           <div>
-            <p className="text-sm text-muted-foreground mb-1">Price Paid</p>
+            <p className="text-sm text-muted-foreground mb-1">{t("depreciationCard.pricePaid")}</p>
             <p className="text-xl font-bold text-foreground">
               {formatCurrency(pricePaid)}
             </p>
           </div>
           <div>
-            <p className="text-sm text-muted-foreground mb-1">Market Value</p>
+            <p className="text-sm text-muted-foreground mb-1">{t("depreciationCard.marketValue")}</p>
             <p className="text-xl font-bold text-foreground">
               {formatCurrency(marketValue)}
             </p>
@@ -66,7 +68,7 @@ export const DepreciationCard = ({
                   <TrendingDown className="w-5 h-5 text-red-500" />
                 )}
                 <span className="text-sm text-muted-foreground">
-                  From MSRP
+                  {t("depreciationCard.fromMSRP")}
                 </span>
               </div>
               <div className="text-right">
@@ -90,7 +92,7 @@ export const DepreciationCard = ({
                 <TrendingDown className="w-5 h-5 text-red-500" />
               )}
               <span className="text-sm text-muted-foreground">
-                From Price Paid
+                {t("depreciationCard.fromPricePaid")}
               </span>
             </div>
             <div className="text-right">
