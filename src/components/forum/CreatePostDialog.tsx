@@ -144,8 +144,7 @@ export function CreatePostDialog({ onSubmit }: CreatePostDialogProps) {
                 onClick={() => fileInputRef.current?.click()}
               >
                 <Image className="h-4 w-4" />
-                Add Image
-              </Button>
+                 {t("createPost.addImage")}
             )}
           </div>
           <div className="flex justify-end gap-2">
