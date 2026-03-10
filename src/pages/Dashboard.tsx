@@ -125,7 +125,7 @@ const Dashboard = () => {
               variant="compact"
             />
             <StatsCard
-              title={t("dashboard.mostUsedColor", { verb: config.usageVerbPast.charAt(0).toUpperCase() + config.usageVerbPast.slice(1), color: config.primaryColorLabel })}
+              title={t("dashboard.mostUsedColor", { verb: tUsageVerbPast.charAt(0).toUpperCase() + tUsageVerbPast.slice(1), color: tPrimaryColorLabel })}
               value={stats.mostWornDialColor || t("dashboard.na")}
               icon={Palette}
               variant="compact"
