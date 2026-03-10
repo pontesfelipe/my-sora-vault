@@ -143,10 +143,10 @@ export function CanvasWidgetManager({ widgets, onWidgetsChange }: CanvasWidgetMa
               >
                 <div className="space-y-0.5 flex-1">
                   <Label htmlFor={`widget-${key}`} className="font-medium text-sm">
-                    {t(WIDGET_I18N[key].label)}
+                    {t(WIDGET_I18N[key as string].label)}
                   </Label>
                   <p className="text-xs text-muted-foreground">
-                    {t(WIDGET_I18N[key].desc)}
+                    {t(WIDGET_I18N[key as string].desc)}
                   </p>
                 </div>
                 <Switch
