@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { SubmitFeedbackDialog } from "@/components/SubmitFeedbackDialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSocialNotifications } from "@/hooks/useSocialNotifications";
+import { useWristCheck } from "@/contexts/WristCheckContext";
 import {
   Sidebar,
   SidebarContent,
