@@ -24,7 +24,6 @@ export function AppNavigation() {
   const { t } = useTranslation();
   const { user, isAdmin, signOut } = useAuth();
   const { totalCount } = useSocialNotifications();
-  const { openWristCheck } = useWristCheck();
 
   const mainNavItems = [
     { title: t("nav.home"), url: "/", icon: Home },
