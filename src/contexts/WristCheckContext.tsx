@@ -18,7 +18,8 @@ export function WristCheckProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
   const [preSelectedWatchId, setPreSelectedWatchId] = useState<string | null>(null);
 
-  const openWristCheck = useCallback((watchId?: string) => {
+  const openWristCheck = useCallback((watchIdOrEvent?: string | React.MouseEvent | unknown) => {
+    const watchId = typeof watchIdOrEvent === 'string' ? watchIdOrEvent : undefined;
     setPreSelectedWatchId(watchId || null);
     setIsOpen(true);
   }, []);
