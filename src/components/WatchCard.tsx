@@ -52,7 +52,7 @@ export const WatchCard = ({ watch, totalDays, onDelete }: WatchCardProps) => {
   const { isAdmin } = useAuth();
   const { requestVerification, isVerified } = usePasscode();
   const { currentCollectionConfig, currentCollectionType } = useCollection();
-  const singularLabel = currentCollectionConfig.singularLabel;
+  const singularLabel = t("collectionConfig.singularLabel");
   const [showCost, setShowCost] = useState(isAdmin);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isFetchingPrice, setIsFetchingPrice] = useState(false);
