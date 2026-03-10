@@ -235,7 +235,7 @@ const Dashboard = () => {
                 <p className="text-sm text-muted-foreground">
                   {t("dashboard.appreciatingItems", {
                     count: stats.appreciatingWatchesCount,
-                    type: stats.appreciatingWatchesCount > 1 ? config.pluralLabel.toLowerCase() : config.singularLabel.toLowerCase(),
+                    type: stats.appreciatingWatchesCount > 1 ? tPluralLabel.toLowerCase() : tSingularLabel.toLowerCase(),
                   })}
                 </p>
               </div>
