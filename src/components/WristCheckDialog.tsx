@@ -392,6 +392,14 @@ export function WristCheckDialog() {
 
       if (error) throw error;
 
+      // Assign selected user tags to the watch
+      for (const tagName of tags) {
+        const matchingTag = userTags.find(ut => ut.name === tagName);
+        if (matchingTag) {
+          await assignTagToWatch(selectedWatchId, matchingTag.id);
+        }
+      }
+
       toast.success(t("log.wristCheckLogged"));
       refetch();
       closeWristCheck();
