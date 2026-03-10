@@ -1,4 +1,4 @@
-import { Home, Clock, Users, User, Menu, BarChart3 } from "lucide-react";
+import { Home, Users, User, Menu, BarChart3 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -6,18 +6,15 @@ import { triggerHaptic } from "@/utils/haptics";
 import { useSocialNotifications } from "@/hooks/useSocialNotifications";
 import { Badge } from "@/components/ui/badge";
 import { MobileMenuDrawer } from "@/components/MobileMenuDrawer";
-import { useWristCheck } from "@/contexts/WristCheckContext";
 
 export function BottomNavigation() {
   const location = useLocation();
   const { t } = useTranslation();
   const { totalCount } = useSocialNotifications();
-  const { openWristCheck } = useWristCheck();
 
   const navItems = [
     { title: t("nav.home"), url: "/", icon: Home },
     { title: t("nav.canvas"), url: "/canvas", icon: BarChart3 },
-    { title: t("nav.log"), url: "#wrist-check", icon: Clock, isAction: true },
     { title: t("nav.feed"), url: "/feed", icon: Users },
     { title: t("nav.profile"), url: "/profile", icon: User },
   ];
@@ -30,24 +27,10 @@ export function BottomNavigation() {
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-lg border-t border-borderSubtle md:hidden safe-area-bottom">
       <div className="flex items-center justify-around h-16 px-1">
         {navItems.map((item) => {
-          const isAction = (item as any).isAction;
-          const isActive = !isAction && (item.url === "/" 
+          const isActive = item.url === "/" 
             ? location.pathname === "/" 
-            : location.pathname.startsWith(item.url));
+            : location.pathname.startsWith(item.url);
           const showBadge = item.url === "/feed" && totalCount > 0;
-          
-          if (isAction) {
-            return (
-              <button
-                key={item.url}
-                onClick={() => { triggerHaptic('selection'); openWristCheck(); }}
-                className="flex flex-col items-center justify-center flex-1 h-full py-2 transition-colors touch-target text-textMuted"
-              >
-                <item.icon className="h-6 w-6 mb-1" />
-                <span className="text-[10px] font-medium">{item.title}</span>
-              </button>
-            );
-          }
           
           return (
             <NavLink

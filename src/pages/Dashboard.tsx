@@ -1,7 +1,6 @@
-import { Watch, Calendar, TrendingUp, Target, Palette, Flame, Plane, Droplets, TrendingDown, DollarSign, Shirt } from "lucide-react";
+import { Watch, Calendar, TrendingUp, Target, Palette, Flame, Plane, Droplets, TrendingDown, DollarSign, Shirt, Plus } from "lucide-react";
 import { StatsCard } from "@/components/StatsCard";
 import { UsageChart } from "@/components/UsageChart";
-import { QuickAddWearDialog } from "@/components/QuickAddWearDialog";
 import { DepreciationCard } from "@/components/DepreciationCard";
 import { DepreciationChart } from "@/components/DepreciationChart";
 import { CollectionSwitcher } from "@/components/CollectionSwitcher";
@@ -15,7 +14,9 @@ import { useCollection } from "@/contexts/CollectionContext";
 import { getCollectionConfig } from "@/types/collection";
 import { useTranslation } from "react-i18next";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { LayoutGrid } from "lucide-react";
+import { useWristCheck } from "@/contexts/WristCheckContext";
 
 const Dashboard = () => {
   const { selectedCollectionId, currentCollection, currentCollectionConfig } = useCollection();
@@ -24,6 +25,7 @@ const Dashboard = () => {
   const { waterUsages, loading: waterLoading } = useWaterUsageData();
   const { t } = useTranslation();
   const [widgets, setWidgets, widgetsLoading] = useCanvasWidgets();
+  const { openWristCheck } = useWristCheck();
 
   const stats = useStatsCalculations(watches, wearEntries, trips, waterUsages);
   const config = currentCollectionConfig;
@@ -67,7 +69,10 @@ const Dashboard = () => {
           </div>
         </div>
         <div className="mt-4 flex justify-center">
-          <QuickAddWearDialog watches={watches} onSuccess={refetch} />
+          <Button onClick={openWristCheck} variant="outline" size="sm" className="gap-2">
+            <Plus className="h-4 w-4" />
+            {t("home.wristCheck")}
+          </Button>
         </div>
       </div>
 
@@ -80,7 +85,10 @@ const Dashboard = () => {
         <div className="flex items-center gap-3">
           <CanvasWidgetManager widgets={widgets} onWidgetsChange={setWidgets} />
           <CollectionSwitcher />
-          <QuickAddWearDialog watches={watches} onSuccess={refetch} />
+          <Button onClick={openWristCheck} variant="outline" size="sm" className="gap-2">
+            <Plus className="h-4 w-4" />
+            {t("home.wristCheck")}
+          </Button>
         </div>
       </div>
 
