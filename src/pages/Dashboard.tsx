@@ -48,7 +48,7 @@ const Dashboard = () => {
 
   const subtitle = currentCollection
     ? t("dashboard.overview", { name: currentCollection.name })
-    : t("dashboard.overviewGeneric", { type: config.pluralLabel.toLowerCase() });
+    : t("dashboard.overviewGeneric", { type: tPluralLabel.toLowerCase() });
 
   const noWidgetsEnabled = !widgets.collection_stats && !widgets.usage_trends && !widgets.usage_chart && !widgets.depreciation;
 
