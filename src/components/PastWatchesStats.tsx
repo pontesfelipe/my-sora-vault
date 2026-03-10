@@ -91,7 +91,7 @@ export const PastWatchesStats = ({ pastWatches, wearEntries }: PastWatchesStatsP
       <Card className="p-4 bg-surfaceMuted/50 border-borderSubtle">
         <div className="flex items-center gap-2 mb-2">
           <Calendar className="w-4 h-4 text-textMuted" />
-          <span className="text-xs text-textMuted">{currentCollectionConfig.usageNoun.charAt(0).toUpperCase() + currentCollectionConfig.usageNoun.slice(1)} Days</span>
+          <span className="text-xs text-textMuted">{t("collectionConfig.usageNoun")} {t("pastWatches.days")}</span>
         </div>
         <p className="text-2xl font-bold text-textMain">{totalWearDays}</p>
         <p className="text-xs text-textMuted mt-1">
