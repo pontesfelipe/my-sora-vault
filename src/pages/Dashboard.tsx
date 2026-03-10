@@ -112,7 +112,7 @@ const Dashboard = () => {
               variant="compact"
             />
             <StatsCard
-              title={t("dashboard.mostUsedItem", { verb: config.usageVerbPast.charAt(0).toUpperCase() + config.usageVerbPast.slice(1), type: config.singularLabel })}
+              title={t("dashboard.mostUsedItem", { verb: tUsageVerbPast.charAt(0).toUpperCase() + tUsageVerbPast.slice(1), type: tSingularLabel })}
               value={stats.mostWornWatch ? `${stats.mostWornWatch.brand} ${stats.mostWornWatch.model}` : t("dashboard.na")}
               icon={TrendingUp}
               variant="compact"
