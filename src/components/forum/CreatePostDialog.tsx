@@ -154,10 +154,10 @@ export function CreatePostDialog({ onSubmit }: CreatePostDialogProps) {
               variant="outline"
               onClick={() => setOpen(false)}
             >
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isSubmitting || !title.trim()}>
-              {isSubmitting ? "Posting..." : "Post"}
+               {t("createPost.cancel")}
+             </Button>
+             <Button type="submit" disabled={isSubmitting || !title.trim()}>
+               {isSubmitting ? t("createPost.posting") : t("createPost.post")}
             </Button>
           </div>
         </form>
