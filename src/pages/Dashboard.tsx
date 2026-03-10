@@ -53,7 +53,20 @@ const Dashboard = () => {
     ? t("dashboard.overview", { name: currentCollection.name })
     : t("dashboard.overviewGeneric", { type: tPluralLabel.toLowerCase() });
 
-  const noWidgetsEnabled = !widgets.collection_stats && !widgets.usage_trends && !widgets.usage_chart && !widgets.depreciation;
+  const stats = useStatsCalculations(watches, wearEntries, trips, waterUsages);
+
+  // Compute tag-based stats
+  const tagStats = useMemo(() => {
+    const collectionWatchIds = new Set(watches.map(w => w.id));
+    return tags.map(tag => {
+      const tagWatchIds = getWatchesForTag(tag.id).filter(id => collectionWatchIds.has(id));
+      const watchCount = tagWatchIds.length;
+      const wearCount = wearEntries.filter(we => tagWatchIds.includes(we.watch_id)).reduce((sum, we) => sum + (we.days || 1), 0);
+      return { tag, watchCount, wearCount };
+    });
+  }, [tags, watchTags, watches, wearEntries, getWatchesForTag]);
+
+  const noWidgetsEnabled = !widgets.collection_stats && !widgets.usage_trends && !widgets.usage_chart && !widgets.depreciation && !tags.some(tag => widgets[`tag_${tag.id}`]);
 
   return (
     <div className="space-y-6">
