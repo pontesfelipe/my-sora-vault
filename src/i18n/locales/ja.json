@@ -926,5 +926,20 @@
     "searching": "検索中...",
     "noResults": "「{{query}}」の結果はありません",
     "logAsWristCheck": "「{{query}}」をリストチェックとして記録"
+  },
+  "createPost": {
+    "button": "投稿を作成",
+    "title": "新しい投稿を作成",
+    "category": "カテゴリー",
+    "selectCategory": "カテゴリーを選択",
+    "titleLabel": "タイトル",
+    "titlePlaceholder": "何を考えていますか？",
+    "contentLabel": "内容",
+    "contentPlaceholder": "考え、質問、発見を共有しましょう...",
+    "imageOptional": "画像（任意）",
+    "addImage": "画像を追加",
+    "cancel": "キャンセル",
+    "post": "投稿",
+    "posting": "投稿中..."
   }
 }

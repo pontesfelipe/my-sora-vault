@@ -67,19 +67,19 @@ export function CreatePostDialog({ onSubmit }: CreatePostDialogProps) {
       <DialogTrigger asChild>
         <Button className="gap-2">
           <Plus className="h-4 w-4" />
-          Create Post
+          {t("createPost.button")}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Create a new post</DialogTitle>
+          <DialogTitle>{t("createPost.title")}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="category">Category</Label>
+            <Label htmlFor="category">{t("createPost.category")}</Label>
             <Select value={category} onValueChange={setCategory}>
               <SelectTrigger>
-                <SelectValue placeholder="Select a category" />
+                <SelectValue placeholder={t("createPost.selectCategory")} />
               </SelectTrigger>
               <SelectContent>
                 {FORUM_CATEGORIES.map((cat) => (
@@ -91,27 +91,27 @@ export function CreatePostDialog({ onSubmit }: CreatePostDialogProps) {
             </Select>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="title">Title</Label>
+            <Label htmlFor="title">{t("createPost.titleLabel")}</Label>
             <Input
               id="title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="What's on your mind?"
+              placeholder={t("createPost.titlePlaceholder")}
               required
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="content">Content</Label>
+            <Label htmlFor="content">{t("createPost.contentLabel")}</Label>
             <Textarea
               id="content"
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="Share your thoughts, questions, or discoveries..."
+              placeholder={t("createPost.contentPlaceholder")}
               rows={4}
             />
           </div>
           <div className="space-y-2">
-            <Label>Image (optional)</Label>
+            <Label>{t("createPost.imageOptional")}</Label>
             <input
               ref={fileInputRef}
               type="file"
@@ -144,7 +144,7 @@ export function CreatePostDialog({ onSubmit }: CreatePostDialogProps) {
                 onClick={() => fileInputRef.current?.click()}
               >
                 <Image className="h-4 w-4" />
-                Add Image
+                 {t("createPost.addImage")}
               </Button>
             )}
           </div>
@@ -154,10 +154,10 @@ export function CreatePostDialog({ onSubmit }: CreatePostDialogProps) {
               variant="outline"
               onClick={() => setOpen(false)}
             >
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isSubmitting || !title.trim()}>
-              {isSubmitting ? "Posting..." : "Post"}
+               {t("createPost.cancel")}
+             </Button>
+             <Button type="submit" disabled={isSubmitting || !title.trim()}>
+               {isSubmitting ? t("createPost.posting") : t("createPost.post")}
             </Button>
           </div>
         </form>

@@ -931,5 +931,20 @@
     "searching": "Searching...",
     "noResults": "No results for \"{{query}}\"",
     "logAsWristCheck": "Log \"{{query}}\" as a wrist check"
+  },
+  "createPost": {
+    "button": "Create Post",
+    "title": "Create a new post",
+    "category": "Category",
+    "selectCategory": "Select a category",
+    "titleLabel": "Title",
+    "titlePlaceholder": "What's on your mind?",
+    "contentLabel": "Content",
+    "contentPlaceholder": "Share your thoughts, questions, or discoveries...",
+    "imageOptional": "Image (optional)",
+    "addImage": "Add Image",
+    "cancel": "Cancel",
+    "post": "Post",
+    "posting": "Posting..."
   }
 }
