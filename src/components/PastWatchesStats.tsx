@@ -27,7 +27,8 @@ interface PastWatchesStatsProps {
 
 export const PastWatchesStats = ({ pastWatches, wearEntries }: PastWatchesStatsProps) => {
   const { currentCollectionConfig, currentCollectionType } = useCollection();
-  const itemLabel = currentCollectionConfig.singularLabel.toLowerCase();
+  const { t } = useTranslation();
+  const itemLabel = t("collectionConfig.singularLabel").toLowerCase();
   
   const totalPastItems = pastWatches.length;
   const soldCount = pastWatches.filter(w => w.status === 'sold').length;
