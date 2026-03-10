@@ -119,7 +119,7 @@ const Dashboard = () => {
               itemId={stats.mostWornWatch?.id}
             />
             <StatsCard
-              title={t("dashboard.avgDaysPerItem", { type: config.singularLabel })}
+              title={t("dashboard.avgDaysPerItem", { type: tSingularLabel })}
               value={stats.avgDaysPerWatch}
               icon={Target}
               variant="compact"
