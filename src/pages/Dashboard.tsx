@@ -160,7 +160,7 @@ const Dashboard = () => {
               itemId={stats.trendingDownWatch?.id}
             />
             <StatsCard
-              title={t("dashboard.topTripItem", { type: config.singularLabel })}
+              title={t("dashboard.topTripItem", { type: tSingularLabel })}
               value={stats.topTripWatch ? `${stats.topTripWatch.brand} ${stats.topTripWatch.model}` : t("dashboard.na")}
               icon={Plane}
               variant="compact"
