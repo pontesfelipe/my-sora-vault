@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, Watch } from "lucide-react";
+import { useWristCheck } from "@/contexts/WristCheckContext";
 import { Button } from "@/components/ui/button";
 import { useWatchData } from "@/hooks/useWatchData";
 import { useCollection } from "@/contexts/CollectionContext";
@@ -22,6 +23,7 @@ const Home = () => {
   const [quickLogWatch, setQuickLogWatch] = useState<any>(null);
   const [quickLogOpen, setQuickLogOpen] = useState(false);
   const { t, i18n } = useTranslation();
+  const { openWristCheck } = useWristCheck();
 
   const dateLocale = useMemo(() => {
     const localeMap: Record<string, Locale> = { en: enUS, es, fr, pt, ja, zh: zhCN };
@@ -100,7 +102,7 @@ const Home = () => {
         {/* Quick Log CTA */}
         <motion.div whileTap={{ scale: 0.98 }}>
           <Button
-            onClick={() => navigate("/log")}
+            onClick={openWristCheck}
             className="w-full h-14 rounded-2xl text-base font-semibold gap-3 shadow-luxury active:scale-[0.98] transition-transform"
             size="lg"
           >

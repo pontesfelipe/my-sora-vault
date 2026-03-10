@@ -102,7 +102,7 @@ function AnimatedRoutes() {
             
             {/* Core 4 tabs */}
             <Route path="/" element={<ProtectedRoute><AppLayout><Home /></AppLayout></ProtectedRoute>} />
-            <Route path="/log" element={<ProtectedRoute><AppLayout><Log /></AppLayout></ProtectedRoute>} />
+            <Route path="/log" element={<Navigate to="/" replace />} />
             <Route path="/feed" element={<ProtectedRoute><AppLayout><Feed /></AppLayout></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><AppLayout><Profile /></AppLayout></ProtectedRoute>} />
             
@@ -124,10 +124,10 @@ function AnimatedRoutes() {
             <Route path="/social" element={<Navigate to="/feed" replace />} />
             <Route path="/messages" element={<Navigate to="/feed?tab=messages" replace />} />
             <Route path="/forum" element={<Navigate to="/feed?tab=forum" replace />} />
-            <Route path="/usage-details" element={<Navigate to="/log" replace />} />
+            <Route path="/usage-details" element={<Navigate to="/" replace />} />
             <Route path="/personal-notes" element={<Navigate to="/profile" replace />} />
             <Route path="/wishlist" element={<Navigate to="/profile?tab=wishlist" replace />} />
-            <Route path="/trips" element={<Navigate to="/log" replace />} />
+            <Route path="/trips" element={<Navigate to="/" replace />} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

@@ -18,7 +18,8 @@ import {
 import { motion, AnimatePresence, type PanInfo } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { useWristCheck } from "@/contexts/WristCheckContext";
+
 
 interface WearCalendarProps {
   watches: any[];
@@ -34,7 +35,7 @@ export const WearCalendar = ({ watches, wearEntries, onWatchTap }: WearCalendarP
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [swipeDirection, setSwipeDirection] = useState(0);
   const { t } = useTranslation();
-  const navigate = useNavigate();
+  const { openWristCheck } = useWristCheck();
 
   const isCurrentWeek = isSameWeek(selectedWeekDate, new Date(), { weekStartsOn: 1 });
 
@@ -121,8 +122,7 @@ export const WearCalendar = ({ watches, wearEntries, onWatchTap }: WearCalendarP
 
   const handleDayTap = (dateKey: string, hasEntry: boolean) => {
     if (!hasEntry) {
-      // Navigate to log page with date pre-selected
-      navigate(`/log?date=${dateKey}`);
+      openWristCheck();
       return;
     }
     setSelectedDay((prev) => (prev === dateKey ? null : dateKey));

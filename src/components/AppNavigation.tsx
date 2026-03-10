@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { SubmitFeedbackDialog } from "@/components/SubmitFeedbackDialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSocialNotifications } from "@/hooks/useSocialNotifications";
+import { useWristCheck } from "@/contexts/WristCheckContext";
 import {
   Sidebar,
   SidebarContent,
@@ -24,11 +25,12 @@ export function AppNavigation() {
   const { t } = useTranslation();
   const { user, isAdmin, signOut } = useAuth();
   const { totalCount } = useSocialNotifications();
+  const { openWristCheck } = useWristCheck();
 
   const mainNavItems = [
     { title: t("nav.home"), url: "/", icon: Home },
     { title: t("nav.canvas"), url: "/canvas", icon: BarChart3 },
-    { title: t("nav.log"), url: "/log", icon: Clock },
+    { title: t("nav.log"), url: "#wrist-check", icon: Clock, isAction: true },
     { title: t("nav.feed"), url: "/feed", icon: Users },
     { title: t("nav.profile"), url: "/profile", icon: User },
   ];
@@ -56,8 +58,26 @@ export function AppNavigation() {
           </div>
           <SidebarMenu className="space-y-1 px-2">
             {mainNavItems.map((item) => {
-              const isActive = item.url === "/" ? location.pathname === "/" : location.pathname.startsWith(item.url);
+              const isAction = (item as any).isAction;
+              const isActive = !isAction && (item.url === "/" ? location.pathname === "/" : location.pathname.startsWith(item.url));
               const showBadge = item.url === "/feed" && totalCount > 0;
+              
+              if (isAction) {
+                return (
+                  <SidebarMenuItem key={item.url}>
+                    <SidebarMenuButton asChild>
+                      <button
+                        onClick={openWristCheck}
+                        className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm transition-colors relative text-textMuted hover:bg-surfaceMuted hover:text-textMain w-full"
+                      >
+                        <item.icon className="h-5 w-5" />
+                        {open && <span>{item.title}</span>}
+                      </button>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              }
+              
               return (
                 <SidebarMenuItem key={item.url}>
                   <SidebarMenuButton asChild isActive={isActive}>

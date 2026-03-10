@@ -9,6 +9,7 @@ import { useWatchData } from "@/hooks/useWatchData";
 import { useCollection } from "@/contexts/CollectionContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
+import { useWristCheck } from "@/contexts/WristCheckContext";
 
 interface SearchResult {
   type: "watch" | "user" | "tag";
@@ -30,6 +31,7 @@ export function GlobalSearch() {
   const { selectedCollectionId } = useCollection();
   const { watches } = useWatchData(selectedCollectionId);
   const { t } = useTranslation();
+  const { openWristCheck } = useWristCheck();
 
   // Close on click outside
   useEffect(() => {
@@ -130,14 +132,14 @@ export function GlobalSearch() {
     } else if (result.type === "user") {
       navigate(`/user/${result.id}`);
     } else if (result.type === "tag") {
-      navigate(`/log`);
+      openWristCheck();
     }
     setIsOpen(false);
     setQuery("");
   };
 
   const handleQuickLog = () => {
-    navigate("/log");
+    openWristCheck();
     setIsOpen(false);
     setQuery("");
   };
