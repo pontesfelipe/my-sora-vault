@@ -95,7 +95,7 @@ export const PastWatchesStats = ({ pastWatches, wearEntries }: PastWatchesStatsP
         </div>
         <p className="text-2xl font-bold text-textMain">{totalWearDays}</p>
         <p className="text-xs text-textMuted mt-1">
-          Avg: {avgDaysPerItem} days/{itemLabel}
+          {t("pastWatches.avg")}: {avgDaysPerItem} {t("pastWatches.days")}/{itemLabel}
         </p>
       </Card>
 
