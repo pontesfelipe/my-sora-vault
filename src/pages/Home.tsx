@@ -102,7 +102,7 @@ const Home = () => {
         {/* Quick Log CTA */}
         <motion.div whileTap={{ scale: 0.98 }}>
           <Button
-            onClick={() => navigate("/log")}
+            onClick={openWristCheck}
             className="w-full h-14 rounded-2xl text-base font-semibold gap-3 shadow-luxury active:scale-[0.98] transition-transform"
             size="lg"
           >

@@ -25,11 +25,12 @@ export function AppNavigation() {
   const { t } = useTranslation();
   const { user, isAdmin, signOut } = useAuth();
   const { totalCount } = useSocialNotifications();
+  const { openWristCheck } = useWristCheck();
 
   const mainNavItems = [
     { title: t("nav.home"), url: "/", icon: Home },
     { title: t("nav.canvas"), url: "/canvas", icon: BarChart3 },
-    { title: t("nav.log"), url: "/log", icon: Clock },
+    { title: t("nav.log"), url: "#wrist-check", icon: Clock, isAction: true },
     { title: t("nav.feed"), url: "/feed", icon: Users },
     { title: t("nav.profile"), url: "/profile", icon: User },
   ];
