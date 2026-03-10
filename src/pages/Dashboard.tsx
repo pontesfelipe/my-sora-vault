@@ -100,7 +100,7 @@ const Dashboard = () => {
         <div className="space-y-3">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
             <StatsCard
-              title={t("dashboard.totalItems", { type: config.pluralLabel })}
+              title={t("dashboard.totalItems", { type: tPluralLabel })}
               value={stats.totalWatches}
               icon={Watch}
               variant="compact"
