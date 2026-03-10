@@ -25,6 +25,7 @@ const Dashboard = () => {
   const { waterUsages, loading: waterLoading } = useWaterUsageData();
   const { t } = useTranslation();
   const [widgets, setWidgets, widgetsLoading] = useCanvasWidgets();
+  const { openWristCheck } = useWristCheck();
 
   const stats = useStatsCalculations(watches, wearEntries, trips, waterUsages);
   const config = currentCollectionConfig;
