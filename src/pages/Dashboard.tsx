@@ -139,7 +139,7 @@ const Dashboard = () => {
         <div className="space-y-3">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
             <StatsCard
-              title={t("dashboard.mostUsedType", { verb: config.usageVerbPast.charAt(0).toUpperCase() + config.usageVerbPast.slice(1), type: config.typeLabel })}
+              title={t("dashboard.mostUsedType", { verb: tUsageVerbPast.charAt(0).toUpperCase() + tUsageVerbPast.slice(1), type: tTypeLabel })}
               value={stats.mostWornStyle || t("dashboard.na")}
               icon={Shirt}
               variant="compact"
