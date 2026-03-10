@@ -124,10 +124,10 @@ function AnimatedRoutes() {
             <Route path="/social" element={<Navigate to="/feed" replace />} />
             <Route path="/messages" element={<Navigate to="/feed?tab=messages" replace />} />
             <Route path="/forum" element={<Navigate to="/feed?tab=forum" replace />} />
-            <Route path="/usage-details" element={<Navigate to="/log" replace />} />
+            <Route path="/usage-details" element={<Navigate to="/" replace />} />
             <Route path="/personal-notes" element={<Navigate to="/profile" replace />} />
             <Route path="/wishlist" element={<Navigate to="/profile?tab=wishlist" replace />} />
-            <Route path="/trips" element={<Navigate to="/log" replace />} />
+            <Route path="/trips" element={<Navigate to="/" replace />} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
