@@ -2,24 +2,34 @@ import { createContext, useContext, useState, ReactNode, useCallback } from "rea
 
 interface WristCheckContextType {
   isOpen: boolean;
-  openWristCheck: () => void;
+  preSelectedWatchId: string | null;
+  openWristCheck: (watchIdOrEvent?: string | React.MouseEvent | unknown) => void;
   closeWristCheck: () => void;
 }
 
 const WristCheckContext = createContext<WristCheckContextType>({
   isOpen: false,
+  preSelectedWatchId: null,
   openWristCheck: () => {},
   closeWristCheck: () => {},
 });
 
 export function WristCheckProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [preSelectedWatchId, setPreSelectedWatchId] = useState<string | null>(null);
 
-  const openWristCheck = useCallback(() => setIsOpen(true), []);
-  const closeWristCheck = useCallback(() => setIsOpen(false), []);
+  const openWristCheck = useCallback((watchIdOrEvent?: string | React.MouseEvent | unknown) => {
+    const watchId = typeof watchIdOrEvent === 'string' ? watchIdOrEvent : undefined;
+    setPreSelectedWatchId(watchId || null);
+    setIsOpen(true);
+  }, []);
+  const closeWristCheck = useCallback(() => {
+    setIsOpen(false);
+    setPreSelectedWatchId(null);
+  }, []);
 
   return (
-    <WristCheckContext.Provider value={{ isOpen, openWristCheck, closeWristCheck }}>
+    <WristCheckContext.Provider value={{ isOpen, preSelectedWatchId, openWristCheck, closeWristCheck }}>
       {children}
     </WristCheckContext.Provider>
   );

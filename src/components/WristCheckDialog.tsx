@@ -25,7 +25,7 @@ const SUGGESTED_TAGS = [
 ];
 
 export function WristCheckDialog() {
-  const { isOpen, closeWristCheck } = useWristCheck();
+  const { isOpen, preSelectedWatchId, closeWristCheck } = useWristCheck();
   const { user } = useAuth();
   const { selectedCollectionId } = useCollection();
   const { watches, refetch } = useWatchData(selectedCollectionId);
@@ -69,7 +69,7 @@ export function WristCheckDialog() {
   // Reset state when dialog opens
   useEffect(() => {
     if (isOpen) {
-      setSelectedWatchId("");
+      setSelectedWatchId(preSelectedWatchId || "");
       setDate(format(new Date(), "yyyy-MM-dd"));
       setTags([]);
       setCustomTag("");
@@ -84,7 +84,7 @@ export function WristCheckDialog() {
       setAddWatchPrefill(null);
       setRejectedSuggestions([]);
     }
-  }, [isOpen]);
+  }, [isOpen, preSelectedWatchId]);
 
   const selectedWatch = watches.find((w) => w.id === selectedWatchId);
 
