@@ -1,4 +1,4 @@
-import { Watch, Calendar, TrendingUp, Target, Palette, Flame, Plane, Droplets, TrendingDown, DollarSign, Shirt, Plus } from "lucide-react";
+import { Watch, Calendar, TrendingUp, Target, Palette, Flame, Plane, Droplets, TrendingDown, DollarSign, Shirt, Plus, Tag } from "lucide-react";
 import { StatsCard } from "@/components/StatsCard";
 import { UsageChart } from "@/components/UsageChart";
 import { DepreciationCard } from "@/components/DepreciationCard";
@@ -17,6 +17,8 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LayoutGrid } from "lucide-react";
 import { useWristCheck } from "@/contexts/WristCheckContext";
+import { useUserTags } from "@/hooks/useUserTags";
+import { useMemo } from "react";
 
 const Dashboard = () => {
   const { selectedCollectionId, currentCollection, currentCollectionConfig } = useCollection();
@@ -26,8 +28,7 @@ const Dashboard = () => {
   const { t } = useTranslation();
   const [widgets, setWidgets, widgetsLoading] = useCanvasWidgets();
   const { openWristCheck } = useWristCheck();
-
-  const stats = useStatsCalculations(watches, wearEntries, trips, waterUsages);
+  const { tags, watchTags, getWatchesForTag } = useUserTags();
   const config = currentCollectionConfig;
 
   // Translated collection config labels
