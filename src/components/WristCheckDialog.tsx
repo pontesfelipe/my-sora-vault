@@ -69,7 +69,7 @@ export function WristCheckDialog() {
   // Reset state when dialog opens
   useEffect(() => {
     if (isOpen) {
-      setSelectedWatchId("");
+      setSelectedWatchId(preSelectedWatchId || "");
       setDate(format(new Date(), "yyyy-MM-dd"));
       setTags([]);
       setCustomTag("");
@@ -84,7 +84,7 @@ export function WristCheckDialog() {
       setAddWatchPrefill(null);
       setRejectedSuggestions([]);
     }
-  }, [isOpen]);
+  }, [isOpen, preSelectedWatchId]);
 
   const selectedWatch = watches.find((w) => w.id === selectedWatchId);
 
