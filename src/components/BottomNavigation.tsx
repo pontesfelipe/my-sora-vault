@@ -6,16 +6,18 @@ import { triggerHaptic } from "@/utils/haptics";
 import { useSocialNotifications } from "@/hooks/useSocialNotifications";
 import { Badge } from "@/components/ui/badge";
 import { MobileMenuDrawer } from "@/components/MobileMenuDrawer";
+import { useWristCheck } from "@/contexts/WristCheckContext";
 
 export function BottomNavigation() {
   const location = useLocation();
   const { t } = useTranslation();
   const { totalCount } = useSocialNotifications();
+  const { openWristCheck } = useWristCheck();
 
   const navItems = [
     { title: t("nav.home"), url: "/", icon: Home },
     { title: t("nav.canvas"), url: "/canvas", icon: BarChart3 },
-    { title: t("nav.log"), url: "/log", icon: Clock },
+    { title: t("nav.log"), url: "#wrist-check", icon: Clock, isAction: true },
     { title: t("nav.feed"), url: "/feed", icon: Users },
     { title: t("nav.profile"), url: "/profile", icon: User },
   ];
