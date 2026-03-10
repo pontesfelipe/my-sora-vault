@@ -1,7 +1,6 @@
-import { Watch, Calendar, TrendingUp, Target, Palette, Flame, Plane, Droplets, TrendingDown, DollarSign, Shirt } from "lucide-react";
+import { Watch, Calendar, TrendingUp, Target, Palette, Flame, Plane, Droplets, TrendingDown, DollarSign, Shirt, Plus } from "lucide-react";
 import { StatsCard } from "@/components/StatsCard";
 import { UsageChart } from "@/components/UsageChart";
-import { QuickAddWearDialog } from "@/components/QuickAddWearDialog";
 import { DepreciationCard } from "@/components/DepreciationCard";
 import { DepreciationChart } from "@/components/DepreciationChart";
 import { CollectionSwitcher } from "@/components/CollectionSwitcher";
@@ -15,7 +14,9 @@ import { useCollection } from "@/contexts/CollectionContext";
 import { getCollectionConfig } from "@/types/collection";
 import { useTranslation } from "react-i18next";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { LayoutGrid } from "lucide-react";
+import { useWristCheck } from "@/contexts/WristCheckContext";
 
 const Dashboard = () => {
   const { selectedCollectionId, currentCollection, currentCollectionConfig } = useCollection();
