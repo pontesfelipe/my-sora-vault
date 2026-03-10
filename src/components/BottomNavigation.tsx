@@ -11,7 +11,6 @@ export function BottomNavigation() {
   const location = useLocation();
   const { t } = useTranslation();
   const { totalCount } = useSocialNotifications();
-  const { openWristCheck } = useWristCheck();
 
   const navItems = [
     { title: t("nav.home"), url: "/", icon: Home },
