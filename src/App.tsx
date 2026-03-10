@@ -109,7 +109,7 @@ function AnimatedRoutes() {
             {/* Utility pages */}
             <Route path="/canvas" element={<ProtectedRoute><AppLayout><Canvas /></AppLayout></ProtectedRoute>} />
             <Route path="/vault-pal" element={<ProtectedRoute><AppLayout><VaultPal /></AppLayout></ProtectedRoute>} />
-            <Route path="/watch/:id" element={<ProtectedRoute><WatchDetail /></ProtectedRoute>} />
+            <Route path="/watch/:id" element={<ProtectedRoute><AppLayout><WatchDetail /></AppLayout></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
             <Route path="/admin/wear-logs" element={<ProtectedRoute><WearLogsAdmin /></ProtectedRoute>} />
             <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
