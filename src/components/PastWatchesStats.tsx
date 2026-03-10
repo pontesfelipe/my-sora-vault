@@ -73,7 +73,7 @@ export const PastWatchesStats = ({ pastWatches, wearEntries }: PastWatchesStatsP
         </div>
         <p className="text-2xl font-bold text-textMain">{totalPastItems}</p>
         <p className="text-xs text-textMuted mt-1">
-          {soldCount} sold · {tradedCount} traded
+          {soldCount} {t("pastWatches.sold")} · {tradedCount} {t("pastWatches.traded")}
         </p>
       </Card>
 
