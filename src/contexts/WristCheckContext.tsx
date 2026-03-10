@@ -3,7 +3,7 @@ import { createContext, useContext, useState, ReactNode, useCallback } from "rea
 interface WristCheckContextType {
   isOpen: boolean;
   preSelectedWatchId: string | null;
-  openWristCheck: (watchId?: string) => void;
+  openWristCheck: (watchIdOrEvent?: string | React.MouseEvent | unknown) => void;
   closeWristCheck: () => void;
 }
 
