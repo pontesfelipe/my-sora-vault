@@ -58,8 +58,26 @@ export function AppNavigation() {
           </div>
           <SidebarMenu className="space-y-1 px-2">
             {mainNavItems.map((item) => {
-              const isActive = item.url === "/" ? location.pathname === "/" : location.pathname.startsWith(item.url);
+              const isAction = (item as any).isAction;
+              const isActive = !isAction && (item.url === "/" ? location.pathname === "/" : location.pathname.startsWith(item.url));
               const showBadge = item.url === "/feed" && totalCount > 0;
+              
+              if (isAction) {
+                return (
+                  <SidebarMenuItem key={item.url}>
+                    <SidebarMenuButton asChild>
+                      <button
+                        onClick={openWristCheck}
+                        className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm transition-colors relative text-textMuted hover:bg-surfaceMuted hover:text-textMain w-full"
+                      >
+                        <item.icon className="h-5 w-5" />
+                        {open && <span>{item.title}</span>}
+                      </button>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              }
+              
               return (
                 <SidebarMenuItem key={item.url}>
                   <SidebarMenuButton asChild isActive={isActive}>
