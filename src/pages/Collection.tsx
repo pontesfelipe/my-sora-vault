@@ -420,6 +420,18 @@ const Collection = () => {
                 {isBulkUpdating ? t("collectionPage.updating") : t("collectionPage.updateAllPrices")}
               </Button>
               <AnalyzeWatchMetadataDialog watches={watches} onSuccess={refetch} />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleBulkRegenerateImages}
+                disabled={isBulkRegeneratingImages || watches.length === 0}
+                className="gap-2"
+              >
+                <ImageIcon className={`w-4 h-4 ${isBulkRegeneratingImages ? 'animate-spin' : ''}`} />
+                {isBulkRegeneratingImages 
+                  ? `Regenerating ${imageRegenProgress.current}/${imageRegenProgress.total}` 
+                  : "Regenerate All Images"}
+              </Button>
             </div>
           </div>
 
