@@ -54,6 +54,7 @@ const Dashboard = () => {
     });
   }, [tags, watchTags, watches, wearEntries, getWatchesForTag]);
 
+  const activeTagStats = tagStats.filter(ts => widgets[`tag_${ts.tag.id}`]);
   const config = currentCollectionConfig;
 
   // Translated collection config labels
