@@ -7,6 +7,8 @@ import { Tag, Plus, Pencil, Trash2, Check, X } from "lucide-react";
 import { useUserTags } from "@/hooks/useUserTags";
 import { toast } from "sonner";
 
+const TAG_SUGGESTIONS = ["Daily Driver", "Weekend", "Dressy", "Sport", "Travel", "Special Occasion", "Beater"];
+
 export function TagManagerCard() {
   const { tags, canCreateMore, createTag, updateTag, deleteTag } = useUserTags();
   const [newTagName, setNewTagName] = useState("");
@@ -67,7 +69,24 @@ export function TagManagerCard() {
         {/* Tag list */}
         <div className="space-y-2">
           {tags.length === 0 && (
-            <p className="text-sm text-muted-foreground py-4 text-center">No tags yet. Create your first tag above.</p>
+            <div className="space-y-3">
+              <p className="text-sm text-muted-foreground text-center">No tags yet. Get started with a suggestion or create your own.</p>
+              <div className="flex flex-wrap gap-2 justify-center">
+                {TAG_SUGGESTIONS
+                  .filter(s => !tags.some(t => t.name.toLowerCase() === s.toLowerCase()))
+                  .map(suggestion => (
+                    <Button
+                      key={suggestion}
+                      size="sm"
+                      variant="outline"
+                      className="text-xs h-7"
+                      onClick={() => createTag(suggestion)}
+                    >
+                      <Plus className="h-3 w-3 mr-1" /> {suggestion}
+                    </Button>
+                  ))}
+              </div>
+            </div>
           )}
           {tags.map((tag) => (
             <div key={tag.id} className="flex items-center gap-2 p-2 rounded-lg border border-border bg-card">
