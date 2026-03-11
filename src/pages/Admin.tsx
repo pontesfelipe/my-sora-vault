@@ -18,7 +18,7 @@ import { ChangeControlLogTab } from "@/components/admin/ChangeControlLogTab";
 import { ExportWearLogsDialog } from "@/components/admin/ExportWearLogsDialog";
 import { ExportWatchInventoryDialog } from "@/components/admin/ExportWatchInventoryDialog";
 import { ExportAllDataDialog } from "@/components/admin/ExportAllDataDialog";
-import { Shield, Users, UserCog, FileCheck, Calendar, BookOpen, FileText, Activity, BarChart3, FolderOpen, MessageSquarePlus, ClipboardList } from "lucide-react";
+import { Shield, Users, FileCheck, Calendar, BookOpen, FileText, Activity, BarChart3, FolderOpen, MessageSquarePlus, ClipboardList } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
