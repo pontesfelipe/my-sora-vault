@@ -79,7 +79,7 @@ const Dashboard = () => {
     ? t("dashboard.overview", { name: currentCollection.name })
     : t("dashboard.overviewGeneric", { type: tPluralLabel.toLowerCase() });
 
-  const noWidgetsEnabled = !widgets.collection_stats && !widgets.usage_trends && !widgets.usage_chart && !widgets.depreciation && !tags.some(tag => widgets[`tag_${tag.id}`]);
+  const noWidgetsEnabled = !widgets.collection_stats && !widgets.usage_trends && !widgets.usage_chart && !widgets.depreciation && activeTagStats.length === 0;
 
   return (
     <div className="space-y-6">
