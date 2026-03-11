@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Search, RefreshCw, History, ChevronDown, ChevronUp, Plus, Heart, Sparkles, Trash2 } from "lucide-react";
+import { Search, RefreshCw, History, ChevronDown, ChevronUp, Plus, Heart, Sparkles, Trash2, ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
