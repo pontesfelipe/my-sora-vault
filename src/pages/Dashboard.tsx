@@ -31,14 +31,26 @@ const Dashboard = () => {
   const { tags, watchTags, getWatchesForTag } = useUserTags();
   const stats = useStatsCalculations(watches, wearEntries, trips, waterUsages);
 
-  // Compute tag-based stats
+  // Compute tag-based stats with #1 most-worn watch per tag
   const tagStats = useMemo(() => {
     const collectionWatchIds = new Set(watches.map(w => w.id));
     return tags.map(tag => {
       const tagWatchIds = getWatchesForTag(tag.id).filter(id => collectionWatchIds.has(id));
       const watchCount = tagWatchIds.length;
       const wearCount = wearEntries.filter(we => tagWatchIds.includes(we.watch_id)).reduce((sum, we) => sum + (we.days || 1), 0);
-      return { tag, watchCount, wearCount };
+      
+      // Find #1 most-worn watch for this tag
+      const wearCountsPerWatch: Record<string, number> = {};
+      wearEntries
+        .filter(we => tagWatchIds.includes(we.watch_id))
+        .forEach(we => {
+          wearCountsPerWatch[we.watch_id] = (wearCountsPerWatch[we.watch_id] || 0) + (we.days || 1);
+        });
+      const topWatchId = Object.entries(wearCountsPerWatch).sort(([, a], [, b]) => b - a)[0]?.[0];
+      const topWatch = topWatchId ? watches.find(w => w.id === topWatchId) : undefined;
+      const topWatchWears = topWatchId ? wearCountsPerWatch[topWatchId] : 0;
+      
+      return { tag, watchCount, wearCount, topWatch, topWatchWears };
     });
   }, [tags, watchTags, watches, wearEntries, getWatchesForTag]);
 
