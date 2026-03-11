@@ -1,4 +1,4 @@
-import { Watch, Calendar, TrendingUp, Target, Palette, Flame, Plane, Droplets, TrendingDown, DollarSign, Shirt, Plus, Tag } from "lucide-react";
+import { Watch, Calendar, TrendingUp, Target, Palette, Flame, TrendingDown, DollarSign, Shirt, Plus, Tag } from "lucide-react";
 import { StatsCard } from "@/components/StatsCard";
 import { UsageChart } from "@/components/UsageChart";
 import { DepreciationCard } from "@/components/DepreciationCard";
@@ -31,14 +31,26 @@ const Dashboard = () => {
   const { tags, watchTags, getWatchesForTag } = useUserTags();
   const stats = useStatsCalculations(watches, wearEntries, trips, waterUsages);
 
-  // Compute tag-based stats
+  // Compute tag-based stats with #1 most-worn watch per tag
   const tagStats = useMemo(() => {
     const collectionWatchIds = new Set(watches.map(w => w.id));
     return tags.map(tag => {
       const tagWatchIds = getWatchesForTag(tag.id).filter(id => collectionWatchIds.has(id));
       const watchCount = tagWatchIds.length;
       const wearCount = wearEntries.filter(we => tagWatchIds.includes(we.watch_id)).reduce((sum, we) => sum + (we.days || 1), 0);
-      return { tag, watchCount, wearCount };
+      
+      // Find #1 most-worn watch for this tag
+      const wearCountsPerWatch: Record<string, number> = {};
+      wearEntries
+        .filter(we => tagWatchIds.includes(we.watch_id))
+        .forEach(we => {
+          wearCountsPerWatch[we.watch_id] = (wearCountsPerWatch[we.watch_id] || 0) + (we.days || 1);
+        });
+      const topWatchId = Object.entries(wearCountsPerWatch).sort(([, a], [, b]) => b - a)[0]?.[0];
+      const topWatch = topWatchId ? watches.find(w => w.id === topWatchId) : undefined;
+      const topWatchWears = topWatchId ? wearCountsPerWatch[topWatchId] : 0;
+      
+      return { tag, watchCount, wearCount, topWatch, topWatchWears };
     });
   }, [tags, watchTags, watches, wearEntries, getWatchesForTag]);
 
@@ -181,20 +193,6 @@ const Dashboard = () => {
               variant="compact"
               itemId={stats.trendingDownWatch?.id}
             />
-            <StatsCard
-              title={t("dashboard.topTripItem", { type: tSingularLabel })}
-              value={stats.topTripWatch ? `${stats.topTripWatch.brand} ${stats.topTripWatch.model}` : t("dashboard.na")}
-              icon={Plane}
-              variant="compact"
-              itemId={stats.topTripWatch?.id}
-            />
-            <StatsCard
-              title={t("dashboard.topWaterUsage")}
-              value={stats.topWaterWatch ? `${stats.topWaterWatch.brand} ${stats.topWaterWatch.model}` : t("dashboard.na")}
-              icon={Droplets}
-              variant="compact"
-              itemId={stats.topWaterWatch?.id}
-            />
           </div>
         </div>
       )}
@@ -273,17 +271,21 @@ const Dashboard = () => {
           <h2 className="text-lg font-semibold text-textMain flex items-center gap-2">
             <Tag className="h-4 w-4" /> Tag Insights
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {tagStats
               .filter(ts => widgets[`tag_${ts.tag.id}`])
               .map(ts => (
                 <StatsCard
                   key={ts.tag.id}
-                  title={ts.tag.name}
-                  value={`${ts.watchCount} item${ts.watchCount !== 1 ? 's' : ''}`}
-                  subtitle={`${ts.wearCount} day${ts.wearCount !== 1 ? 's' : ''} worn`}
+                  title={`#1 ${ts.tag.name}`}
+                  value={ts.topWatch ? `${ts.topWatch.brand} ${ts.topWatch.model}` : t("dashboard.na")}
+                  subtitle={ts.topWatch 
+                    ? `${ts.topWatchWears} day${ts.topWatchWears !== 1 ? 's' : ''} · ${ts.watchCount} item${ts.watchCount !== 1 ? 's' : ''} tagged`
+                    : `${ts.watchCount} item${ts.watchCount !== 1 ? 's' : ''} tagged`
+                  }
                   icon={Tag}
                   variant="compact"
+                  itemId={ts.topWatch?.id}
                 />
               ))}
           </div>
