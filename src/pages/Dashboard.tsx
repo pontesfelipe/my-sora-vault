@@ -169,6 +169,25 @@ const Dashboard = () => {
         </div>
       )}
 
+      {/* Tag-based Widgets */}
+      {activeTagStats.length > 0 && (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+          {activeTagStats.map(ts => (
+            <StatsCard
+              key={ts.tag.id}
+              title={`#1 ${ts.tag.name}`}
+              value={ts.topWatch ? `${ts.topWatch.brand} ${ts.topWatch.model}` : t("dashboard.na")}
+              subtitle={ts.topWatch 
+                ? `${ts.topWatchWears} day${ts.topWatchWears !== 1 ? 's' : ''} · ${ts.watchCount} item${ts.watchCount !== 1 ? 's' : ''} tagged`
+                : `${ts.watchCount} item${ts.watchCount !== 1 ? 's' : ''} tagged`
+              }
+              icon={Tag}
+              variant="compact"
+              itemId={ts.topWatch?.id}
+            />
+          ))}
+        </div>
+
       {/* Usage Trends Widget */}
       {widgets.usage_trends && (
         <div className="space-y-3">
