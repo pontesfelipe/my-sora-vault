@@ -187,6 +187,7 @@ const Dashboard = () => {
             />
           ))}
         </div>
+      )}
 
       {/* Usage Trends Widget */}
       {widgets.usage_trends && (
