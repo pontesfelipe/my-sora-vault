@@ -1,4 +1,4 @@
-import { Watch, Calendar, TrendingUp, Target, Palette, Flame, Plane, Droplets, TrendingDown, DollarSign, Shirt, Plus, Tag } from "lucide-react";
+import { Watch, Calendar, TrendingUp, Target, Palette, Flame, TrendingDown, DollarSign, Shirt, Plus, Tag } from "lucide-react";
 import { StatsCard } from "@/components/StatsCard";
 import { UsageChart } from "@/components/UsageChart";
 import { DepreciationCard } from "@/components/DepreciationCard";
