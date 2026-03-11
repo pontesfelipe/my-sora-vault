@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Search, RefreshCw, History, ChevronDown, ChevronUp, Plus, Heart, Sparkles, Trash2 } from "lucide-react";
+import { Search, RefreshCw, History, ChevronDown, ChevronUp, Plus, Heart, Sparkles, Trash2, ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -62,6 +62,8 @@ const Collection = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedBrand, setSelectedBrand] = useState<string>("all");
   const [isBulkUpdating, setIsBulkUpdating] = useState(false);
+  const [isBulkRegeneratingImages, setIsBulkRegeneratingImages] = useState(false);
+  const [imageRegenProgress, setImageRegenProgress] = useState({ current: 0, total: 0 });
   const [localWatches, setLocalWatches] = useState(watches);
   const [showPastWatches, setShowPastWatches] = useState(false);
   const [activeTab, setActiveTab] = useState("collection");
@@ -208,6 +210,63 @@ const Collection = () => {
     toast({
       title: t("collectionPage.bulkUpdateComplete"),
       description: t("collectionPage.bulkUpdateResult", { success: successCount, failed: errorCount > 0 ? errorCount : '' }),
+    });
+  };
+
+  const handleBulkRegenerateImages = async () => {
+    if (!watches.length) return;
+    setIsBulkRegeneratingImages(true);
+    setImageRegenProgress({ current: 0, total: watches.length });
+    let successCount = 0;
+    let errorCount = 0;
+
+    toast({
+      title: "Regenerating images",
+      description: `Processing ${watches.length} watches with standardized sizing...`,
+    });
+
+    for (let i = 0; i < watches.length; i++) {
+      const watch = watches[i];
+      setImageRegenProgress({ current: i + 1, total: watches.length });
+      try {
+        const body: Record<string, unknown> = {
+          watchId: watch.id,
+          brand: watch.brand,
+          model: watch.model,
+          dialColor: watch.dial_color,
+          type: watch.type,
+          caseSize: watch.case_size || undefined,
+          movement: watch.movement || undefined,
+        };
+
+        // Use existing AI image as reference to preserve identity while standardizing size
+        if (watch.ai_image_url) {
+          body.referenceImageUrl = watch.ai_image_url;
+        }
+
+        const { error } = await supabase.functions.invoke('generate-watch-image', { body });
+        if (error) {
+          console.error(`Image regen failed for ${watch.brand} ${watch.model}:`, error);
+          errorCount++;
+        } else {
+          successCount++;
+        }
+
+        // Delay to avoid rate limiting
+        await new Promise(resolve => setTimeout(resolve, 3000));
+      } catch (err) {
+        console.error(`Image regen error for ${watch.brand} ${watch.model}:`, err);
+        errorCount++;
+      }
+    }
+
+    setIsBulkRegeneratingImages(false);
+    setImageRegenProgress({ current: 0, total: 0 });
+    refetch();
+
+    toast({
+      title: "Image regeneration complete",
+      description: `${successCount} succeeded${errorCount > 0 ? `, ${errorCount} failed` : ''}`,
     });
   };
 
@@ -418,6 +477,18 @@ const Collection = () => {
                 {isBulkUpdating ? t("collectionPage.updating") : t("collectionPage.updateAllPrices")}
               </Button>
               <AnalyzeWatchMetadataDialog watches={watches} onSuccess={refetch} />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleBulkRegenerateImages}
+                disabled={isBulkRegeneratingImages || watches.length === 0}
+                className="gap-2"
+              >
+                <ImageIcon className={`w-4 h-4 ${isBulkRegeneratingImages ? 'animate-spin' : ''}`} />
+                {isBulkRegeneratingImages 
+                  ? `Regenerating ${imageRegenProgress.current}/${imageRegenProgress.total}` 
+                  : "Regenerate All Images"}
+              </Button>
             </div>
           </div>
 
