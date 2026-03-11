@@ -550,12 +550,8 @@ export default function Auth() {
                 </p>
               </CardContent>
             </Card>
-          </TabsContent>
-          
-          <TabsContent value="request">
-            <RegistrationRequestForm />
-          </TabsContent>
-        </Tabs>
+          </div>
+        </div>
 
         <TermsDialog open={termsOpen} onOpenChange={setTermsOpen} />
         <PrivacyDialog open={privacyOpen} onOpenChange={setPrivacyOpen} />
