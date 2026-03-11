@@ -7,6 +7,8 @@ import { Tag, Plus, Pencil, Trash2, Check, X } from "lucide-react";
 import { useUserTags } from "@/hooks/useUserTags";
 import { toast } from "sonner";
 
+const TAG_SUGGESTIONS = ["Daily Driver", "Weekend", "Dressy", "Sport", "Travel", "Special Occasion", "Beater"];
+
 export function TagManagerCard() {
   const { tags, canCreateMore, createTag, updateTag, deleteTag } = useUserTags();
   const [newTagName, setNewTagName] = useState("");
