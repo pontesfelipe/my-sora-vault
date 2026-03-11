@@ -298,13 +298,8 @@ export default function Auth() {
             </p>
           </div>
         
-        <Tabs defaultValue="signin" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-6">
-            <TabsTrigger value="signin">Sign In</TabsTrigger>
-            <TabsTrigger value="request">Request Access</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="signin">
+        <div className="w-full">
+          <div>
             <Card>
               <CardHeader className="space-y-1 text-center">
                 <CardTitle className="text-2xl font-bold">
