@@ -24,12 +24,27 @@ const inputSchema = z.object({
   customPrompt: z.string().max(2000).optional(),
 });
 
+// ─── SIZE CALIBRATION ───
+// All watches must appear the SAME visual size regardless of actual case diameter.
+// Calibration reference: IWC Pilot Mark XX (40mm) — this is our "100% standard".
+// A 34mm watch still renders at the same visual size. A 46mm watch still renders at the same visual size.
+const SIZE_CALIBRATION = [
+  'SIZE CALIBRATION (MOST IMPORTANT RULE AFTER ORIENTATION):',
+  'Every watch in this catalog MUST appear IDENTICALLY sized. Use the IWC Pilot Mark XX (40mm round case) as the universal size reference',
+  'In a 1024×1024 output, the watch case (bezel edge to bezel edge, EXCLUDING strap/bracelet) must measure approximately 580-620 pixels wide and 580-620 pixels tall for round cases',
+  'For non-round cases, the longest dimension must be 580-620 pixels',
+  'This means the case fills roughly 57-60% of the image width',
+  'The strap/bracelet extends beyond this, showing 1-2 links or ~2cm from each lug',
+  'Do NOT make smaller watches (e.g. 34mm) appear smaller. Do NOT make larger watches (e.g. 46mm) appear larger. ALL cases render at the SAME pixel size',
+  'If you are unsure, err on the side of making the watch LARGER to fill the frame, never smaller',
+].join('. ');
+
 // ─── COMPOSITION RULES ───
 const COMPOSITION_RULES = [
   '*** ABSOLUTE #1 PRIORITY — ORIENTATION ***: The watch MUST be rendered UPRIGHT and VERTICAL. 12 o\'clock at the TOP, 6 o\'clock at the BOTTOM. The watch must NEVER be lying down, tilted, horizontal, or rotated. If you generate a horizontal/laying watch, the output is INVALID and REJECTED',
   'SQUARE 1:1 aspect ratio composition',
   'The watch must be PERFECTLY CENTERED in the frame, both horizontally and vertically',
-  'CRITICAL SIZE RULE: Regardless of the actual case diameter, ALL watches must appear the SAME visual size — the case (excluding strap) fills exactly 60% of image width and 50% of image height',
+  SIZE_CALIBRATION,
   'STRAIGHT-ON front-facing view looking directly at the dial face — absolutely NO side angles, NO wrist shots',
   'Maximum 3-5 degree tilt for minimal depth perception — the full dial must be completely visible and readable',
   'For rectangular watches, long axis must be vertical, crown at 3 o\'clock side, no 90-degree rotation',
