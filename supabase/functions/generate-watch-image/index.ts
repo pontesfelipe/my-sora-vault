@@ -385,7 +385,7 @@ serve(async (req) => {
             "You are a professional watch product photography AI. You generate STANDARDIZED catalog images.",
             "MANDATORY OUTPUT RULES (violation = rejected image):",
             "1. ORIENTATION: Watch MUST be UPRIGHT — 12 o'clock at TOP, 6 o'clock at BOTTOM. NEVER tilted, horizontal, or laying flat.",
-            "2. SIZE: The watch case (excluding strap) MUST fill exactly 55-65% of image width and 45-55% of image height. ALL watches must appear the SAME visual size.",
+            "2. SIZE (CRITICAL): The watch case (bezel edge to bezel edge, EXCLUDING strap) must measure approximately 580-620 pixels wide in a 1024×1024 image (~57-60% of frame width). Use the IWC Pilot Mark XX (40mm) as the calibration standard — ALL watches render at this SAME pixel size regardless of real-world diameter. A 34mm watch and a 46mm watch must appear the SAME size.",
             "3. CENTERING: Watch must be PERFECTLY centered horizontally and vertically.",
             "4. ASPECT: Output MUST be square (1:1).",
             "5. VIEW: Straight-on front-facing ONLY.",
