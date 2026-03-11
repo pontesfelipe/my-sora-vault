@@ -181,20 +181,6 @@ const Dashboard = () => {
               variant="compact"
               itemId={stats.trendingDownWatch?.id}
             />
-            <StatsCard
-              title={t("dashboard.topTripItem", { type: tSingularLabel })}
-              value={stats.topTripWatch ? `${stats.topTripWatch.brand} ${stats.topTripWatch.model}` : t("dashboard.na")}
-              icon={Plane}
-              variant="compact"
-              itemId={stats.topTripWatch?.id}
-            />
-            <StatsCard
-              title={t("dashboard.topWaterUsage")}
-              value={stats.topWaterWatch ? `${stats.topWaterWatch.brand} ${stats.topWaterWatch.model}` : t("dashboard.na")}
-              icon={Droplets}
-              variant="compact"
-              itemId={stats.topWaterWatch?.id}
-            />
           </div>
         </div>
       )}
