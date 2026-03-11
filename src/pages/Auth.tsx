@@ -12,7 +12,7 @@ import { Watch } from "lucide-react";
 
 import { useAuth } from "@/contexts/AuthContext";
 import { lovable } from "@/integrations/lovable/index";
-import { RegistrationRequestForm } from "@/components/RegistrationRequestForm";
+
 import { BetaBadge } from "@/components/BetaBadge";
 import { PrivacyDialog } from "@/components/PrivacyDialog";
 import { TermsDialog } from "@/components/TermsDialog";
