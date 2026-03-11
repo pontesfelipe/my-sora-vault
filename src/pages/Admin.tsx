@@ -4,9 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AllowedUsersTable } from "@/components/admin/AllowedUsersTable";
 import { RegisteredUsersTable } from "@/components/admin/RegisteredUsersTable";
-import { RegistrationRequestsTable } from "@/components/admin/RegistrationRequestsTable";
 import { TermsAcceptancesTable } from "@/components/admin/TermsAcceptancesTable";
 import { ManageCollectionsDialog } from "@/components/admin/ManageCollectionsDialog";
 import { MethodologyTab } from "@/components/admin/MethodologyTab";
@@ -20,7 +18,7 @@ import { ChangeControlLogTab } from "@/components/admin/ChangeControlLogTab";
 import { ExportWearLogsDialog } from "@/components/admin/ExportWearLogsDialog";
 import { ExportWatchInventoryDialog } from "@/components/admin/ExportWatchInventoryDialog";
 import { ExportAllDataDialog } from "@/components/admin/ExportAllDataDialog";
-import { Shield, Users, UserCog, FileCheck, Calendar, BookOpen, FileText, Activity, BarChart3, FolderOpen, MessageSquarePlus, ClipboardList } from "lucide-react";
+import { Shield, Users, FileCheck, Calendar, BookOpen, FileText, Activity, BarChart3, FolderOpen, MessageSquarePlus, ClipboardList } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -76,16 +74,8 @@ export default function Admin() {
           </div>
         </div>
 
-        <Tabs defaultValue="requests" className="w-full">
-          <TabsList className="grid w-full max-w-7xl grid-cols-11">
-            <TabsTrigger value="requests" className="flex items-center gap-1 text-xs">
-              <UserCog className="h-3 w-3" />
-              Requests
-            </TabsTrigger>
-            <TabsTrigger value="allowed" className="flex items-center gap-1 text-xs">
-              <UserCog className="h-3 w-3" />
-              Allowed
-            </TabsTrigger>
+        <Tabs defaultValue="registered" className="w-full">
+          <TabsList className="grid w-full max-w-7xl grid-cols-9">
             <TabsTrigger value="registered" className="flex items-center gap-1 text-xs">
               <Users className="h-3 w-3" />
               Users
@@ -123,34 +113,6 @@ export default function Admin() {
               Changes
             </TabsTrigger>
           </TabsList>
-
-          <TabsContent value="requests" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Registration Requests</CardTitle>
-                <CardDescription>
-                  Review and approve user registration requests
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <RegistrationRequestsTable />
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="allowed" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Manage Allowed Users</CardTitle>
-                <CardDescription>
-                  Add or remove email addresses that can register for the platform
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <AllowedUsersTable />
-              </CardContent>
-            </Card>
-          </TabsContent>
 
           <TabsContent value="registered" className="space-y-4">
             <Card>

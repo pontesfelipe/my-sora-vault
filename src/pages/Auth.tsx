@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -12,7 +11,7 @@ import { Watch } from "lucide-react";
 
 import { useAuth } from "@/contexts/AuthContext";
 import { lovable } from "@/integrations/lovable/index";
-import { RegistrationRequestForm } from "@/components/RegistrationRequestForm";
+
 import { BetaBadge } from "@/components/BetaBadge";
 import { PrivacyDialog } from "@/components/PrivacyDialog";
 import { TermsDialog } from "@/components/TermsDialog";
@@ -298,13 +297,8 @@ export default function Auth() {
             </p>
           </div>
         
-        <Tabs defaultValue="signin" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-6">
-            <TabsTrigger value="signin">Sign In</TabsTrigger>
-            <TabsTrigger value="request">Request Access</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="signin">
+        <div className="w-full">
+          <div>
             <Card>
               <CardHeader className="space-y-1 text-center">
                 <CardTitle className="text-2xl font-bold">
@@ -555,12 +549,8 @@ export default function Auth() {
                 </p>
               </CardContent>
             </Card>
-          </TabsContent>
-          
-          <TabsContent value="request">
-            <RegistrationRequestForm />
-          </TabsContent>
-        </Tabs>
+          </div>
+        </div>
 
         <TermsDialog open={termsOpen} onOpenChange={setTermsOpen} />
         <PrivacyDialog open={privacyOpen} onOpenChange={setPrivacyOpen} />
