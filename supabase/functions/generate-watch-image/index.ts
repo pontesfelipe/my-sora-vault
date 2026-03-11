@@ -181,7 +181,7 @@ function buildUserPhotoEnhancementPrompt(
     `- Remove any wrist, arm, table, or surface — show only the watch`,
     `- Apply clean, even studio lighting`,
     `- Set hands to 10:10 if they are in a significantly different position`,
-    `*** CRITICAL ZOOM/SIZE OVERRIDE ***: Do NOT preserve the original photo's framing distance. IGNORE how close or far the camera was. You MUST ZOOM IN or ENLARGE the watch so the case (excluding strap) fills exactly 60% of the output image width and 50% of the output image height. The watch must appear LARGE and CLOSE-UP, as if photographed with a macro lens from 30cm away. If the source photo shows the watch small or far away, you MUST dramatically enlarge it to fill the frame. Every watch in our catalog must appear the SAME visual size regardless of the source photo's zoom level`,
+    `*** CRITICAL ZOOM/SIZE OVERRIDE ***: Do NOT preserve the original photo's framing distance. IGNORE how close or far the camera was. You MUST ZOOM IN or ENLARGE the watch so the case (bezel edge to bezel edge, excluding strap) measures approximately 580-620 pixels in a 1024x1024 output — roughly 57-60% of image width. Use the IWC Pilot Mark XX (40mm) as the universal size standard. ALL watches must appear this SAME size regardless of their actual case diameter. If the source photo shows the watch small or far away, you MUST dramatically enlarge it`,
     cues,
     identity,
     `COMPOSITION: ${COMPOSITION_RULES}`,
