@@ -62,6 +62,8 @@ const Collection = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedBrand, setSelectedBrand] = useState<string>("all");
   const [isBulkUpdating, setIsBulkUpdating] = useState(false);
+  const [isBulkRegeneratingImages, setIsBulkRegeneratingImages] = useState(false);
+  const [imageRegenProgress, setImageRegenProgress] = useState({ current: 0, total: 0 });
   const [localWatches, setLocalWatches] = useState(watches);
   const [showPastWatches, setShowPastWatches] = useState(false);
   const [activeTab, setActiveTab] = useState("collection");
