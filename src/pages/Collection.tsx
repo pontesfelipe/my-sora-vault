@@ -213,6 +213,63 @@ const Collection = () => {
     });
   };
 
+  const handleBulkRegenerateImages = async () => {
+    if (!watches.length) return;
+    setIsBulkRegeneratingImages(true);
+    setImageRegenProgress({ current: 0, total: watches.length });
+    let successCount = 0;
+    let errorCount = 0;
+
+    toast({
+      title: "Regenerating images",
+      description: `Processing ${watches.length} watches with standardized sizing...`,
+    });
+
+    for (let i = 0; i < watches.length; i++) {
+      const watch = watches[i];
+      setImageRegenProgress({ current: i + 1, total: watches.length });
+      try {
+        const body: Record<string, unknown> = {
+          watchId: watch.id,
+          brand: watch.brand,
+          model: watch.model,
+          dialColor: watch.dial_color,
+          type: watch.type,
+          caseSize: watch.case_size || undefined,
+          movement: watch.movement || undefined,
+        };
+
+        // Use existing AI image as reference to preserve identity while standardizing size
+        if (watch.ai_image_url) {
+          body.referenceImageUrl = watch.ai_image_url;
+        }
+
+        const { error } = await supabase.functions.invoke('generate-watch-image', { body });
+        if (error) {
+          console.error(`Image regen failed for ${watch.brand} ${watch.model}:`, error);
+          errorCount++;
+        } else {
+          successCount++;
+        }
+
+        // Delay to avoid rate limiting
+        await new Promise(resolve => setTimeout(resolve, 3000));
+      } catch (err) {
+        console.error(`Image regen error for ${watch.brand} ${watch.model}:`, err);
+        errorCount++;
+      }
+    }
+
+    setIsBulkRegeneratingImages(false);
+    setImageRegenProgress({ current: 0, total: 0 });
+    refetch();
+
+    toast({
+      title: "Image regeneration complete",
+      description: `${successCount} succeeded${errorCount > 0 ? `, ${errorCount} failed` : ''}`,
+    });
+  };
+
   const handleGenerateSuggestions = async (tasteDescription: string, focusOnGaps?: boolean) => {
     if (!user) return;
     
