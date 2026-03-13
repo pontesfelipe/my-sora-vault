@@ -146,7 +146,7 @@ serve(async (req) => {
                   },
                   dial_color: {
                     type: 'string',
-                    description: 'The color of the watch dial (e.g., Black, Blue, White, Silver)'
+                    description: 'One simple color name from: Black, Blue, White, Silver, Gray, Green, Red, Orange, Gold, Bronze, Brown, Beige, Champagne, Cream, Navy, Teal, Burgundy, Yellow, Pink, Purple, Salmon, Anthracite, Mother of Pearl, Skeleton'
                   },
                   type: {
                     type: 'string',
