@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { DIAL_COLORS } from "@/constants/dialColors";
 import { useTranslation } from "react-i18next";
 import { ResponsiveDialog } from "@/components/ResponsiveDialog";
 import { Button } from "@/components/ui/button";

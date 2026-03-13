@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { DIAL_COLORS } from "@/constants/dialColors";
 import { ResponsiveDialog } from "@/components/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
