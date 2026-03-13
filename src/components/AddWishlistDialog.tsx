@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { DIAL_COLORS } from "@/constants/dialColors";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
@@ -101,12 +103,19 @@ export const AddWishlistDialog = ({ open, onOpenChange, onSuccess }: AddWishlist
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="dial_colors">{t("addWishlist.dialColors")} *</Label>
-            <Input
-              id="dial_colors"
+            <Select
               value={formValues.dial_colors}
-              onChange={(e) => setFormValues({ ...formValues, dial_colors: e.target.value })}
-              placeholder={t("addWishlist.dialColorsPlaceholder")}
-            />
+              onValueChange={(value) => setFormValues({ ...formValues, dial_colors: value })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder={t("addWishlist.dialColorsPlaceholder")} />
+              </SelectTrigger>
+              <SelectContent>
+                {DIAL_COLORS.map((color) => (
+                  <SelectItem key={color} value={color}>{color}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="space-y-2">
             <Label htmlFor="rank">{t("addWishlist.priorityRank")}</Label>

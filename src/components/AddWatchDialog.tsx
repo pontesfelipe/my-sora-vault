@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { DIAL_COLORS } from "@/constants/dialColors";
 import { useTranslation } from "react-i18next";
 import { ResponsiveDialog } from "@/components/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
@@ -591,14 +592,19 @@ export const AddWatchDialog = ({ onSuccess, externalOpen, onExternalOpenChange, 
 
             <div className="space-y-2">
               <Label htmlFor="dialColor">{t("addWatch.dialColor")}</Label>
-              <Input
-                id="dialColor"
+              <Select
                 value={formValues.dialColor}
-                onChange={(e) => setFormValues({ ...formValues, dialColor: e.target.value })}
-                required
-                maxLength={50}
-                className="bg-background border-border"
-              />
+                onValueChange={(value) => setFormValues({ ...formValues, dialColor: value })}
+              >
+                <SelectTrigger className="bg-background border-border">
+                  <SelectValue placeholder="Select dial color" />
+                </SelectTrigger>
+                <SelectContent>
+                  {DIAL_COLORS.map((color) => (
+                    <SelectItem key={color} value={color}>{color}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">

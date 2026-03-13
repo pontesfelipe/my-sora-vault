@@ -75,7 +75,7 @@ Calculate the average US resale price by aggregating prices from these sources f
 Return the information in this exact JSON format:
 {
   "model": "full model name",
-  "dialColor": "dial color (e.g., Black, Blue, Silver, White, Green)",
+  "dialColor": "one simple color name from this list ONLY: Black, Blue, White, Silver, Gray, Green, Red, Orange, Gold, Bronze, Brown, Beige, Champagne, Cream, Navy, Teal, Burgundy, Yellow, Pink, Purple, Salmon, Anthracite, Mother of Pearl, Skeleton",
   "type": "watch type (e.g., Diver, Chronograph, Pilot, GMT, Dress, Field)",
   "cost": retail price in USD as a number (from official brand site),
   "averageResalePrice": average US pre-owned resale price in USD as a number (from Chrono24, Bob's Watches, WatchBox, Crown & Caliber) or null if not found,
