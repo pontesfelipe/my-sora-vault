@@ -68,18 +68,6 @@ export const SplashScreen = ({ onComplete, minDuration = 1500 }: SplashScreenPro
           </p>
         </div>
 
-        {/* Collection type icon */}
-        <div 
-          className="flex items-center gap-6 animate-fade-in"
-          style={{ animationDelay: '0.5s', animationFillMode: 'backwards' }}
-        >
-          <div className="flex flex-col items-center gap-2 group">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent/10 transition-all group-hover:bg-accent/20">
-              <Watch className="h-6 w-6 text-accent" />
-            </div>
-            <span className="text-xs text-textMuted">{t("splash.watches")}</span>
-          </div>
-        </div>
 
         {/* Loading indicator */}
         <div 
