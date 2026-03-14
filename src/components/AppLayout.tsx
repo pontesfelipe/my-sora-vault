@@ -1,10 +1,12 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppNavigation } from "./AppNavigation";
 import { BottomNavigation } from "./BottomNavigation";
 import { GlobalSearch } from "./GlobalSearch";
 import { WristCheckProvider } from "@/contexts/WristCheckContext";
 import { WristCheckDialog } from "./WristCheckDialog";
+import { logAccess } from "@/utils/accessLogging";
 
 interface AppLayoutProps {
   children: ReactNode;
