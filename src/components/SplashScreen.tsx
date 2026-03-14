@@ -33,11 +33,11 @@ export const SplashScreen = ({ onComplete, minDuration = 1500 }: SplashScreenPro
       }`}
     >
       {/* Subtle background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-accent/10" />
+      <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--gold)/0.05)] via-transparent to-[hsl(var(--gold)/0.08)]" />
       
       {/* Animated glow effect */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-accent/10 rounded-full blur-[100px] animate-pulse" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[hsl(var(--gold)/0.08)] rounded-full blur-[100px] animate-pulse" />
       </div>
 
       {/* Content */}
@@ -45,14 +45,14 @@ export const SplashScreen = ({ onComplete, minDuration = 1500 }: SplashScreenPro
         {/* Logo */}
         <div className="relative">
           <div 
-            className="flex h-28 w-28 items-center justify-center rounded-3xl shadow-2xl shadow-accent/30 animate-scale-in overflow-hidden"
+            className="flex h-24 w-24 items-center justify-center animate-scale-in"
             style={{ animationDuration: '0.6s' }}
           >
-            <img src={logoImg} alt="Luxury Vault" className="h-full w-full object-contain" />
+            <img src={logoImg} alt="Luxury Vault" className="h-full w-full object-contain drop-shadow-[0_0_20px_hsl(var(--gold)/0.4)]" />
           </div>
           {/* Decorative ring */}
-          <div className="absolute -inset-4 rounded-[2.5rem] border-2 border-accent/20 animate-pulse" />
-          <div className="absolute -inset-8 rounded-[3rem] border border-accent/10 animate-pulse" style={{ animationDelay: '0.2s' }} />
+          <div className="absolute -inset-6 rounded-full border border-[hsl(var(--gold)/0.15)] animate-pulse" />
+          <div className="absolute -inset-12 rounded-full border border-[hsl(var(--gold)/0.08)] animate-pulse" style={{ animationDelay: '0.2s' }} />
         </div>
 
         {/* Brand name */}
