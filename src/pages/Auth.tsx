@@ -200,9 +200,7 @@ export default function Auth() {
         <div className="w-full max-w-md">
           <div className="flex flex-col items-center mb-8">
             <div className="flex items-center gap-3 mb-4">
-               <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-accent/15 text-xl font-bold text-accent shadow-lg shadow-accent/20">
-                LV
-              </div>
+               <img src={logoImg} alt="Luxury Vault" className="h-14 w-14 object-contain drop-shadow-[0_0_8px_hsl(var(--gold)/0.4)]" />
               <div className="flex items-center gap-2">
                 <h1 className="text-3xl font-bold tracking-tight text-textMain">Luxury Vault</h1>
                 <BetaBadge />
