@@ -18,6 +18,7 @@ import { TermsDialog } from "@/components/TermsDialog";
 import { MfaVerification } from "@/components/MfaVerification";
 import { recordLoginAttempt } from "@/utils/loginTracking";
 import heroImage from "@/assets/hero-collection.jpg";
+import logoImg from "@/assets/logo-transparent.png";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -199,9 +200,7 @@ export default function Auth() {
         <div className="w-full max-w-md">
           <div className="flex flex-col items-center mb-8">
             <div className="flex items-center gap-3 mb-4">
-               <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-accent/15 text-xl font-bold text-accent shadow-lg shadow-accent/20">
-                LV
-              </div>
+               <img src={logoImg} alt="Luxury Vault" className="h-14 w-14 object-contain drop-shadow-[0_0_8px_hsl(var(--gold)/0.4)]" />
               <div className="flex items-center gap-2">
                 <h1 className="text-3xl font-bold tracking-tight text-textMain">Luxury Vault</h1>
                 <BetaBadge />
@@ -239,9 +238,7 @@ export default function Auth() {
         <div className="relative z-10 flex flex-col justify-end p-12 pb-16">
           <div className="space-y-6">
             <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/20 backdrop-blur-sm text-lg font-bold text-accent shadow-lg">
-                LV
-              </div>
+              <img src={logoImg} alt="Luxury Vault" className="h-12 w-12 object-contain drop-shadow-[0_0_12px_hsl(var(--gold)/0.5)]" />
               <h1 className="text-3xl font-bold tracking-tight text-foreground">Luxury Vault</h1>
             </div>
             
@@ -265,9 +262,7 @@ export default function Auth() {
           {/* Mobile header */}
           <div className="flex flex-col items-center mb-8 lg:hidden">
             <div className="flex items-center gap-3 mb-4">
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-accent/15 text-xl font-bold text-accent shadow-lg shadow-accent/20">
-                LV
-              </div>
+              <img src={logoImg} alt="Luxury Vault" className="h-14 w-14 object-contain drop-shadow-[0_0_8px_hsl(var(--gold)/0.4)]" />
               <div className="flex items-center gap-2">
                 <h1 className="text-3xl font-bold tracking-tight text-textMain">Luxury Vault</h1>
                 <BetaBadge />

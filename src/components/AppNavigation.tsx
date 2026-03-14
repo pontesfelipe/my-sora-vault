@@ -1,5 +1,5 @@
 import { Home, Users, User, Watch, BookHeart, Shield, Settings, HelpCircle, Info, Lightbulb, Bot, ClipboardList, BarChart3 } from "lucide-react";
-import logoImg from "@/assets/logo.png";
+import logoImg from "@/assets/logo-transparent.png";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -46,7 +46,7 @@ export function AppNavigation() {
       <SidebarContent className="flex flex-col h-full">
         <SidebarGroup className="flex-1">
           <div className={`mb-6 ${open ? "px-4" : "px-2"} pt-6 transition-all duration-200 flex items-center gap-2`}>
-            <img src={logoImg} alt="Luxury Vault" className="h-8 w-8 rounded-xl object-contain" />
+            <img src={logoImg} alt="Luxury Vault" className="h-8 w-8 object-contain drop-shadow-[0_0_6px_hsl(var(--gold)/0.3)]" />
             {open && (
               <div>
                 <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-textSoft">Luxury Vault</div>
