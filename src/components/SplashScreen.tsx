@@ -45,10 +45,10 @@ export const SplashScreen = ({ onComplete, minDuration = 1500 }: SplashScreenPro
         {/* Logo */}
         <div className="relative">
           <div 
-            className="flex h-28 w-28 items-center justify-center rounded-3xl bg-accent/15 text-5xl font-bold text-accent shadow-2xl shadow-accent/30 animate-scale-in"
+            className="flex h-28 w-28 items-center justify-center rounded-3xl shadow-2xl shadow-accent/30 animate-scale-in overflow-hidden"
             style={{ animationDuration: '0.6s' }}
           >
-            LV
+            <img src={logoImg} alt="Luxury Vault" className="h-full w-full object-contain" />
           </div>
           {/* Decorative ring */}
           <div className="absolute -inset-4 rounded-[2.5rem] border-2 border-accent/20 animate-pulse" />
