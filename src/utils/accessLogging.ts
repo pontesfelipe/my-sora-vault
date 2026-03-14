@@ -11,15 +11,15 @@ export const logAccess = async (
 
     const userAgent = navigator.userAgent;
 
-    await supabase.from('access_logs').insert({
+    await supabase.from('access_logs').insert([{
       user_id: session.user.id,
       user_email: session.user.email || null,
       action,
       page: page || window.location.pathname,
-      details: details || null,
+      details: (details as any) || null,
       user_agent: userAgent,
       ip_address: null,
-    });
+    }]);
   } catch (error) {
     console.error('Failed to log access:', error);
   }
