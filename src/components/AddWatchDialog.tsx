@@ -423,6 +423,8 @@ export const AddWatchDialog = ({ onSuccess, externalOpen, onExternalOpenChange, 
         }
       }
 
+      logAccess('add_item', '/collection', { brand: data.brand, model: data.model });
+
       toast({
         title: "Success",
         description: "Watch added to your collection",

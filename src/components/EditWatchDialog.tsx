@@ -284,6 +284,8 @@ export const EditWatchDialog = ({ watch, onSuccess }: { watch: Watch; onSuccess:
         }
       }
 
+      logAccess('edit_item', '/collection', { brand: data.brand, model: data.model });
+
       toast({
         title: "Success",
         description: "Watch updated successfully",

@@ -104,6 +104,8 @@ export const WatchCard = ({ watch, totalDays, onDelete }: WatchCardProps) => {
 
       if (error) throw error;
 
+      logAccess('delete_item', '/collection', { brand: watch.brand, model: watch.model });
+
       toast({
         title: `${singularLabel} Deleted`,
         description: `${singularLabel} and all related data permanently removed`,
