@@ -13,6 +13,12 @@ interface AppLayoutProps {
 }
 
 export function AppLayout({ children }: AppLayoutProps) {
+  const location = useLocation();
+
+  useEffect(() => {
+    logAccess('page_view', location.pathname);
+  }, [location.pathname]);
+
   return (
     <WristCheckProvider>
       <SidebarProvider>
