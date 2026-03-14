@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Watch } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import logoImg from "@/assets/logo.png";
 
 interface SplashScreenProps {
   onComplete?: () => void;
