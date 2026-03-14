@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Watch } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import logoImg from "@/assets/logo.png";
 
 interface SplashScreenProps {
   onComplete?: () => void;
@@ -45,10 +45,10 @@ export const SplashScreen = ({ onComplete, minDuration = 1500 }: SplashScreenPro
         {/* Logo */}
         <div className="relative">
           <div 
-            className="flex h-28 w-28 items-center justify-center rounded-3xl bg-accent/15 text-5xl font-bold text-accent shadow-2xl shadow-accent/30 animate-scale-in"
+            className="flex h-28 w-28 items-center justify-center rounded-3xl shadow-2xl shadow-accent/30 animate-scale-in overflow-hidden"
             style={{ animationDuration: '0.6s' }}
           >
-            LV
+            <img src={logoImg} alt="Luxury Vault" className="h-full w-full object-contain" />
           </div>
           {/* Decorative ring */}
           <div className="absolute -inset-4 rounded-[2.5rem] border-2 border-accent/20 animate-pulse" />
@@ -68,18 +68,6 @@ export const SplashScreen = ({ onComplete, minDuration = 1500 }: SplashScreenPro
           </p>
         </div>
 
-        {/* Collection type icon */}
-        <div 
-          className="flex items-center gap-6 animate-fade-in"
-          style={{ animationDelay: '0.5s', animationFillMode: 'backwards' }}
-        >
-          <div className="flex flex-col items-center gap-2 group">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent/10 transition-all group-hover:bg-accent/20">
-              <Watch className="h-6 w-6 text-accent" />
-            </div>
-            <span className="text-xs text-textMuted">{t("splash.watches")}</span>
-          </div>
-        </div>
 
         {/* Loading indicator */}
         <div 

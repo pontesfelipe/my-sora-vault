@@ -2,6 +2,7 @@ import { AppLayout } from "@/components/AppLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Watch, Heart, Shield, Sparkles, Users, Globe, BarChart3 } from "lucide-react";
 import watchHero from "@/assets/watch-hero.jpg";
+import logoImg from "@/assets/logo.png";
 import { useTranslation } from "react-i18next";
 
 export default function About() {
@@ -14,7 +15,7 @@ export default function About() {
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-accent/20 via-transparent to-transparent opacity-50" />
           <div className="relative z-10">
             <div className="flex items-center gap-4 mb-6">
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-accent/15 text-2xl font-bold text-accent shadow-lg shadow-accent/20">LV</div>
+              <img src={logoImg} alt="Luxury Vault" className="h-16 w-16 rounded-2xl object-contain shadow-lg shadow-accent/20" />
               <div>
                 <h1 className="text-4xl font-bold tracking-tight">Luxury Vault</h1>
                 <p className="text-muted-foreground text-lg">{t("about.subtitle")}</p>
