@@ -18,6 +18,7 @@ import { TermsDialog } from "@/components/TermsDialog";
 import { MfaVerification } from "@/components/MfaVerification";
 import { recordLoginAttempt } from "@/utils/loginTracking";
 import heroImage from "@/assets/hero-collection.jpg";
+import logoImg from "@/assets/logo-transparent.png";
 
 export default function Auth() {
   const navigate = useNavigate();
