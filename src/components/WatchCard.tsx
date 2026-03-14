@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Watch as WatchIcon, Calendar, Eye, EyeOff, Trash2, RefreshCw, Info } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { logAccess } from "@/utils/accessLogging";
 import { useTranslation } from "react-i18next";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
@@ -102,6 +103,8 @@ export const WatchCard = ({ watch, totalDays, onDelete }: WatchCardProps) => {
       const { error } = await supabase.from("watches").delete().eq("id", watch.id);
 
       if (error) throw error;
+
+      logAccess('delete_item', '/collection', { brand: watch.brand, model: watch.model });
 
       toast({
         title: `${singularLabel} Deleted`,

@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Edit } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
+import { logAccess } from "@/utils/accessLogging";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import { WarrantyCardUpload } from "./WarrantyCardUpload";
@@ -282,6 +283,8 @@ export const EditWatchDialog = ({ watch, onSuccess }: { watch: Watch; onSuccess:
           if (specsError) throw specsError;
         }
       }
+
+      logAccess('edit_item', '/collection', { brand: data.brand, model: data.model });
 
       toast({
         title: "Success",
