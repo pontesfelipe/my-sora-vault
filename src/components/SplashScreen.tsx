@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import logoImg from "@/assets/logo.png";
+import logoImg from "@/assets/logo-transparent.png";
 
 interface SplashScreenProps {
   onComplete?: () => void;

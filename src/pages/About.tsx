@@ -2,7 +2,7 @@ import { AppLayout } from "@/components/AppLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Watch, Heart, Shield, Sparkles, Users, Globe, BarChart3 } from "lucide-react";
 import watchHero from "@/assets/watch-hero.jpg";
-import logoImg from "@/assets/logo.png";
+import logoImg from "@/assets/logo-transparent.png";
 import { useTranslation } from "react-i18next";
 
 export default function About() {
