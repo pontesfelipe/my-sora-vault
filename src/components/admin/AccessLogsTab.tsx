@@ -20,14 +20,54 @@ export function AccessLogsTab() {
   const { data: logs, isLoading, refetch } = useQuery({
     queryKey: ['access-logs', limit],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Fetch access_logs
+      const { data: accessData, error: accessError } = await supabase
         .from('access_logs')
         .select('*')
         .order('created_at', { ascending: false })
         .limit(limit);
 
-      if (error) throw error;
-      return data;
+      if (accessError) throw accessError;
+
+      // Also fetch login_history for historical auth events
+      const { data: loginData, error: loginError } = await supabase
+        .from('login_history')
+        .select('*')
+        .order('login_at', { ascending: false })
+        .limit(limit);
+
+      // Merge login_history entries that aren't already in access_logs
+      const accessTimestamps = new Set(accessData?.map(a => a.created_at) || []);
+      const mergedLoginEntries = (loginData || [])
+        .filter(lh => !accessTimestamps.has(lh.login_at))
+        .map(lh => ({
+          id: lh.id,
+          user_id: lh.user_id,
+          user_email: null as string | null,
+          action: lh.success ? 'login' : 'login_failed',
+          page: '/auth',
+          details: { source: 'login_history', browser: lh.browser, os: lh.os, device: lh.device_type, country: lh.country, failure_reason: lh.failure_reason },
+          ip_address: lh.ip_address,
+          user_agent: lh.user_agent,
+          created_at: lh.login_at,
+        }));
+
+      // If we have login entries without emails, try to resolve them
+      if (mergedLoginEntries.length > 0) {
+        const userIds = [...new Set(mergedLoginEntries.map(e => e.user_id))];
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('id, email')
+          .in('id', userIds);
+        const emailMap = new Map(profiles?.map(p => [p.id, p.email]) || []);
+        mergedLoginEntries.forEach(e => {
+          e.user_email = emailMap.get(e.user_id) || null;
+        });
+      }
+
+      const combined = [...(accessData || []), ...mergedLoginEntries];
+      combined.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      return combined.slice(0, limit);
     },
   });
 
