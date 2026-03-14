@@ -46,7 +46,7 @@ export function AppNavigation() {
       <SidebarContent className="flex flex-col h-full">
         <SidebarGroup className="flex-1">
           <div className={`mb-6 ${open ? "px-4" : "px-2"} pt-6 transition-all duration-200 flex items-center gap-2`}>
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-accentSubtle text-xs font-semibold text-accent">LV</div>
+            <img src={logoImg} alt="Luxury Vault" className="h-8 w-8 rounded-xl object-contain" />
             {open && (
               <div>
                 <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-textSoft">Luxury Vault</div>
