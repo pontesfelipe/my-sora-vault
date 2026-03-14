@@ -11,6 +11,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Plus, Search, Loader2, CalendarIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { logAccess } from "@/utils/accessLogging";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import { format } from "date-fns";
