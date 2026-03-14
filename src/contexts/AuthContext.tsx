@@ -1,8 +1,9 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, useRef, ReactNode } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { syncLanguageFromDB } from "@/i18n/config";
 import { useNavigate } from "react-router-dom";
+import { logAccess } from "@/utils/accessLogging";
 
 interface AuthContextType {
   user: User | null;
@@ -20,6 +21,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
 
+  const hasLoggedSignIn = useRef(false);
+
   useEffect(() => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -27,6 +30,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setSession(session);
         setUser(session?.user ?? null);
         
+        // Log sign-in and sign-out events
+        if (event === 'SIGNED_IN' && session?.user && !hasLoggedSignIn.current) {
+          hasLoggedSignIn.current = true;
+          setTimeout(() => {
+            logAccess('login', '/auth', { method: 'password' });
+          }, 0);
+        }
+        if (event === 'SIGNED_OUT') {
+          hasLoggedSignIn.current = false;
+          logAccess('logout', window.location.pathname);
+        }
+
         // Check admin status when session changes
         if (session?.user) {
           setTimeout(() => {
