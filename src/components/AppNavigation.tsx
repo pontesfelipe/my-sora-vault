@@ -1,4 +1,5 @@
 import { Home, Users, User, Watch, BookHeart, Shield, Settings, HelpCircle, Info, Lightbulb, Bot, ClipboardList, BarChart3 } from "lucide-react";
+import logoImg from "@/assets/logo.png";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
